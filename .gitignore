@@ -1,0 +1,52 @@
+# Project docs / notes
+notes.md
+ideas.py
+
+# Render outputs & previews
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ppm
+*.mp4
+prewiew.*
+
+# Generated assets / animations
+/images/
+anim_light/
+skyboxes/
+frames/
+output/
+renders/
+
+stls/
+
+# Logs / profiling
+*.log
+*.out
+*.err
+
+# Python cache / build
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.dll
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE configs
+.vscode/
+.idea/
+
+#OS
+.DS_Store
+Thumbs.db
