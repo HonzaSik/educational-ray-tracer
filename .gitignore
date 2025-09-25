@@ -3,7 +3,7 @@ notes.md
 ideas.py
 
 # Render outputs & previews
-*.png
+/*.png
 *.jpg
 *.jpeg
 *.gif
