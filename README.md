@@ -1,5 +1,7 @@
 # Educational Ray Tracer
 
+Project in development ...
+
 Table of Contents
 - [Overview](#overview)
 - [Features](#features)
@@ -10,10 +12,10 @@ Table of Contents
 
 
 ## Overview
-todo
+- A simple educational ray tracer implemented in Python. Focused on clarity and simplicity rather than performance.
 
 ## Features
-todo
+- Ray tracing basics implemented in Python
 
 ## Examples
 Image 1:
@@ -33,11 +35,7 @@ Skybox in progress
 Image 5:
 ![Image 4](docs/examples/image5.png)
 
-## Usage
-todo
-
-
-## Links
+## More about ray tracing
 More literature and resources on ray tracing to expand your knowledge:
 
 basics
