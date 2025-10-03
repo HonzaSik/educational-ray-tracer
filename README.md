@@ -27,7 +27,11 @@ Image 3:
 Resolution 1920x1080, 6 samples per pixel, max depth 7, rendering time 15 minutes macbook M1
 
 Image 4:
-![Image 4](examples/image4.png)
+![Image 4](examples/image5.png)
+Skybox in progress
+
+Image 5:
+![Image 4](examples/image5.png)
 
 ## Usage
 todo

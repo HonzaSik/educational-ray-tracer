@@ -11,6 +11,11 @@ class Vec3:
     y: float
     z: float
 
+    def __iter__(self):
+        yield self.x
+        yield self.y
+        yield self.z
+
     # ---- unary ----
     def __neg__(self) -> "Vec3":
         return Vec3(-self.x, -self.y, -self.z)
@@ -58,6 +63,13 @@ class Vec3:
             return Vec3(self.x / o, self.y / o, self.z / o)
         return NotImplemented
 
+    def __rtruediv__(self, o: "Vec3 | _Scalar") -> "Vec3":
+        if isinstance(o, Vec3):
+            return Vec3(o.x / self.x, o.y / self.y, o.z / self.z)
+        if isinstance(o, _Scalar):
+            return Vec3(o / self.x, o / self.y, o / self.z)
+        return NotImplemented
+
     # ---- vector ops ----
     def dot(self, o: "Vec3") -> float:
         return self.x * o.x + self.y * o.y + self.z * o.z
@@ -75,3 +87,14 @@ class Vec3:
     def normalize(self) -> "Vec3":
         n = self.norm()
         return self / n if n > 0 else Vec3(0.0, 0.0, 0.0)
+
+    def interpolate_vec3(self: Vec3, b: Vec3, t: float) -> Vec3:
+        """
+        Linear interpolation between two Vec3 by factor t in [0, 1].
+        :param self: point a (Vec3)
+        :param b: point b (Vec3)
+        :param t: interpolation factor
+        :return: interpolated Vec3
+        """
+        return self * (1.0 - t) + b * t
+
