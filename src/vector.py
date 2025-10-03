@@ -1,4 +1,4 @@
-from vec3 import Vec3
+from .vec3 import Vec3
 
 
 class Vector(Vec3):

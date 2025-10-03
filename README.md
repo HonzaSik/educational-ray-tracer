@@ -17,21 +17,21 @@ todo
 
 ## Examples
 Image 1:
-![Image 1](examples/image1.png)
+![Image 1](docs/examples/image1.png)
 
 Image 2:
-![Image 2](examples/image2.png)
+![Image 2](docs/examples/image2.png)
 
 Image 3:
-![Image 3](examples/image3.png)
+![Image 3](docs/examples/image3.png)
 Resolution 1920x1080, 6 samples per pixel, max depth 7, rendering time 15 minutes macbook M1
 
 Image 4:
-![Image 4](examples/image5.png)
+![Image 4](docs/examples/image5.png)
 Skybox in progress
 
 Image 5:
-![Image 4](examples/image5.png)
+![Image 4](docs/examples/image5.png)
 
 ## Usage
 todo
@@ -53,23 +53,6 @@ other implementations
 path tracing
 - [Physically Based Rendering: From Theory to Implementation (book)](https://www.pbr-book.org/)
 - [Ray Tracing in One Weekend (book)](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
-
-# Commit 
-Initial pre-commit
-
-#### Pre-commit setup
-To set up pre-commit hooks, run the following command in your terminal:
-```
-python3 -m venv .venv
-source .venv/bin/activate
-or
-source .venv/bin/activate.fish
-
-
-pip install pre-commit
-pre-commit install
-pre-commit run --all-files
-```
 
 # License
 MIT License
