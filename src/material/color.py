@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Iterator
-from .vec3 import Vec3
+from src.core.math.vec3 import Vec3
 
 
 def _clamp01(x: float) -> float:
