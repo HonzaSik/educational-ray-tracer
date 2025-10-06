@@ -84,6 +84,13 @@ class Vec3:
     def norm(self) -> float:
         return math.sqrt(self.dot(self))
 
+    def clamp01(self) -> "Vec3":
+        return Vec3(
+            0.0 if self.x < 0.0 else 1.0 if self.x > 1.0 else self.x,
+            0.0 if self.y < 0.0 else 1.0 if self.y > 1.0 else self.y,
+            0.0 if self.z < 0.0 else 1.0 if self.z > 1.0 else self.z,
+        )
+
     def normalize(self) -> "Vec3":
         n = self.norm()
         return self / n if n > 0 else Vec3(0.0, 0.0, 0.0)

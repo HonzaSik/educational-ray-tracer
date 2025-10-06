@@ -22,6 +22,7 @@ from src.io.pickle_manager import PickleManager
 # light modules
 from src.light.light import PointLight, AmbientLight, Light
 
+from src.io.object_libraries import LightLibrary, MaterialLibrary, ColorLibrary
 
 
 
@@ -30,5 +31,6 @@ __all__ = [
     "Vec3", "Vector", "Vertex",
     "Color", "Material",
     "convert_ppm_to_png", "write_ppm", "PickleManager",
-    "PointLight", "AmbientLight", "Light"
+    "PointLight", "AmbientLight", "Light",
+    "LightLibrary", "MaterialLibrary", "ColorLibrary"
 ]

@@ -2,16 +2,17 @@ from pathlib import Path
 from pickle import dump, load
 from pprint import pprint
 from typing import Any
-from dataclasses import dataclass
-#import modules for type validation
-from src.light.light import Light
+from dataclasses import dataclass, field
 
+# type imports
+from src.light.light import Light
+from src.material.material import Material
+from src.io.object_libraries import ColorLibrary, LightLibrary, MaterialLibrary
 
 class PickleManager:
     """
-    Manages saving and loading objects using pickle in a specified directory. With optional verbose mode (prints actions) .set_verbose(True/False). And object validation.
+    Manages saving and loading objects using pickle in a specified directory. Supports optional verbose mode (prints actions) and object validation. Can save/load lists or libraries (dicts) of Lights, Materials, and Colors.
     """
-    #todo objects validation
 
     def __init__(self, directory: str | Path = "./", verbose: bool = False):
         self.directory: Path = Path(directory)
@@ -19,10 +20,6 @@ class PickleManager:
         self.__post_init__()
 
     def __post_init__(self):
-        self.directory.mkdir(parents=True, exist_ok=True)
-
-    def set_directory(self, directory: str | Path) -> None:
-        self.directory = Path(directory)
         self.directory.mkdir(parents=True, exist_ok=True)
 
     def set_verbose(self, verbose: bool) -> None:
@@ -46,9 +43,23 @@ class PickleManager:
             pprint(obj)
         return obj
 
-    def save_lights(self, lights: list[Light]) -> Path:
-        return self.save(lights, "lights.pkl")
+    def save_color_library(self, color_lib: ColorLibrary) -> None:
+        self.save(color_lib.colors, "colors.pkl")
 
-    def load_lights(self) -> list[Light]:
-        return self.load("lights.pkl")
+    def load_color_library(self) -> ColorLibrary:
+        colors = self.load("colors.pkl")
+        return ColorLibrary(colors)
 
+    def save_light_library(self, light_lib: LightLibrary) -> None:
+        self.save(light_lib.lights, "lights.pkl")
+
+    def load_light_library(self) -> LightLibrary:
+        lights = self.load("lights.pkl")
+        return LightLibrary(lights)
+
+    def save_material_library(self, material_lib: MaterialLibrary) -> None:
+        self.save(material_lib.materials, "materials.pkl")
+
+    def load_material_library(self) -> MaterialLibrary:
+        materials = self.load("materials.pkl")
+        return MaterialLibrary(materials)

@@ -46,10 +46,19 @@ class Color(Vec3):
                 _clamp255(int(self.b * 255)))
 
     @classmethod
-    def from_hdr(cls, SKYBOX_HDR, direction) -> Color:
-        # Placeholder for sampling an HDR environment map
-        return cls(0.5, 0.5, 0.5)  # TODO implement properly
+    def background_color(cls, direction, skybox=None) -> Color:
+        if skybox is not None:
+            return Color.from_hdr(skybox, direction)
+        #normalize direction
+        direction = direction.normalize()
 
+        t = 0.5 * (direction.y + 1.0)
+        return (1.0 - t) * Color.White + t * Color.custom_rgb(100, 100, 255)
+
+    @classmethod
+    def from_hdr(cls, skybox, direction) -> Color:
+        # Placeholder for sampling an HDR environment map
+        return cls(0.5, 0.5, 0.8)  # TODO implement properly
 
 # --- Named Presets ---
 Color.Black = Color(0.0, 0.0, 0.0)

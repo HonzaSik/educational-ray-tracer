@@ -9,6 +9,7 @@ class Material:
     mirror - 0 <= mirror <= 1
     albedo - base color of the material
     """
+    name: str = "Default"
     base_color: Color = field(default_factory=lambda: Color.custom_rgb(255,255,255))
     reflectivity: float = 0.0 # 0=matte, 1=perfect mirror
     spec_color: Color = field(default_factory=lambda: Color.custom_rgb(255,255,255))
@@ -20,16 +21,20 @@ class Material:
 
 
     @classmethod
-    def make(cls, *, base_color: Color, spec_color: Color = Color.custom_rgb(255,255,255), **kw) -> Material:
+    def make(cls, *, name: str, base_color: Color, spec_color: Color = Color.custom_rgb(255,255,255), **kw) -> Material:
         """
         Create a Material instance with the given base color, specular color, and additional properties.
 
+        :param name: The name of the material.
         :param base_color: The base color of the material.
         :param spec_color: The specular color of the material (default is Color.White).
         :param kw: Additional keyword arguments for other material properties.
         :return: A Material instance.
         """
-        return cls(base_color=base_color, spec_color=spec_color, **kw)
+        return cls(name=name, base_color=base_color, spec_color=spec_color, **kw)
+
+    def get_material_name(self) -> str:
+        return self.name
 
     def with_color(self, base_color: Color) -> Material:
         return replace(self, base_color=base_color)
