@@ -14,11 +14,14 @@ from src.core.math.vertex import Vertex
 # material modules
 from src.material.color import Color
 
-# io modules with pickle
+# io modules
 from src.io.image_helper import convert_ppm_to_png, write_ppm
+from src.io.pickle_io import PickleManager
+
 
 # light modules
 from src.light.light import PointLight, AmbientLight, Light
+
 
 
 
@@ -26,6 +29,6 @@ __all__ = [
     "Resolution",
     "Vec3", "Vector", "Vertex",
     "Color",
-    "convert_ppm_to_png", "write_ppm",
+    "convert_ppm_to_png", "write_ppm", "PickleManager",
     "PointLight", "AmbientLight", "Light"
 ]

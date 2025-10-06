@@ -9,6 +9,7 @@ ideas.py
 *.gif
 *.ppm
 *.mp4
+*.pkl
 prewiew.*
 
 # Generated assets / animations
@@ -19,6 +20,7 @@ frames/
 output/
 renders/
 notebooks/images/
+notebooks/pickle_data/
 
 stls/
 

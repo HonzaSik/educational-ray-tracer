@@ -1,0 +1,54 @@
+from pathlib import Path
+from pickle import dump, load
+from pprint import pprint
+from typing import Any
+from dataclasses import dataclass
+#import modules for type validation
+from src.light.light import Light
+
+
+class PickleManager:
+    """
+    Manages saving and loading objects using pickle in a specified directory. With optional verbose mode (prints actions) .set_verbose(True/False). And object validation.
+    """
+    #todo objects validation
+
+    def __init__(self, directory: str | Path = "./", verbose: bool = False):
+        self.directory: Path = Path(directory)
+        self.verbose: bool = verbose
+        self.__post_init__()
+
+    def __post_init__(self):
+        self.directory.mkdir(parents=True, exist_ok=True)
+
+    def set_directory(self, directory: str | Path) -> None:
+        self.directory = Path(directory)
+        self.directory.mkdir(parents=True, exist_ok=True)
+
+    def set_verbose(self, verbose: bool) -> None:
+        self.verbose = verbose
+
+    def save(self, data: Any, filename: str | Path) -> Path:
+        path = self.directory / Path(str(filename))
+        with open(path, "wb") as f:
+            dump(data, f)
+        if self.verbose:
+            print(f"Saved object to {path}")
+            pprint(data)
+        return path
+
+    def load(self, filename: str | Path) -> Any:
+        path = self.directory / Path(str(filename))
+        with open(path, "rb") as f:
+            obj = load(f)
+        if self.verbose:
+            print(f"Loaded object from {path}")
+            pprint(obj)
+        return obj
+
+    def save_lights(self, lights: list[Light]) -> Path:
+        return self.save(lights, "lights.pkl")
+
+    def load_lights(self) -> list[Light]:
+        return self.load("lights.pkl")
+
