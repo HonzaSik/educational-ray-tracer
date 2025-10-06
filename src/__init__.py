@@ -18,7 +18,7 @@ from src.material.color import Color
 from src.io.image_helper import convert_ppm_to_png, write_ppm
 
 # light modules
-from src.light.light import Light
+from src.light.light import PointLight, AmbientLight, Light
 
 
 
@@ -27,5 +27,5 @@ __all__ = [
     "Vec3", "Vector", "Vertex",
     "Color",
     "convert_ppm_to_png", "write_ppm",
-    "Light",
+    "PointLight", "AmbientLight", "Light"
 ]
