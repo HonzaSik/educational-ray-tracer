@@ -16,7 +16,7 @@ from src.material.color import Color
 
 # io modules
 from src.io.image_helper import convert_ppm_to_png, write_ppm
-from src.io.pickle_io import PickleManager
+from src.io.pickle_manager import PickleManager
 
 
 # light modules
