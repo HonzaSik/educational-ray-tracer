@@ -1,4 +1,8 @@
+from pathlib import Path
+
+from IPython.core.display_functions import display
 from PIL import Image as PILImage
+from IPython.display import Image
 
 # helper functions for image processing
 
@@ -13,6 +17,7 @@ def convert_ppm_to_png(ppm_path, png_path):
         img = PILImage.open(ppm_file)
         img.save(png_path, "PNG")
 
+
 def write_ppm(filename, pixels, w, h):
     """
     Write a PPM image file.
@@ -26,3 +31,13 @@ def write_ppm(filename, pixels, w, h):
         f.write(f"P3\n{w} {h}\n255\n")
         for (r, g, b) in pixels:
             f.write(f"{r} {g} {b}\n")
+
+
+def ipynb_display_image(path: str = "./images/phong.png") -> None:
+    """
+    Display the rendered image (e.g., in a Jupyter notebook).
+    """
+    if not Path(path).exists():
+        raise FileNotFoundError(f"Image file {path} not found.")
+
+    display(Image(filename=path))

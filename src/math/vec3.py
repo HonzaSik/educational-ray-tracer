@@ -105,3 +105,16 @@ class Vec3:
         """
         return self * (1.0 - t) + b * t
 
+    def orthonormal_basis(self) -> tuple["Vec3", "Vec3", "Vec3"]:
+        """
+        Generate an orthonormal basis (tangent, bitangent, normal) from a given normal vector.
+        :param n: normal vector (must be normalized)
+        :return: tuple of (tangent, bitangent, normal)
+        """
+        n = self.normalize()  # ensure normal is normalized
+        if abs(n.x) > abs(n.z):
+            tangent = Vec3(-n.y, n.x, 0.0).normalize()
+        else:
+            tangent = Vec3(0.0, -n.z, n.y).normalize()
+        bitangent = n.cross(tangent)
+        return tangent, bitangent, n

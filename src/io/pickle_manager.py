@@ -2,12 +2,11 @@ from pathlib import Path
 from pickle import dump, load
 from pprint import pprint
 from typing import Any
-from dataclasses import dataclass, field
+from src.scene import Scene
 
 # type imports
-from src.light.light import Light
-from src.material.material import Material
 from src.io.object_libraries import ColorLibrary, LightLibrary, MaterialLibrary
+from src.geometry.world import World
 
 class PickleManager:
     """
@@ -63,3 +62,17 @@ class PickleManager:
     def load_material_library(self) -> MaterialLibrary:
         materials = self.load("materials.pkl")
         return MaterialLibrary(materials)
+
+    def save_world(self, world: World) -> None:
+        self.save(world, "world.pkl")
+
+    def load_world(self) -> World:
+        world = self.load("world.pkl")
+        return world
+
+    def save_scene(self, scene: Scene, scene_name: str = "default") -> None:
+        self.save(scene, f"scene_{scene_name}.pkl")
+
+    def load_scene(self, scene_name: str = "default") -> Scene:
+        scene = self.load(f"scene_{scene_name}.pkl")
+        return scene
