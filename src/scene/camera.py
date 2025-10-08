@@ -76,3 +76,7 @@ class Camera:
         """
         self.fov *= factor
         self.__post_init__()
+
+    def set_resolution(self, res) -> None:
+        self.resolution = res
+        self.__post_init__()
