@@ -106,7 +106,7 @@ class Scene:
         :param resolution: Resolution to set
         :return: None
         """
-        self.camera.resolution = resolution
+        self.camera.set_resolution(resolution)
         self.camera.__post_init__()
 
     def move_camera_to(self, position: Vertex) -> None:

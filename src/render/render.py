@@ -16,9 +16,6 @@ from src.math import fresnel_schlick
 from src.shading.blinn_phong_shader import BlinnPhongShader
 from src.shading.model import ShadingModel
 
-
-
-
 def ray_color(
     ray: Ray,
     world: World,
@@ -151,9 +148,6 @@ def render(
 
     #camera setup
     res = cam.resolution
-
-    if specified_resolution is not None:
-        res = specified_resolution
 
     pixels = []
 
