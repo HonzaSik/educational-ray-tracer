@@ -53,3 +53,7 @@ ENV/
 #OS
 .DS_Store
 Thumbs.db
+
+# files
+notebooks/legacy.ipynb
+research.md
