@@ -55,5 +55,5 @@ ENV/
 Thumbs.db
 
 # files
-notebooks/legacy.ipynb
+stls/legacy.ipynb
 research.md
