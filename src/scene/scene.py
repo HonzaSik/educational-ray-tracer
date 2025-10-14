@@ -13,7 +13,6 @@ from src.io.resolution import Resolution
 from src.io.image_helper import write_ppm, convert_ppm_to_png
 from IPython.display import Image, display
 from time import time
-from src.material.color import Color
 
 from src.shading import BlinnPhongShader
 
@@ -162,7 +161,7 @@ class Scene:
         start_time = time()
         lights = self.get_point_lights()
         print(f"Rendering preview at resolution {self.camera.resolution} with FOV {self.camera.fov}")
-        p_px, p_w, p_h = render(samples_per_pixel=1, max_depth=1, cam=self.camera, world=self.world, lights=lights, specified_resolution=resolution, skybox=None)
+        p_px, p_w, p_h = render(samples_per_pixel=1, max_depth=1, cam=self.camera, world=self.world, lights=lights, skybox=None)
         write_ppm("./images/preview.ppm", p_px, p_w, p_h)
         convert_ppm_to_png("./images/preview.ppm", "./images/preview.png")
         print(f"Preview render took {time() - start_time:.2f} seconds")
@@ -190,7 +189,6 @@ class Scene:
             cam=self.camera,
             world=self.world,
             lights=lights,
-            specified_resolution=self.camera.resolution,
             skybox=self.skybox_path,
             shading_model=shader
         )
@@ -243,6 +241,5 @@ class Scene:
     @staticmethod
     def _ensure_images_dir(path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
-
 
 #todo test animations methods in the notebook and add more if needed

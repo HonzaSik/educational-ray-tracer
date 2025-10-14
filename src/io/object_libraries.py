@@ -59,7 +59,7 @@ class LightLibrary:
         Get all point lights from the library.
         :return: List of Point Lights
         """
-        return [light for light in self.lights.values() if isinstance(light, Light)]
+        return [light for light in self.lights.values() if isinstance(light.type, LightType) and light.type == LightType.POINT]
 
     def get_ambient_light(self) -> Light | None:
         """

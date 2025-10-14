@@ -8,7 +8,6 @@ from src.scene.camera import Camera
 from src.math import Vector
 from random import random
 from typing import Tuple
-from src.io.resolution import Resolution
 from tqdm.notebook import tqdm #todo move this away so that render does not depend on tqdm only when in notebook
 from src.math import reflect, refract
 from src.math.helpers import clamp_float_01
@@ -119,7 +118,6 @@ def render(
             lights: list[Light] = None,
             samples_per_pixel: int = 10,
             max_depth: int = 5,
-            specified_resolution: Resolution = None,
             skybox: str | None = None,
             shading_model: ShadingModel | None = None,
         ) -> Tuple[list[Tuple[int, int, int]], int, int]:
@@ -128,7 +126,6 @@ def render(
     :param lights:
     :param shading_model: shading model to use (default is Blinn-Phong)
     :param skybox: path to an HDR image for environment lighting
-    :param specified_resolution: prefered resolution for rendering (Overrides camera resolution if provided)
     :param lights: list of Light sources in the scene
     :param world:
     :param cam:

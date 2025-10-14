@@ -11,7 +11,7 @@ class Plane(Hittable):
     """
     Plane in 3D space defined by a point, normal, and color.
     """
-    plane_point: Vertex # a point on the plane
+    point: Vertex # a point on the plane
     normal: Vector      # normal vector of the plane (should be normalized)
     material: Material # material properties
 
@@ -30,7 +30,7 @@ class Plane(Hittable):
         if abs(denom) < 1e-6:
             return None # Ray is parallel to the plane
 
-        t = (self.plane_point - ray.origin).dot(self.normal) / denom
+        t = (self.point - ray.origin).dot(self.normal) / denom
         if t < t_min or t > t_max:
             return None # Intersection is out of bounds
 
