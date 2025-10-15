@@ -44,9 +44,9 @@ class BlinnPhongShader(ShadingModel, ABC):
             return Color.custom_rgb(0, 0, 0)
 
         # Normalize vectors
-        n = hit.normal.normalize()
-        l = light_direction.normalize()
-        v = view_dir.normalize()
+        n = hit.normal.normalize_ip()
+        l = light_direction.normalize_ip()
+        v = view_dir.normalize_ip()
 
         diffuse = self._lambert_diffuse(hit.material, n, l)
         specular = self._blinn_specular(hit.material, n, l, v)
@@ -91,7 +91,7 @@ class BlinnPhongShader(ShadingModel, ABC):
         """
         Classic Blinn–Phong specular: (n·h)^shininess with optional Fresnel.
         """
-        h = (l + v).normalize()
+        h = (l + v).normalize_ip()
         ndoth = max(0.0, n.dot(h))
         shininess = max(2.0, getattr(m, "shininess", 32.0))
 

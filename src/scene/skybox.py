@@ -154,7 +154,7 @@ class SkyboxHDR:
         :param direction: Direction vector
         :return: (u, v) coordinates in [0, 1] range
         """
-        direction = direction.normalize()
+        direction = direction.normalize_ip()
         x,y,z = direction.x, direction.y, direction.z
 
         # apply yaw rotation around Y axis to direction vector sy = sin(yaw), cy = cos(yaw)
@@ -177,7 +177,7 @@ class SkyboxHDR:
 
     def color_from_dir(self, d: Vec3) -> Color:
         # get (u, v) coordinates from direction
-        u, v = self._dir_to_uv(d.normalize())
+        u, v = self._dir_to_uv(d.normalize_ip())
 
         # float pixel coordinates
         float_x = u * (self.w - 1)

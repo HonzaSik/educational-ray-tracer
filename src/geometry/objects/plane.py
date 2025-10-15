@@ -16,7 +16,7 @@ class Plane(Hittable):
     material: Material # material properties
 
     def __post_init__(self):
-        self.normal = self.normal.normalize()
+        self.normal = self.normal.normalize_ip()
 
     def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> HitPoint | None:
         """

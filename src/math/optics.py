@@ -22,8 +22,8 @@ def refract(v: Vector, n: Vector, ior_out: float, ior_in: float) -> Vector | Non
     :param ior_in: index of refraction of the medium ray is entering
     :return: refracted vector or None if total internal reflection occurs
     """
-    v = v.normalize()
-    n = n.normalize()
+    v = v.normalize_ip()
+    n = n.normalize_ip()
 
     eta = ior_out / ior_in # ratio of indices
     cos_i = -n.dot(v) # cosine of angle of incidence
@@ -39,7 +39,7 @@ def refract(v: Vector, n: Vector, ior_out: float, ior_in: float) -> Vector | Non
 
     cos_t = sqrt(max(0.0, 1.0 - sin2_t)) # cosine of angle of refraction
     t = v * eta + n * (eta * cos_i - cos_t)
-    return t.normalize()
+    return t.normalize_ip()
 
 def fresnel_schlick(normal: Vector, view_dir: Vector, f0: Color) -> Color:
     """

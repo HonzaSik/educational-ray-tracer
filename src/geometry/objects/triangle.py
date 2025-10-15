@@ -72,7 +72,7 @@ class Triangle(Hittable, ABC):
         # Calculate intersection point in 3D space
         hit_point = ray.point_at(t)
         # Calculate normal using cross product of edges
-        normal = self.edge_1.cross(self.edge_2).normalize()
+        normal = self.edge_1.cross(self.edge_2).normalize_ip()
         if ray.direction.dot(normal) > 0.0:
             normal = -normal
 

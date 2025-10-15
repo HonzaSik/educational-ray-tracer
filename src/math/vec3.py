@@ -103,7 +103,7 @@ class Vec3:
 
     def normalize_ip(self) -> Vec3:
         """
-        Safely normalize this vector in-place.
+        Safely normalize this vector in-place so that it has length 1 and no allocation is done.
         If the vector has zero length, sets it to zero vector.
         :return:
         """
