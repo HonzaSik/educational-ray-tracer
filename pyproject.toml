@@ -1,23 +1,20 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "educational-ray-tracer"
 version = "0"
-description = "Educational ray tracer package written in Python for learning purposes."
-authors = [{ name = "Jan Šik"}]
+description = "Educational Ray Tracer"
+readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-dir]
-"" = "src"
-
+authors = [{ name = "Jan Sik" }]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
+
+[tool.setuptools]
+packages = ["src"]

@@ -8,7 +8,7 @@ class MaterialType(Enum):
     PBR = 2
     CUSTOM = 3
 
-def create_phong_material(name: str, base_color: Color, spec_color: Color = Color.custom_rgb(255,255,255), shininess: float = 32.0, reflectivity: float = 0.0, transparency: float = 0.0, ior: float = 1.5) -> Material:
+def create_phong_material(name: str, base_color: Color, spec_color: Color = Color.custom_rgb(255,255,255), shininess: float = 32.0, reflectivity: float = 0.0, transparency: float = 0.0, ior: float = 1.5, emission: Color = Color(0.0, 0.0, 0.0)) -> Material:
     return Material(
         name=name,
         material_type=MaterialType.PHONG,
@@ -17,8 +17,28 @@ def create_phong_material(name: str, base_color: Color, spec_color: Color = Colo
         shininess=shininess,
         reflectivity=reflectivity,
         transparency=transparency,
-        ior=ior
+        ior=ior,
+        emission=emission
     )
+
+def create_pbr_material(
+    name: str,
+    base_color: Color,
+    metallic: float = 0.0,
+    roughness: float = 0.5,
+    ior: float = 1.5,
+    emission: Color = Color(0.0, 0.0, 0.0)
+) -> Material:
+    return Material(
+        name=name,
+        material_type=MaterialType.PBR,
+        base_color=base_color,
+        metallic=metallic,
+        roughness=roughness,
+        ior=ior,
+        emission=emission,
+    )
+
 
 @dataclass
 class Material:

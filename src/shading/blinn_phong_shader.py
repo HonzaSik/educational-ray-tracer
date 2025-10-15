@@ -1,8 +1,8 @@
 # src/shading/blinn_phong_shader.py
 from __future__ import annotations
 from abc import ABC
-from typing import Iterable, Optional
-from .model import ShadingModel
+from typing import Optional
+from .shader_model import ShadingModel
 from src.geometry.hit_point import HitPoint
 from src.geometry.world import World
 from src.material.color import Color, clamp_color255
@@ -104,6 +104,3 @@ class BlinnPhongShader(ShadingModel, ABC):
             spec = spec * F
 
         return spec
-
-
-

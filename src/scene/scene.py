@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.render.render import render
+from src.render import render, render_multithreaded
 from src.scene.camera import Camera
 from src.geometry.world import World
 from src.scene.light import Light, LightType
@@ -242,4 +242,43 @@ class Scene:
     def _ensure_images_dir(path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
 
-#todo test animations methods in the notebook and add more if needed
+    def render_multithreaded(self, samples_per_pixel: int = 10, max_depth: int = 5, shading_model=None, image_png_path: str = "./images/fast_render.png") -> str:
+        """
+        Render the scene using ray tracing and save PNG (and an intermediate PPM).
+        Returns the PNG path as a string.
+        """
+        png_path = Path(image_png_path)
+        ppm_path = png_path.with_suffix(".ppm")
+        self._ensure_images_dir(png_path)
+
+        skybox = self.skybox_path
+        print(f"Using skybox: {skybox}")
+
+        lights = self.get_point_lights()
+
+        print(f"Rendering fast at resolution {self.camera.resolution} with FOV {self.camera.fov} and samples_per_pixel={samples_per_pixel}, max_depth={max_depth}")
+        print(f"No progress bar in multithreaded mode - switch to other render method for that if needed - this is supposed to be fast!")
+
+        if shading_model is None:
+            shader = BlinnPhongShader()
+        else:
+            shader = shading_model
+
+        # call your renderer
+        pixels, w, h = render_multithreaded(
+            samples_per_pixel=samples_per_pixel,
+            max_depth=max_depth,
+            camera=self.camera,
+            world=self.world,
+            lights=lights,
+            skybox=skybox,
+            shading_model=shader
+        )
+
+        # save to disk
+        write_ppm(str(ppm_path), pixels, w, h)
+
+        convert_ppm_to_png(str(ppm_path), str(png_path))
+        print(f"Fast render saved to {png_path}")
+
+        return str(png_path)

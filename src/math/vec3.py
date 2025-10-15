@@ -1,120 +1,180 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import math
-import numpy as _np
 
-_Scalar = (int, float, _np.floating)
+Number = float | int
 
-@dataclass
+@dataclass(slots=True)
 class Vec3:
+    """
+    3D vector with basic operations.
+    Can be used for points, directions, colors, etc.
+    3 floats, no allocations except for operations that return new Vec3.
+    """
     x: float
     y: float
     z: float
 
-    def __iter__(self):
-        yield self.x
-        yield self.y
-        yield self.z
-
-    # ---- unary ----
-    def __neg__(self) -> "Vec3":
+    # basic ops (return new objects)
+    def __neg__(self) -> Vec3:
         return Vec3(-self.x, -self.y, -self.z)
 
-    # ---- arithmetic (vec <op> vec | scalar) ----
-    def __add__(self, o: "Vec3 | _Scalar") -> "Vec3":
-        if isinstance(o, Vec3):
-            return Vec3(self.x + o.x, self.y + o.y, self.z + o.z)
-        if isinstance(o, _Scalar):
-            return Vec3(self.x + o, self.y + o, self.z + o)
-        return NotImplemented
+    def __add__(self, o: Vec3) -> Vec3:
+        return Vec3(self.x+o.x, self.y+o.y, self.z+o.z)
 
-    def __radd__(self, o: "Vec3 | _Scalar") -> "Vec3":
-        return self.__add__(o)
+    def __sub__(self, o: Vec3) -> Vec3:
+        return Vec3(self.x-o.x, self.y-o.y, self.z-o.z)
 
-    def __sub__(self, o: "Vec3 | _Scalar") -> "Vec3":
-        if isinstance(o, Vec3):
-            return Vec3(self.x - o.x, self.y - o.y, self.z - o.z)
-        if isinstance(o, _Scalar):
-            return Vec3(self.x - o, self.y - o, self.z - o)
-        return NotImplemented
+    def __mul__(self, s: Number) -> Vec3:
+        return Vec3(self.x*s, self.y*s, self.z*s)
 
-    def __rsub__(self, o: "Vec3 | _Scalar") -> "Vec3":
-        if isinstance(o, Vec3):
-            return Vec3(o.x - self.x, o.y - self.y, o.z - self.z)
-        if isinstance(o, _Scalar):
-            return Vec3(o - self.x, o - self.y, o - self.z)
-        return NotImplemented
+    __rmul__ = __mul__
 
-    def __mul__(self, o: "Vec3 | _Scalar") -> "Vec3":
-        # componentwise if Vec3, scalar if number
-        if isinstance(o, Vec3):
-            return Vec3(self.x * o.x, self.y * o.y, self.z * o.z)
-        if isinstance(o, _Scalar):
-            return Vec3(self.x * o, self.y * o, self.z * o)
-        return NotImplemented
+    def __truediv__(self, s: Number) -> Vec3:
+        inv = 1.0/float(s)
+        return Vec3(self.x*inv, self.y*inv, self.z*inv)
 
-    def __rmul__(self, o: "Vec3 | _Scalar") -> "Vec3":
-        return self.__mul__(o)
+    # in-place ops (modify self, return self)
+    def iadd(self, o: Vec3) -> Vec3:
+        self.x += o.x
+        self.y += o.y
+        self.z += o.z
+        return self
 
-    def __truediv__(self, o: "Vec3 | _Scalar") -> "Vec3":
-        if isinstance(o, Vec3):
-            return Vec3(self.x / o.x, self.y / o.y, self.z / o.z)
-        if isinstance(o, _Scalar):
-            return Vec3(self.x / o, self.y / o, self.z / o)
-        return NotImplemented
+    def isub(self, o: Vec3) -> Vec3:
+        self.x -= o.x
+        self.y -= o.y
+        self.z -= o.z
+        return self
 
-    def __rtruediv__(self, o: "Vec3 | _Scalar") -> "Vec3":
-        if isinstance(o, Vec3):
-            return Vec3(o.x / self.x, o.y / self.y, o.z / self.z)
-        if isinstance(o, _Scalar):
-            return Vec3(o / self.x, o / self.y, o / self.z)
-        return NotImplemented
+    def imul(self, s: Number) -> Vec3:
+        s = float(s)
+        self.x *= s
+        self.y *= s
+        self.z *= s
+        return self
 
-    # ---- vector ops ----
-    def dot(self, o: "Vec3") -> float:
-        return self.x * o.x + self.y * o.y + self.z * o.z
+    def idiv(self, s: Number) -> Vec3:
+        inv = 1.0/float(s)
+        self.x *= inv
+        self.y *= inv
+        self.z *= inv
+        return self
 
-    def cross(self, o: "Vec3") -> "Vec3":
+    # Hadamard products (component-wise multiplication)
+    def hadamard(self, o: Vec3) -> Vec3:
+        return Vec3(self.x*o.x, self.y*o.y, self.z*o.z)
+
+    def hadamard_ip(self, o: Vec3) -> Vec3:
+        self.x*=o.x
+        self.y*=o.y
+        self.z*=o.z
+        return self
+
+    # vector operations
+    def dot(self, o: Vec3) -> float:
+        return self.x*o.x + self.y*o.y + self.z*o.z
+
+    def cross(self, o: Vec3) -> Vec3:
         return Vec3(
-            self.y * o.z - self.z * o.y,
-            self.z * o.x - self.x * o.z,
-            self.x * o.y - self.y * o.x,
+            self.y*o.z - self.z*o.y,
+            self.z*o.x - self.x*o.z,
+            self.x*o.y - self.y*o.x
         )
 
+    # length and normalization
     def norm(self) -> float:
-        return math.sqrt(self.dot(self))
+        return math.sqrt(self.x*self.x + self.y*self.y + self.z*self.z)
 
-    def clamp01(self) -> "Vec3":
+    def normalize(self) -> Vec3:
+        """
+        Return a safely normalized copy of this vector.
+        If the vector has zero length, returns a zero vector.
+        0,0,0 -> 0,0,0
+        1,0,0 -> 1,0,0
+        1,1,1 -> 0.577,0.577,0.577
+        10,0,0 -> 1,0,0
+        :return:
+        """
+        n2 = self.x*self.x + self.y*self.y + self.z*self.z
+        if n2 == 0.0: return Vec3(0.0,0.0,0.0)
+        inv = 1.0 / math.sqrt(n2)
+        return Vec3(self.x*inv, self.y*inv, self.z*inv)
+
+    def normalize_ip(self) -> Vec3:
+        """
+        Safely normalize this vector in-place.
+        If the vector has zero length, sets it to zero vector.
+        :return:
+        """
+        n2 = self.x*self.x + self.y*self.y + self.z*self.z
+        if n2 == 0.0: self.x = self.y = self.z = 0.0
+        else:
+            inv = 1.0 / math.sqrt(n2)
+            self.x *= inv; self.y *= inv; self.z *= inv
+        return self
+
+    def clamp01(self) -> Vec3:
         return Vec3(
             0.0 if self.x < 0.0 else 1.0 if self.x > 1.0 else self.x,
             0.0 if self.y < 0.0 else 1.0 if self.y > 1.0 else self.y,
             0.0 if self.z < 0.0 else 1.0 if self.z > 1.0 else self.z,
         )
 
-    def normalize(self) -> "Vec3":
-        n = self.norm()
-        return self / n if n > 0 else Vec3(0.0, 0.0, 0.0)
+    def clamp01_ip(self) -> Vec3:
+        self.x = 0.0 if self.x < 0.0 else 1.0 if self.x > 1.0 else self.x
+        self.y = 0.0 if self.y < 0.0 else 1.0 if self.y > 1.0 else self.y
+        self.z = 0.0 if self.z < 0.0 else 1.0 if self.z > 1.0 else self.z
+        return self
 
-    def interpolate_vec3(self: Vec3, b: Vec3, t: float) -> Vec3:
+    def lerp(self, b: Vec3, t: float) -> Vec3:
         """
-        Linear interpolation between two Vec3 by factor t in [0, 1].
-        :param self: point a (Vec3)
-        :param b: point b (Vec3)
-        :param t: interpolation factor
-        :return: interpolated Vec3
+        Linear interpolation between this vector (a) and b by t in [0..1]
+        :param b: target vector
+        :param t: interpolation factor in [0..1]
+        :return: interpolated vector
         """
-        return self * (1.0 - t) + b * t
+        return Vec3(
+            self.x + (b.x - self.x) * t,
+            self.y + (b.y - self.y) * t,
+            self.z + (b.z - self.z) * t,
+        )
 
-    def orthonormal_basis(self) -> tuple["Vec3", "Vec3", "Vec3"]:
-        """
-        Generate an orthonormal basis (tangent, bitangent, normal) from a given normal vector.
-        :param n: normal vector (must be normalized)
-        :return: tuple of (tangent, bitangent, normal)
-        """
-        n = self.normalize()  # ensure normal is normalized
+    def orthonormal_basis(self) -> tuple[Vec3,Vec3,Vec3]:
+        n = self.normalize_ip()
         if abs(n.x) > abs(n.z):
-            tangent = Vec3(-n.y, n.x, 0.0).normalize()
+            t = Vec3(-n.y, n.x, 0.0).normalize_ip()
         else:
-            tangent = Vec3(0.0, -n.z, n.y).normalize()
-        bitangent = n.cross(tangent)
-        return tangent, bitangent, n
+            t = Vec3(0.0, -n.z, n.y).normalize_ip()
+        b = n.cross(t)
+        return t, b, n
+
+    def __repr__(self) -> str:
+        """
+        String representation
+        :return: str
+        """
+        return f"Vec3({self.x:.3f}, {self.y:.3f}, {self.z:.3f})"
+
+
+    def __radd__(self, o):
+        """
+        Add Vec3
+        :param o: Vec3
+        :return: Vec3
+        """
+        if isinstance(o, Vec3):
+            return Vec3(self.x + o.x, self.y + o.y, self.z + o.z)
+
+    def __mul__(self, o):
+        """
+        Multiply by scalar
+        :param o: scalar or Vec3
+        :return: Vec3
+        """
+        if isinstance(o, (int, float)):
+            return Vec3(self.x * o, self.y * o, self.z * o)
+        if isinstance(o, Vec3):
+            return Vec3(self.x * o.x, self.y * o.y, self.z * o.z)
+
+
