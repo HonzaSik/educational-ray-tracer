@@ -93,3 +93,14 @@ class Triangle(Hittable, ABC):
         self.v1 += offset
         self.v2 += offset
         self.__post_init__()
+
+
+    def random_point(self) -> Vertex:
+        import random
+        u = random.uniform(0, 1)
+        v = random.uniform(0, 1)
+        if u + v > 1:
+            u = 1 - u
+            v = 1 - v
+        point = self.v0 + (self.v1 - self.v0) * u + (self.v2 - self.v0) * v
+        return point

@@ -6,6 +6,7 @@ from src.geometry.hittable import Hittable
 from src.geometry.ray import Ray
 from src.geometry.hit_point import HitPoint
 from src.material import Material
+from src.math import Vector
 
 
 @dataclass
@@ -56,3 +57,23 @@ class Sphere(Hittable):
             normal = -normal
 
         return HitPoint(dist=root, point=hit_point, normal=normal, material=self.material, ray_dir=ray.direction)
+
+    def random_point(self) -> Vertex:
+        """
+        Generate a random point on the sphere's surface.
+        :return: Vertex on the sphere surface
+        """
+        import random
+        import math
+
+        u = random.uniform(0, 1)
+        v = random.uniform(0, 1)
+
+        theta = 2 * math.pi * u  # azimuthal angle
+        phi = math.acos(2 * v - 1)  # polar angle
+
+        x = self.radius * math.sin(phi) * math.cos(theta)
+        y = self.radius * math.sin(phi) * math.sin(theta)
+        z = self.radius * math.cos(phi)
+
+        return Vertex(self.center.x + x, self.center.y + y, self.center.z + z)

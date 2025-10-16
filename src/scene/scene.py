@@ -159,7 +159,7 @@ class Scene:
         :return: Path to the saved image
         """
         start_time = time()
-        lights = self.get_point_lights()
+        lights = self.get_all_lights()
         print(f"Rendering preview at resolution {self.camera.resolution} with FOV {self.camera.fov}")
         p_px, p_w, p_h = render(samples_per_pixel=1, max_depth=1, cam=self.camera, world=self.world, lights=lights, skybox=None)
         write_ppm("./images/preview.ppm", p_px, p_w, p_h)
@@ -178,7 +178,7 @@ class Scene:
         ppm_path = png_path.with_suffix(".ppm")
         self._ensure_images_dir(png_path)
 
-        lights = self.get_point_lights()
+        lights = self.get_all_lights()
 
         shader = BlinnPhongShader()
 
@@ -208,6 +208,13 @@ class Scene:
         """
         point_lights = [light for light in self.lights if isinstance(light, Light) and light.type == LightType.POINT]
         return point_lights
+
+    def get_all_lights(self) -> list[Light]:
+        """
+        Get all lights in the scene.
+        :return: List of all lights
+        """
+        return self.lights
 
 
     def get_ambient_light(self) -> Light | None:
@@ -254,7 +261,7 @@ class Scene:
         skybox = self.skybox_path
         print(f"Using skybox: {skybox}")
 
-        lights = self.get_point_lights()
+        lights = self.get_all_lights()
 
         print(f"Rendering fast at resolution {self.camera.resolution} with FOV {self.camera.fov} and samples_per_pixel={samples_per_pixel}, max_depth={max_depth}")
         print(f"No progress bar in multithreaded mode - switch to other render method for that if needed - this is supposed to be fast!")

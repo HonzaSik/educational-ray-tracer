@@ -50,3 +50,13 @@ class Square(Hittable, ABC):
         if hit1 and hit2:
             return hit1 if hit1.dist < hit2.dist else hit2
         return hit1 or hit2
+
+    def random_point(self) -> Vertex:
+        import random
+        u = random.uniform(0, 1)
+        v = random.uniform(0, 1)
+        if u + v > 1:
+            u = 1 - u
+            v = 1 - v
+        point = self.v0 + (self.v1 - self.v0) * u + (self.v3 - self.v0) * v
+        return point

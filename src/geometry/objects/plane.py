@@ -40,3 +40,13 @@ class Plane(Hittable):
             normal = -normal
 
         return HitPoint(dist=t, point=hit_point, normal=normal, material=self.material, ray_dir=ray.direction)
+
+    def random_point(self) -> Vertex:
+        import random
+        # Generate a random point on the plane within a certain range
+        # This is a simple implementation and may need to be adjusted based on specific requirements
+        d = random.uniform(-10, 10)
+        u = Vector(1, 0, 0) if abs(self.normal.x) < 0.9 else Vector(0, 1, 0)
+        v = self.normal.cross(u).normalize_ip()
+        u = v.cross(self.normal).normalize_ip()
+        return self.point + u * d + v * d

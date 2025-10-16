@@ -20,18 +20,16 @@ class BlinnPhongShader(ShadingModel, ABC):
     def __init__(
         self,
         use_fresnel: bool = True,
-        ambient_light: Optional[AmbientLight] = None,
     ) -> None:
         self.use_fresnel = use_fresnel
-        self.ambient_light = ambient_light
 
 
     def shade(self, hit: HitPoint, world: World, light: Light, view_dir: Vector) -> Color:
         """
         Shade a single light with shadows, attenuation, diffuse, and specular.
         """
-        if light.type == AmbientLight:
-            raise ValueError("AmbientLight should be handled in shade_multiple_lights")
+        if light.type == AmbientLight: # Ambient light is handled in shade_multiple_lights
+            return Color(0, 0, 0)
 
         light_direction, light_distance = light_dir_dist(hit, light)
 
@@ -43,6 +41,7 @@ class BlinnPhongShader(ShadingModel, ABC):
         if light_intensity <= 0.0:
             return Color.custom_rgb(0, 0, 0)
 
+
         # Normalize vectors
         n = hit.normal.normalize_ip()
         l = light_direction.normalize_ip()
@@ -53,28 +52,52 @@ class BlinnPhongShader(ShadingModel, ABC):
 
         return (diffuse + specular) * light_intensity
 
+
     def shade_multiple_lights(self, hit, world, lights, view_dir) -> Color:
-        m = hit.material
-        is_transmissive = getattr(m, "transparency", 0.0) > 0.0 and getattr(m, "ior", 1.0) > 1.0
+        material = hit.material
+        is_transmissive = getattr(material, "transparency", 0.0) > 0.0 and getattr(material, "ior", 1.0) > 1.0
 
         accum = Color(0, 0, 0)
 
+        emmiters = world.emitters()
+        hited_objects_color = []
+        hited = False
+
+        for emitter in emmiters:
+            for i in range(10):  # todo hardcoded for testing
+                emitter_point = emitter.random_point()
+                to_emitter = (emitter_point - hit.point)
+                light_distance = to_emitter.norm()
+
+                if light_distance < 1e-6:
+                    continue
+
+                # normalize direction
+                to_emitter.normalize_ip()
+
+                # shadow test
+                if not shadow_trace(hit, to_emitter, light_distance, world):
+                    hited = True
+                    # inverse square falloff
+                    falloff = 1.0 / (light_distance * light_distance)
+                    # accumulate color
+                    color = emitter.material.emission * material.base_color * falloff
+                    hited_objects_color.append(color)
+
+        if hited:
+            for obj in hited_objects_color:
+                accum += obj
 
         for light in lights:
-            if isinstance(light, AmbientLight):
-                if not is_transmissive:
-                    accum += m.base_color * light.intensity_at(hit.point)
+            if light.type == AmbientLight:
+                accum += light.intensity_at(hit.point) * material.base_color
             else:
-                if not is_transmissive:
-                    accum += self.shade(hit, world, light, view_dir)
+                accum += self.shade(hit, world, light, view_dir)
 
-        if self.ambient_light and not is_transmissive:
-            accum += m.base_color * self.ambient_light.intensity_at(hit.point)
-
-        accum += m.emission
+        accum += material.emission
 
         if is_transmissive:
-            accum += self._blinn_specular(m, hit.normal, -view_dir, view_dir)
+            accum += self._blinn_specular(material, hit.normal, -view_dir, view_dir)
 
         return clamp_color255(accum)
 

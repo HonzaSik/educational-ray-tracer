@@ -4,6 +4,7 @@ from typing import  Iterable
 from src.geometry.hittable import Hittable
 from .ray import Ray
 from .hit_point import HitPoint
+from src.math import Vertex
 
 
 class World(Hittable, ABC):
@@ -34,3 +35,14 @@ class World(Hittable, ABC):
 
     def hit(self, ray: Ray, t_min: float = 1e-3, t_max: float = float('inf')) -> HitPoint | None:
         return self.intersect(ray, t_min, t_max)
+
+    def emitters(self) -> Iterable[Hittable]:
+        for obj in self.objects:
+            material = getattr(obj, "material", None)
+            if material and getattr(material, "emission", None):
+                yield obj
+
+    def random_point(self) -> Vertex:
+        import random
+        obj = random.choice(self.objects)
+        return obj.random_point()

@@ -4,7 +4,7 @@ from src.geometry.world import World
 from src.material.color import Color, interpolate_color, clamp_color01
 from src.material.material import Material
 from src.scene.light import Light
-from src.math import Vector
+from src.math import Vector, dielectric_f0
 from src.math import reflect, refract
 from src.math.helpers import clamp_float_01
 from src.math import fresnel_schlick
@@ -20,12 +20,15 @@ def ray_color(
     skybox: str | None = None,
 ) -> Color:
     if shader is None:
-        shader = BlinnPhongShader() # default shader
+        shader = BlinnPhongShader()
 
     if depth <= 0:
         return Color.custom_rgb(0, 0, 0)
 
     hit = world.hit(ray)
+
+    throughput = 1.0
+
     if hit is not None:
         # direct lighting
         local_color = shader.shade_multiple_lights(hit, world, lights, -ray.direction).clamp01()
@@ -40,11 +43,11 @@ def ray_color(
         n = hit.normal.normalize()
 
         if reflectivity >= transparency:
-            reflected_ray, _ = handle_reflection(ray, hit, n, m, throughput=1.0)
+            reflected_ray, throughput = handle_reflection(ray, hit, n, m, throughput=throughput)
             reflected_color = ray_color(reflected_ray, world, lights, depth - 1, shader=shader, skybox=skybox)
             return clamp_color01(local_color + reflected_color * reflectivity)
         else:
-            refracted_ray, _ = handle_refraction(ray, hit, n, m, throughput=1.0)
+            refracted_ray, throughput = handle_refraction(ray, hit, n, m, throughput=throughput)
             refracted_color = ray_color(refracted_ray, world, lights, depth - 1, shader=shader, skybox=skybox)
             return clamp_color01(local_color + refracted_color * transparency)
 
@@ -59,18 +62,17 @@ def handle_reflection(ray: Ray,
     R = reflect(ray.direction, normal).normalize()
 
     # Fresnel-Schlick
-    f0_base = Color(0.04, 0.04, 0.04)
-    metallic = clamp_float_01(getattr(material, "metallic", 0.0))
-    f0 = interpolate_color(f0_base, material.base_color, metallic)
-    F = fresnel_schlick(normal, -ray.direction, f0).clamp01()
+    ior = getattr(material, "ior", 1.5)
+    # f stands for Fresnel reflectance
+    f = fresnel_schlick(normal, -ray.direction, dielectric_f0(ior))
 
     # Energy mixing
     def luminance(c: Color) -> float:
         return 0.2126*c.x + 0.7152*c.y + 0.0722*c.z
 
-    F_avg = luminance(F)
+    f_avg = luminance(f)
     user_refl = clamp_float_01(getattr(material, "reflectivity", 0.0))
-    energy = clamp_float_01(user_refl + (1.0 - user_refl) * F_avg)
+    energy = clamp_float_01(user_refl + (1.0 - user_refl) * f_avg)
     throughput *= energy
 
     next_dir = R

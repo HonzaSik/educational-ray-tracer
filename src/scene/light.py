@@ -1,22 +1,27 @@
 from dataclasses import dataclass
+from src.math import Vertex
 from enum import Enum
 from src.math import Vector
-from src.math import Vertex
 from abc import ABC, abstractmethod
 from math import pi
+from numpy import sqrt
+from dataclasses import field
 
 #enum types of lights
 class LightType(Enum):
     POINT = "point"
     AMBIENT = "ambient"
+    DIRECTIONAL = "directional"
+    SPOT = "spot"
+    AREA = "area"
 
 @dataclass
 class Light(ABC):
     """
     Abstract base class for different types of lights in a 3D scene.
     """
-    position: Vertex
     intensity: float
+    position: Vertex = field(default_factory=lambda: Vertex(0.0, 0.0, 0.0))
     falloff: float = 1.0
     type: LightType = None
 
@@ -51,15 +56,16 @@ class PointLight(Light):
     type: LightType = LightType.POINT
 
     def intensity_at(self, point: Vertex) -> float:
-        dx = self.position.x - point.x
-        dy = self.position.y - point.y
-        dz = self.position.z - point.z
-        r2 = dx*dx + dy*dy + dz*dz
-        if r2 <= 1e-8:
+        dx = point.x - self.position.x
+        dy = point.y - self.position.y
+        dz = point.z - self.position.z
+        r2 = sqrt(dx ** 2 + dy ** 2 + dz ** 2) ** 2
+        if r2 < 1e-8:
             return 0.0
-        # inverse-square with optional extra falloff factor
         inv_square = self.intensity / (4.0 * pi * r2)
-        return inv_square / (1.0 + self.falloff * r2)
+        if self.falloff > 0.0:
+            return inv_square / (1.0 + self.falloff * r2)
+        return inv_square
 
 
 @dataclass
