@@ -10,11 +10,32 @@ from pathlib import Path
 from src.io.resolution import Resolution
 
 #todo move elsewhere just for testing
-from src.io.image_helper import write_ppm, convert_ppm_to_png
+from src.io.image_helper import write_ppm, convert_ppm_to_png, png_to_mp4
 from IPython.display import Image, display
 from time import time
-
 from src.shading import BlinnPhongShader
+from enum import Enum
+
+
+# enum of render methods
+class RenderMethod(Enum):
+    SHADOW_TRACE = "phong"
+    SHADOW_TRACE_MULTITHREADED = "phong_multithreaded"
+    RASTERIZE = "rasterize"
+    PBR = "pbr"
+
+
+class ShadingModel(Enum):
+    BLINN_PHONG = "blinn_phong"
+    PREVIEW = "preview"
+    PBR = "pbr"
+
+
+class QualityPreset(Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    ULTRA = "ultra"
 
 
 @dataclass
@@ -133,7 +154,6 @@ class Scene:
         """
         return self.camera
 
-
     def zoom_camera(self, factor: float) -> None:
         """
         Zoom the camera in or out by a given factor. Factor < 1.0 zooms in, > 1.0 zooms out.
@@ -141,7 +161,6 @@ class Scene:
         :return: None
         """
         self.camera.zoom(factor)
-
 
     def translate_light(self, light: Light, translation: Vector) -> None:
         """
@@ -152,6 +171,36 @@ class Scene:
         """
         light.translate(translation)
 
+    def render(self, quality: QualityPreset = QualityPreset.MEDIUM,
+               render_method: RenderMethod = RenderMethod.SHADOW_TRACE,
+               shading_model: ShadingModel = ShadingModel.BLINN_PHONG,
+               image_png_path: str = "./images/render.png") -> str:
+        """
+        Render the scene with specified quality, method, and shading model. Defaults to medium quality, shadow trace method, and Blinn-Phong shading.
+        :param quality: Quality preset for rendering
+        :param render_method: Rendering method to use
+        :param shading_model: Shading model to apply
+        :param image_png_path: Path to save the rendered image
+        :return: Path to the saved image
+        """
+        quality_settings = {
+            QualityPreset.LOW: (1, 3),
+            QualityPreset.MEDIUM: (5, 5),
+            QualityPreset.HIGH: (10, 10),
+            QualityPreset.ULTRA: (20, 15),
+        }
+        samples_per_pixel, max_depth = quality_settings[quality]
+
+        if render_method == RenderMethod.SHADOW_TRACE:
+            if shading_model == ShadingModel.BLINN_PHONG:
+                return self.render_phong(samples_per_pixel=samples_per_pixel, max_depth=max_depth,
+                                         image_png_path=image_png_path)
+        elif render_method == RenderMethod.SHADOW_TRACE_MULTITHREADED:
+            return self.render_multithreaded(samples_per_pixel=samples_per_pixel, max_depth=max_depth,
+                                             image_png_path=image_png_path)
+        else:
+            raise NotImplementedError(
+                f"Render method {render_method} with shading model {shading_model} not implemented yet.")
 
     def render_preview(self, resolution: Resolution = Resolution.R144p) -> str:
         """
@@ -161,15 +210,16 @@ class Scene:
         start_time = time()
         lights = self.get_all_lights()
         print(f"Rendering preview at resolution {self.camera.resolution} with FOV {self.camera.fov}")
-        p_px, p_w, p_h = render(samples_per_pixel=1, max_depth=1, cam=self.camera, world=self.world, lights=lights, skybox=None)
+        p_px, p_w, p_h = render(samples_per_pixel=1, max_depth=1, cam=self.camera, world=self.world, lights=lights,
+                                skybox=None)
         write_ppm("./images/preview.ppm", p_px, p_w, p_h)
         convert_ppm_to_png("./images/preview.ppm", "./images/preview.png")
         print(f"Preview render took {time() - start_time:.2f} seconds")
         display(Image(filename="./images/preview.png"))
         return "./images/preview.png"
 
-
-    def render_phong(self, image_png_path: str = "./images/phong.png", samples_per_pixel: int = 2, max_depth: int = 5) -> str:
+    def render_phong(self, image_png_path: str = "./images/phong.png", samples_per_pixel: int = 2,
+                     max_depth: int = 5) -> str:
         """
         Render the scene using Phong shading and save PNG (and an intermediate PPM).
         Returns the PNG path as a string.
@@ -182,7 +232,6 @@ class Scene:
 
         shader = BlinnPhongShader()
 
-        # call your renderer
         pixels, w, h = render(
             samples_per_pixel=samples_per_pixel,
             max_depth=max_depth,
@@ -200,7 +249,6 @@ class Scene:
 
         return str(png_path)
 
-
     def get_point_lights(self) -> list[Light]:
         """
         Get all point lights in the scene.
@@ -215,7 +263,6 @@ class Scene:
         :return: List of all lights
         """
         return self.lights
-
 
     def get_ambient_light(self) -> Light | None:
         """
@@ -244,12 +291,12 @@ class Scene:
 
         print("Scene validation passed.")
 
-
     @staticmethod
     def _ensure_images_dir(path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
 
-    def render_multithreaded(self, samples_per_pixel: int = 10, max_depth: int = 5, shading_model=None, image_png_path: str = "./images/fast_render.png") -> str:
+    def render_multithreaded(self, samples_per_pixel: int = 10, max_depth: int = 5, shading_model=None,
+                             image_png_path: str = "./images/fast_render.png") -> str:
         """
         Render the scene using ray tracing and save PNG (and an intermediate PPM).
         Returns the PNG path as a string.
@@ -263,8 +310,10 @@ class Scene:
 
         lights = self.get_all_lights()
 
-        print(f"Rendering fast at resolution {self.camera.resolution} with FOV {self.camera.fov} and samples_per_pixel={samples_per_pixel}, max_depth={max_depth}")
-        print(f"No progress bar in multithreaded mode - switch to other render method for that if needed - this is supposed to be fast!")
+        print(
+            f"Rendering fast at resolution {self.camera.resolution} with FOV {self.camera.fov} and samples_per_pixel={samples_per_pixel}, max_depth={max_depth}")
+        print(
+            f"No progress bar in multithreaded mode - switch to other render method for that if needed - this is supposed to be fast!")
 
         if shading_model is None:
             shader = BlinnPhongShader()

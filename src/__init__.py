@@ -7,12 +7,12 @@ from .io import ColorLibrary, LightLibrary, MaterialLibrary, PickleManager, Reso
 # material
 from .material import Material, Color
 # scene setting
-from .scene import Scene, Camera, AmbientLight, PointLight
+from .scene import Scene, Camera, AmbientLight, PointLight, RenderMethod, ShadingModel, QualityPreset
 
 __all__ = [
     "Plane", "Sphere", "World", "Square", "Triangle",
     "Vertex", "Vector",
     "ColorLibrary", "LightLibrary", "MaterialLibrary", "PickleManager", "ipynb_display_image",
     "Material", "Color",
-    "Scene", "Camera", "AmbientLight", "PointLight", "Resolution"
+    "Scene", "Camera", "AmbientLight", "PointLight", "Resolution", "RenderMethod", "ShadingModel", "QualityPreset"
 ]

@@ -80,3 +80,12 @@ class Camera:
     def set_resolution(self, res) -> None:
         self.resolution = res
         self.__post_init__()
+
+    def copy(self) -> Camera:
+        return Camera(
+            fov=self.fov,
+            resolution=self.resolution,
+            origin=Vertex(self.origin.x, self.origin.y, self.origin.z),
+            direction=Vector(self.direction.x, self.direction.y, self.direction.z),
+            up_hint=Vector(self.up_hint.x, self.up_hint.y, self.up_hint.z)
+        )

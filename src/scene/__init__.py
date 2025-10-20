@@ -1,11 +1,11 @@
 from .camera import Camera
 from .light import Light, AmbientLight, PointLight
-from .scene import Scene
+from .scene import Scene, RenderMethod, ShadingModel, QualityPreset
 from src.io.resolution import Resolution
 
 __all__ = [
     "Camera",
     "Light", "AmbientLight", "PointLight",
-    "Scene",
+    "Scene", "RenderMethod", "ShadingModel", "QualityPreset",
     "Resolution"
 ]
