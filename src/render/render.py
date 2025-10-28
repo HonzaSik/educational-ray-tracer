@@ -8,7 +8,7 @@ from src.scene.camera import Camera
 from src.math import Vector
 from random import random
 from typing import Tuple
-from tqdm.notebook import tqdm #todo move this away so that render does not depend on tqdm only when in notebook
+from tqdm import tqdm #todo move this away so that render does not depend on tqdm only when in notebook
 from src.math import reflect, refract
 from src.math.helpers import clamp_float_01
 from src.math import fresnel_schlick
@@ -57,9 +57,13 @@ def render(
     else:
         shader = shading_model
 
+    for j in tqdm(range(res.height), desc="Rendering", unit="row",
+                  mininterval=0.0, miniters=1, smoothing=0.0, dynamic_ncols=False):
 
-    for j in tqdm(range(res.height), desc="Rendering", unit="rows"):
         v_base = ((res.height - 1 - j) / (res.height - 1)) - 0.5
+
+        if j % 50 == 0:
+            print(f"row {j}/{res.height}")
 
         for i in range(res.width):
             u_base = (i / (res.width - 1)) - 0.5
