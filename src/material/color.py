@@ -58,6 +58,13 @@ class Color(Vec3):
 
     @staticmethod
     def custom_albedo(r: float, g: float, b: float) -> "Color":
+        """
+        Create a custom color with specified red, green, and blue components.
+        :param r: red component
+        :param g: green component
+        :param b: blue component
+        :return: Color instance clamped to [0..1]
+        """
         return Color(clamp01(r), clamp01(g), clamp01(b))
 
     @staticmethod

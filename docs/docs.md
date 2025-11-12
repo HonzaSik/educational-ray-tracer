@@ -1,53 +1,45 @@
-# How to Use the Raytracer
-*(details coming later – work in progress)*
+<p align="center">
+  <img src="./examples/header.png" alt="Educational Ray Tracer" width="2560" />
+</p>
+
+<h1 align="center">Detailed Documentation Of Library Features</h1>
 
 ---
 
-# Roadmap & Progress
-
-This log shows the evolution of the raytracer.   
-**Newest results are shown first.**
-
----
-
-## Image 5 – Improved Glass + Skybox (Current)
-- **Scene:** spheres with better glass material  
-- **Features:** experimental reflections/refractions, working skybox  
-- **Status:** current development stage  
-
-![Image 5](./examples/image5.png)
+<p align="center">
+  <b>This section provides detailed documentation what is this library capable of and how to use it.</b><br>
+  Goes through all features step by step.<br><br>
+  Project in active development — Structure and features may change frequently.<br>
+</p>
 
 ---
 
-## Image 4 – Skybox (In Progress)
-- **Scene:** early skybox experiments  
-- **Status:** partial implementation  
+## Define Colors - [Color](./api/color.md)
+Colors in the ray tracer are represented using RGB values. You can create colors and manipulate them using various methods.
+You can define colors using the `Color` class.
 
-![Image 4](./examples/image4.png)
+## Resolution Settings - [Resolution](./api/resolution.md)
+The ray tracer allows you to set the resolution of the output image. You can specify the width and height in pixels.
 
----
+## World Definition - [World](./api/world.md)
+The world represents the 3D environment where objects are placed.
 
-## Image 3 – Glass Spheres v2 (Old Version)
-- **Scene:** more spheres, single light  
-- **Glass Material:** second iteration (semi-functional)  
-- **Render Specs:** 1920×1080, 6 spp, max depth 7  
-- **Performance:** ~15 min (MacBook M1)  
+## Scene Management - [Scene](./api/scene.md)
+The scene contains all objects, lights, and camera settings.
 
-![Image 3](./examples/image3.png)
 
----
+## API Reference
 
-## Image 2 – Cornell Box (Old Version)
-- **Scene:** simple Cornell Box with spheres  
-- **Glass Material:** first working attempt (semi-functional)  
+- `Color` - [See Color](./api/color.md)
+- `Resolution` - [see Resolution](./api/resolution.md)
+- `World` - [see World](./api/world.md)
+- `Scene` - [see Scene](./api/scene.md)
+- `Camera` - 
+- `Sphere` - 
+- `Plane` - 
+- `Light` - 
+- `Material` - 
+- `Vector3` - 
+- `Color` - 
 
-![Image 2](./examples/image2.png)
 
----
-
-## Image 1 – Glass Spheres v1 (Old Version)
-- **Scene:** basic spheres with one light source
-
-![Image 1](./examples/image1.png)
-
----

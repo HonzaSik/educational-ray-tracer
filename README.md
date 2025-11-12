@@ -37,12 +37,22 @@
 </p>
 
 ---
-## Table of Contents
+## Before You Start - [Theoretical Background Of Ray Tracing](docs/raytracing.md)
+Go check out the theoretical background of ray tracing to better understand the concepts used in this project.
+- [Theoretical Background](docs/raytracing.md#theoretical-background)
+---
+
+## Detailed Usage Documentation Of The Library [View Docs](docs/docs.md)
+Detailed documentation what is this library capable of and how to use it. [View Docs](docs/docs.md)
+
+---
+
+## Library Table of Contents
 - **Overview** [about the project](#overview)
 - **Features** [what it can do](#features)
 - **Setup & Usage** [how to set it up and use it](#setup--usage)
-  - [Setup](#setup)
-  - [Usage](#usage)
+  - Setup [How to set up](#setup)
+  - Usage [How to use](#usage)
 - **Custom definitions – Shaders, Objects, Renderloops** [how to create your own components](#custom-definitions--shaders-objects-renderloops)
   - Shaders [Jupyter Notebook custom shader definition (in progress)](#jupyter-notebook-custom-shader-definition-in-progress)
   - Objects [Jupyter Notebook custom object definition](#jupyter-notebook-custom-object-definition)
@@ -98,7 +108,7 @@ from src import Shader
 ```
 #### example of shaders
 ###
-#### Custom Normal Shader - will be defined in ./notebooks/custom_shader.ipynb #todo
+#### Custom Normal Shader - will be defined in ./notebooks/custom_shader.ipynb [go to notebook](./notebooks/custom_shader.ipynb)
 ![Custom Normal Shader](docs/examples/custom_normal_shader.png)
 
 ---
@@ -111,7 +121,7 @@ from src import Object
 ```
 
 ### example of custom objects
-#### Custom Tourus - defined in ./notebooks/custom_objet.ipynb
+#### Custom Tourus - defined in ./notebooks/custom_objet.ipynb [go to notebook](./notebooks/custom_object.ipynb)
 ![Custom Torus](docs/examples/custom_torus.png)
 
 ---
