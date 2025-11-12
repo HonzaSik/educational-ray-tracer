@@ -63,12 +63,21 @@ class Camera:
         """
         self.origin += offset
 
-    def rotate(self, axis: Vector, angle_deg: float) -> None:
+    def rotate_around_axis(self, axis: Vector, angle_deg: float) -> None:
         """
         Rotate camera direction and up_hint around axis by angle in degrees.
         """
-        #todo implement camera rotation
+        angle_rad = radians(angle_deg)
+        # rotate direction
+        new_dir = self.direction.rotate_around_axis(axis, angle_rad).normalize()
+        self.direction = new_dir
+        # rotate up_hint
+        new_up = self.up_hint.rotate_around_axis(axis, angle_rad).normalize()
+        self.up_hint = new_up
+
+        self.__post_init__()
         pass
+
 
     def zoom(self, factor: float) -> None:
         """

@@ -21,6 +21,7 @@ output/
 renders/
 notebooks/images/
 notebooks/pickle_data/
+notebooks/animation_frames/
 
 stls/
 

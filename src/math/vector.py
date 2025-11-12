@@ -1,3 +1,5 @@
+from numpy import cos, sin
+
 from .vec3 import Vec3
 
 class Vector(Vec3):

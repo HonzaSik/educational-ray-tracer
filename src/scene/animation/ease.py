@@ -1,4 +1,10 @@
 from typing import Callable
+from enum import Enum
+
+#enum of ease types
+class EaseType(Enum):
+    LINEAR = 1
+    EASE_IN_OUT = 2
 
 def linear(t: float) -> float:
     return t

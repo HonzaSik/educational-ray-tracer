@@ -33,6 +33,7 @@ class ShadingModel(Enum):
 
 
 class QualityPreset(Enum):
+    ULTRA_LOW = "ultra_low"
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -185,6 +186,7 @@ class Scene:
         :return: Path to the saved image
         """
         quality_settings = {
+            QualityPreset.ULTRA_LOW: (1, 1),
             QualityPreset.LOW: (1, 3),
             QualityPreset.MEDIUM: (5, 5),
             QualityPreset.HIGH: (10, 10),

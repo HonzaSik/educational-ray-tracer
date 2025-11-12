@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-import math
+from numpy import cos, sin, sqrt
 
 Number = float | int
 
@@ -84,7 +84,7 @@ class Vec3:
 
     # length and normalization
     def norm(self) -> float:
-        return math.sqrt(self.x*self.x + self.y*self.y + self.z*self.z)
+        return sqrt(self.x*self.x + self.y*self.y + self.z*self.z)
 
     def normalize(self) -> Vec3:
         """
@@ -98,7 +98,7 @@ class Vec3:
         """
         n2 = self.x*self.x + self.y*self.y + self.z*self.z
         if n2 == 0.0: return Vec3(0.0,0.0,0.0)
-        inv = 1.0 / math.sqrt(n2)
+        inv = 1.0 / sqrt(n2)
         return Vec3(self.x*inv, self.y*inv, self.z*inv)
 
     def normalize_ip(self) -> Vec3:
@@ -110,7 +110,7 @@ class Vec3:
         n2 = self.x*self.x + self.y*self.y + self.z*self.z
         if n2 == 0.0: self.x = self.y = self.z = 0.0
         else:
-            inv = 1.0 / math.sqrt(n2)
+            inv = 1.0 / sqrt(n2)
             self.x *= inv; self.y *= inv; self.z *= inv
         return self
 
@@ -178,3 +178,15 @@ class Vec3:
             return Vec3(self.x * o.x, self.y * o.y, self.z * o.z)
 
 
+    def rotate_around_axis(self, axis: Vec3, angle_rad: float) -> Vec3:
+        """
+        Rotate this vector around given axis by angle in radians using Rodrigues' rotation formula.
+        """
+        k = axis.normalize()
+        v = self
+        cos_theta = cos(angle_rad)
+        sin_theta = sin(angle_rad)
+        rotated = (v * cos_theta +
+                   k.cross(v) * sin_theta +
+                   k * (k.dot(v)) * (1 - cos_theta))
+        return rotated

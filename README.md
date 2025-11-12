@@ -113,8 +113,19 @@
 ## Jupyter Notebook Custom shader definition (in progress)
 You can define your own shaders by creating a new class that inherits from the `Shader` base class like:
 ```python
-from src import Shader
-#todo
+@dataclass
+class NormalShader(ShadingModel):
+
+    def shade(self, hit: HitPoint, world: World, light: Light| None, view_dir: Vector) -> Color:
+        norm = hit.normal.normalize()
+        red = int((norm.x + 1) * 0.5 * 255)
+        green = int((norm.y + 1) * 0.5 * 255)
+        blue = int((norm.z + 1) * 0.5 * 255)
+        return Color.custom_rgb(red, green, blue)
+
+
+    def shade_multiple_lights(self, hit: HitPoint, world: World, lights: list[Light], view_dir: Vector) -> Color:
+        return self.shade(hit=hit, world=world, light=None, view_dir=view_dir)
 ```
 #### example of shaders
 ###
