@@ -7,6 +7,7 @@ from src.geometry.ray import Ray
 from src.geometry.hit_point import HitPoint
 from src.material import Material
 from .triangle import Triangle
+import random
 
 
 class Square(Hittable, ABC):
@@ -52,7 +53,6 @@ class Square(Hittable, ABC):
         return hit1 or hit2
 
     def random_point(self) -> Vertex:
-        import random
         u = random.uniform(0, 1)
         v = random.uniform(0, 1)
         if u + v > 1:
@@ -60,3 +60,7 @@ class Square(Hittable, ABC):
             v = 1 - v
         point = self.v0 + (self.v1 - self.v0) * u + (self.v3 - self.v0) * v
         return point
+
+    def normal_at(self, point: Vertex) -> Vector:
+        # Normal is the same for both triangles
+        return self.tri1.normal_at(point)

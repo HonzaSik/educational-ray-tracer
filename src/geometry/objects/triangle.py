@@ -8,6 +8,7 @@ from src.geometry.hittable import Hittable
 from src.geometry.ray import Ray
 from src.geometry.hit_point import HitPoint
 from src.material import Material
+import random
 
 @dataclass
 class Triangle(Hittable, ABC):
@@ -96,7 +97,6 @@ class Triangle(Hittable, ABC):
 
 
     def random_point(self) -> Vertex:
-        import random
         u = random.uniform(0, 1)
         v = random.uniform(0, 1)
         if u + v > 1:
@@ -104,3 +104,12 @@ class Triangle(Hittable, ABC):
             v = 1 - v
         point = self.v0 + (self.v1 - self.v0) * u + (self.v2 - self.v0) * v
         return point
+
+    def normal_at(self, point: Vertex) -> Vector:
+        """
+        Get the normal vector at a given point on the triangle's surface.
+        :param point: Point on the triangle
+        :return: Normal vector at that point
+        """
+        normal = self.edge_1.cross(self.edge_2).normalize_ip()
+        return normal

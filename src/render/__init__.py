@@ -1,4 +1,4 @@
-from .render import render
-from .multithread_render import render_multithreaded
+from .loops.raytrace_loop import LineRenderLoop
+from src.render.loops.multithread_render import MultiProcessRowRenderLoop
 
-__all__ = ['render', 'render_multithreaded']
+__all__ = ['LineRenderLoop', 'MultiProcessRowRenderLoop']

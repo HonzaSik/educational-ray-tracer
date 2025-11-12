@@ -5,9 +5,10 @@ from src.geometry.hittable import Hittable
 from .ray import Ray
 from .hit_point import HitPoint
 from src.math import Vertex
+from src.math.vector import Vector
 
 
-class World(Hittable, ABC):
+class World(Hittable):
     """
     Container for all objects in the scene. Supports ray intersection with all objects.
     objects: list of Sphere, Plane, Mesh
@@ -46,3 +47,36 @@ class World(Hittable, ABC):
         import random
         obj = random.choice(self.objects)
         return obj.random_point()
+
+
+    def normal_at(self, point: Vertex, debug: bool = False) -> Vector:
+        """
+        Approximate the normal of the object nearest to a given world-space point.
+        Used for educational shaders (curvature, flow fields, etc.).
+        """
+        closest_dist = float("inf")
+        closest_normal = Vector(0, 1, 0)
+
+        for obj in self.objects:
+            if not hasattr(obj, "normal_at"):
+                continue
+
+            try:
+                n = obj.normal_at(point)
+            except (AttributeError, TypeError) as e:
+                if debug:
+                    print(f"[World.normal_at] Skipping {obj}: {e}")
+                continue
+
+
+            dist = 0.0
+            if hasattr(obj, "center"):
+                dist = (point - obj.center).norm()
+            elif hasattr(obj, "position"):
+                dist = (point - obj.position).norm()
+
+            if dist < closest_dist and n is not None:
+                closest_dist = dist
+                closest_normal = n
+
+        return closest_normal.normalize()

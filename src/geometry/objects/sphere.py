@@ -52,7 +52,7 @@ class Sphere(Hittable):
         hit_point = ray.point_at(root)
 
         # Calculate normal at the intersection point for lighting calculations
-        normal = (hit_point - self.center) / self.radius
+        normal = self.normal_at(hit_point)
         if ray.direction.dot(normal) > 0.0:
             normal = -normal
 
@@ -77,3 +77,12 @@ class Sphere(Hittable):
         z = self.radius * math.cos(phi)
 
         return Vertex(self.center.x + x, self.center.y + y, self.center.z + z)
+
+    def normal_at(self, point: Vertex) -> Vector:
+        """
+        Get the normal vector at a given point on the sphere's surface.
+        :param point: Point on the sphere
+        :return: Normal vector at that point
+        """
+        normal = (point - self.center) / self.radius
+        return normal

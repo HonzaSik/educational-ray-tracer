@@ -50,3 +50,11 @@ class Plane(Hittable):
         v = self.normal.cross(u).normalize_ip()
         u = v.cross(self.normal).normalize_ip()
         return self.point + u * d + v * d
+
+    def normal_at(self, point: Vertex) -> Vector:
+        """
+        Get the normal vector at a given point on the plane's surface.
+        :param point: Point on the plane
+        :return: Normal vector at that point
+        """
+        return self.normal

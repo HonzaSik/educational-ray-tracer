@@ -20,3 +20,8 @@ class Hittable(ABC):
     def random_point(self) -> Vertex:
         """Generate a random point on the surface of the object."""
         pass
+
+    @abstractmethod
+    def normal_at(self, point: Vertex) -> Vertex:
+        """Get the normal vector at a given point on the object's surface."""
+        pass
