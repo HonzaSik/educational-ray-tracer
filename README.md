@@ -29,17 +29,24 @@
   </a>
 </p>
 
----
+
 
 <p align="center">
   <b>Ray tracer for educational purposes, implemented in Python for clarity and simplicity.</b><br>
   Project in active development — Structure and features may change frequently.<br>
 </p>
 
+
+
+<br><br><br>
+
 ---
+
+
 ### Before You Start - [Theoretical Background Of Ray Tracing](docs/raytracing.md)
 - Go check out the basics before diving into the code. This section provides the theoretical background of ray tracing to better understand the concepts used in this project.
   - [👉 Theoretical Background](docs/raytracing.md)
+  
 ---
 
 ### Detailed Usage [Documentation Of The Library ](docs/docs.md)
@@ -47,6 +54,8 @@
   - [👉 View Docs And API](docs/docs.md)
 
 ---
+
+<br><br><br>
 
 ## Table of Contents
 - **Overview** [about the project](#overview)
@@ -67,7 +76,7 @@
 - **More about ray tracing** [additional resources](#more-about-ray-tracing)
 - **License** [MIT License](#license)
 
----
+<br><br><br>
 
 ## Overview
 - A simple ray tracer library written in Python, designed for educational purposes. You can find the code in the `src` folder but be aware this project is still in early development and the code structure may change frequently.
