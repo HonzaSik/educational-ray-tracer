@@ -37,17 +37,18 @@
 </p>
 
 ---
-## Before You Start - [Theoretical Background Of Ray Tracing](docs/raytracing.md)
-Go check out the theoretical background of ray tracing to better understand the concepts used in this project.
-- [Theoretical Background](docs/raytracing.md#theoretical-background)
+### Before You Start - [Theoretical Background Of Ray Tracing](docs/raytracing.md)
+- Go check out the basics before diving into the code. This section provides the theoretical background of ray tracing to better understand the concepts used in this project.
+  - [👉 Theoretical Background](docs/raytracing.md)
 ---
 
-## Detailed Usage Documentation Of The Library [View Docs](docs/docs.md)
-Detailed documentation what is this library capable of and how to use it. [View Docs](docs/docs.md)
+### Detailed Usage [Documentation Of The Library ](docs/docs.md)
+- Detailed documentation what is this library capable of and how to use it. Goes through all features step by step documenting the current state of the project and its capabilities.
+  - [👉 View Docs And API](docs/docs.md)
 
 ---
 
-## Library Table of Contents
+## Table of Contents
 - **Overview** [about the project](#overview)
 - **Features** [what it can do](#features)
 - **Setup & Usage** [how to set it up and use it](#setup--usage)
