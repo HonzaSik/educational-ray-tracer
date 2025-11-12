@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.render import render, render_multithreaded
+from src.render import LineRenderLoop, MultiProcessRowRenderLoop
 from src.scene.camera import Camera
 from src.geometry.world import World
 from src.scene.light import Light, LightType
@@ -13,8 +13,9 @@ from src.io.resolution import Resolution
 from src.io.image_helper import write_ppm, convert_ppm_to_png, png_to_mp4
 from IPython.display import Image, display
 from time import time
-from src.shading import BlinnPhongShader
+from src.shading import BlinnPhongShader, NormalShader, DepthShader, DiffShader, HashMethod, DotProductShader, CurvatureShader
 from enum import Enum
+from src.render.loops.progress import ProgressDisplay, PreviewConfig
 
 
 # enum of render methods
@@ -68,6 +69,15 @@ class Scene:
         :return: None
         """
         self.lights.remove(light)
+
+    def translate_light(self, light: Light, translation: Vector) -> None:
+        """
+        Translate a light by a given vector.
+        :param light: Light to translate
+        :param translation: Vector to translate the light
+        :return: None
+        """
+        light.translate(translation)
 
     def clear_lights(self) -> None:
         """
@@ -162,15 +172,6 @@ class Scene:
         """
         self.camera.zoom(factor)
 
-    def translate_light(self, light: Light, translation: Vector) -> None:
-        """
-        Translate a light by a given vector.
-        :param light: Light to translate
-        :param translation: Vector to translate the light
-        :return: None
-        """
-        light.translate(translation)
-
     def render(self, quality: QualityPreset = QualityPreset.MEDIUM,
                render_method: RenderMethod = RenderMethod.SHADOW_TRACE,
                shading_model: ShadingModel = ShadingModel.BLINN_PHONG,
@@ -202,16 +203,44 @@ class Scene:
             raise NotImplementedError(
                 f"Render method {render_method} with shading model {shading_model} not implemented yet.")
 
-    def render_preview(self, resolution: Resolution = Resolution.R144p) -> str:
+    def render_preview(self, shader: ShadingModel | None = None, image_preview: bool = True) -> str:
         """
         Render a quick preview of the scene from the camera's perspective in 144p resolution if not specified.
         :return: Path to the saved image
         """
         start_time = time()
+
+        #todo make this not hardcoded
+        # shader = DiffShader(a= NormalShader(), b=DepthShader(), hash_method=HashMethod.HALF_IMAGE)
+        shader = NormalShader()
+        # shader = DepthShader()
+        # shader = DotProductShader()
+        # shader = CurvatureShader()
+
         lights = self.get_all_lights()
         print(f"Rendering preview at resolution {self.camera.resolution} with FOV {self.camera.fov}")
-        p_px, p_w, p_h = render(samples_per_pixel=1, max_depth=1, cam=self.camera, world=self.world, lights=lights,
-                                skybox=None)
+
+        if not image_preview:
+            preview_cfg = PreviewConfig(refresh_interval_rows=0, show_status=False)
+            progress_mode = ProgressDisplay.TQDM_CONSOLE
+        else:
+            preview_cfg = PreviewConfig(refresh_interval_rows=30, show_status=True)
+            progress_mode = ProgressDisplay.TQDM_IMAGE_PREVIEW
+
+        loop = LineRenderLoop(
+        cam=self.camera,
+        world=self.world,
+        lights=lights,
+        samples_per_pixel=5,
+        max_depth=1,
+        skybox=None,
+        shading_model=shader,
+        progress= progress_mode,
+        preview_cfg= preview_cfg
+        )
+
+        p_px, p_w, p_h = loop.render()
+
         write_ppm("./images/preview.ppm", p_px, p_w, p_h)
         convert_ppm_to_png("./images/preview.ppm", "./images/preview.png")
         print(f"Preview render took {time() - start_time:.2f} seconds")
@@ -232,7 +261,7 @@ class Scene:
 
         shader = BlinnPhongShader()
 
-        pixels, w, h = render(
+        loop = LineRenderLoop(
             samples_per_pixel=samples_per_pixel,
             max_depth=max_depth,
             cam=self.camera,
@@ -241,6 +270,8 @@ class Scene:
             skybox=self.skybox_path,
             shading_model=shader
         )
+
+        pixels, w, h = loop.render()
 
         # save to disk
         write_ppm(str(ppm_path), pixels, w, h)
@@ -321,15 +352,17 @@ class Scene:
             shader = shading_model
 
         # call your renderer
-        pixels, w, h = render_multithreaded(
+        loop = MultiProcessRowRenderLoop(
             samples_per_pixel=samples_per_pixel,
             max_depth=max_depth,
-            camera=self.camera,
             world=self.world,
             lights=lights,
             skybox=skybox,
-            shading_model=shader
+            shading_model=shader,
+            cam=self.camera
         )
+
+        pixels, w, h = loop.render()
 
         # save to disk
         write_ppm(str(ppm_path), pixels, w, h)
