@@ -7,7 +7,6 @@ from src.math.helpers import interpolate
 DT = np.float32
 _skybox_cache: dict[str, "SkyboxHDR"] = {}
 
-# ---- small gamma LUT (faster than pow in loop) ----
 _LUT_N = 2048
 _gamma_u8 = (255.99 * (np.linspace(0.0, 1.0, _LUT_N+1, dtype=DT) ** (DT(1/2.2)))).astype(np.uint8)
 
@@ -57,7 +56,6 @@ def clamp_color255(col: "Color") -> "Color":
 class Color(Vec3):
     """Color = Vec3 in [0..1] with helpers."""
 
-    # --- Factories ---
     @staticmethod
     def custom_albedo(r: float, g: float, b: float) -> "Color":
         return Color(clamp01(r), clamp01(g), clamp01(b))
@@ -105,14 +103,14 @@ class Color(Vec3):
             try:
                 if skybox not in _skybox_cache:
                     _skybox_cache[skybox] = SkyboxHDR(skybox)
-                sb = _skybox_cache[skybox]
+                skybox = _skybox_cache[skybox]
             except Exception as e:
                 print(f"Warning: Failed to load skybox '{skybox}': {e}")
                 return cls.background_color(direction, skybox=None)
         else:
-            sb = skybox  # assume SkyboxHDR
+            skybox = skybox
 
-        col = sb.color_from_dir(direction)          # may be Vec3 or np array
+        col = skybox.color_from_dir(direction)
         if isinstance(col, Vec3):
             return cls(col.x, col.y, col.z)
         col_np = _as_np3(col)
