@@ -15,5 +15,3 @@ class AnimationSetup:
     zoom_from: float | None = None  # fov in degrees
     zoom_to: float | None = None  # fov in degrees
     zoom_duration: float | None = None  # in seconds
-
-    render_method: str = "raytrace"  # or "rasterize"
