@@ -49,6 +49,9 @@
   - **OLD** [Image 3 – Glass Spheres v2 (Old)](#image-3--glass-spheres-v2-old-version)
   - **OLD** [Image 2 – Cornell Box (Old)](#image-2--cornell-box-old-version)
   - **OLD** [Image 1 – Glass Spheres v1 (Old)](#image-1--glass-spheres-v1-old-version)
+- **Custom shaders & objects** [how to define your own](#custom-shaders--objects)
+  - [Jupyter Notebook custom object definition](#jupyter-notebook-custom-object-definition)
+  - [Jupyter Notebook custom shader definition (in progress)](#jupyter-notebook-custom-shader-definition-in-progress)
 - **More about ray tracing** [additional resources](#more-about-ray-tracing)
 - **License** [MIT License](#license)
 
@@ -59,13 +62,19 @@
 
 ---
 
-## Features
-1. todo
-2. todo
-3. todo
-4. todo
-5. todo
-
+## Features - Current Capabilities
+1. Blinn-Phong shading model with support for multiple light sources
+2. Basic materials: diffuse, reflective, refractive (glass)
+3. Jupyter Notebook examples for easy experimentation and learning
+4. Pickle-based scene saving/loading for progress persistence
+5. Custom camera setup with adjustable field of view and aspect ratio
+6. Basic geometric primitives: spheres, planes, triangles, squares
+7. Support for shadows and multiple samples per pixel (spp) for anti-aliasing
+8. Modular design for easy extension and modification
+9. Basic skybox support in HDR format
+10. Configurable rendering parameters: image resolution, max ray depth, samples per pixel
+11. Jupyter Notebook custom object definition
+12. Jupyter Notebook custom shader definition (in progress)
 ---
 
 ## Setup & Usage
@@ -131,10 +140,47 @@ This log shows the evolution of the raytracer.
 
 ---
 
+# Custom shaders & objects
+
+## Jupyter Notebook Custom shader definition (in progress)
+You can define your own shaders by creating a new class that inherits from the `Shader` base class like:
+```python
+from src import Shader
+#todo
+```
+#### example of shaders
+###
+#### Custom Normal Shader - will be defined in ./notebooks/custom_shader.ipynb #todo
+![Custom Normal Shader](docs/examples/custom_normal_shader.png)
+
+---
+
+## Jupyter Notebook custom object definition
+You can define your own objects by creating a new class that inherits from the `Object` base class like:
+```python
+from src import Object
+#todo
+```
+
+### example of custom objects
+#### Custom Tourus - defined in ./notebooks/custom_objet.ipynb
+![Custom Torus](docs/examples/custom_torus.png)
+
+---
+
+## Jupyter Notebook custom renderloop definition (coming later)
+You can define your own renderloop by creating a new class that inherits from the `RenderLoop` base class like:
+```python
+from src import RenderLoop
+#todo
+```
+
+---
+
 ![Visitors](https://visitor-badge.laobi.icu/badge?page_id=HonzaSik.educational-ray-tracer)
 
 ---
 
 # License
-MIT License
+MIT License -
 Copyright (c) 2025 Jan Šik
