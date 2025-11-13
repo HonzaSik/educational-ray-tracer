@@ -37,10 +37,15 @@
 ## Animations
 - Animations have lower quality due to GIF format limitations.
 
-### Zoom Animation
+### Zoom Animation - Linear Easing
 ![Zoom Animation](./examples/zoom.gif)
 
 🔗 [Full-quality MP4](./examples/zoom.mp4)
+
+### Move and zoom Animation - Ease In Out
+![Zoom Animation](./examples/move_zoom.gif)
+
+🔗 [Full-quality MP4](./examples/move_zoom.mp4)
 
 ---
 
