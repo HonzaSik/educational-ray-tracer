@@ -50,3 +50,9 @@ Ray tracing is a rendering technique used in computer graphics to simulate how l
 
 - **Fresnel Equations:**
   - [Go try interactive demo!](./demos/fresnel_equations.ipynb)
+  - 
+---
+
+<p align="center">
+  <b> Documentation is not complete yet. Works as a example of how to document the project. </b>
+</p>

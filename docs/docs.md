@@ -22,18 +22,22 @@
 ## Define Colors - [Color](./api/color.md)
 Colors in the ray tracer are represented using RGB values. You can create colors and manipulate them using various methods.
 You can define colors using the `Color` class.
+...
 
 ## Resolution Settings - [Resolution](./api/resolution.md)
 The ray tracer allows you to set the resolution of the output image. You can specify the width and height in pixels.
+...
 
 ## World Definition - [World](./api/world.md)
 The world represents the 3D environment where objects are placed.
+...
 
 ## Scene Management - [Scene](./api/scene.md)
 The scene contains all objects, lights, and camera settings.
-
+...
 
 ## API Reference
+#### Every public class and its documentation:
 
 - `Color` - [See Color](./api/color.md)
 - `Resolution` - [see Resolution](./api/resolution.md)
@@ -46,5 +50,10 @@ The scene contains all objects, lights, and camera settings.
 - `Material` - 
 - `Vector3` - 
 - `Color` - 
+- ...
 
+---
+<p align="center">
+  <b> Documentation is not complete yet. Works as a example of how to document the project. </b>
+</p>
 
