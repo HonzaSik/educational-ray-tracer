@@ -217,13 +217,13 @@ class Animator:
         :param ease: Easing type to use for transitions.
         :param shader: Optional shader model to use for rendering.
         :param scene: Scene to render.
-        :param output_path: Path to save the MP4 file. If None, defaults to "./video/animation.mp4"
+        :param output_path: Path to save the MP4 file. If None, defaults to "./animatons/animation.mp4"
         :return: Path to the rendered MP4 file.
         """
         from src.io.video import frames_to_mp4
 
         if output_path is None:
-            output_path = Path("./video/animation.mp4")
+            output_path = Path("./animatons/animation.mp4")
         elif not isinstance(output_path, Path):
             output_path = Path(output_path)
 

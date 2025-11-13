@@ -4,5 +4,5 @@ tqdm>=4.67.0
 ipython>=9.6.0
 ipywidgets>=8.1.0
 
-# only for one function - src/io/video.py frames_to_mp4 can be done using ffmpeg instead from sequence of images
+# only for one function - src/io/animatons.py frames_to_mp4 can be done using ffmpeg instead from sequence of images
 imageio>=2.30.0

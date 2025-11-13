@@ -10,10 +10,10 @@ def frames_to_mp4(
     fps: int = 24,
 ) -> Path:
     """
-    Takes a sequence of image frames and compiles them into an MP4 video file.
+    Takes a sequence of image frames and compiles them into an MP4 animatons file.
     :param frames: Sequence of file paths to image frames.
     :param output_path: Path to save the output MP4 file.
-    :param fps: Frames per second for the output video.
+    :param fps: Frames per second for the output animatons.
     :return: Path to the created MP4 file.
     """
     if not frames:

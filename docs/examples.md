@@ -47,14 +47,18 @@
 
 ![Zoom Animation](./examples/zoom.gif)
 
-🔗 [Full-quality MP4](./examples/zoom.mp4)
+🔗 [Full-quality MP4](examples/animatons/mp4/zoom.mp4)
+
+---
 
 ### Move and zoom Animation - Ease In Out
 - no anti-aliasing and only 1 bounce for performance reasons
 
-![Zoom Animation](./examples/move_zoom.gif)
+![Zoom Animation](examples/animatons/gif/move_zoom.gif)
 
-🔗 [Full-quality MP4](./examples/move_zoom.mp4)
+🔗 [Full-quality MP4](examples/animatons/mp4/move_zoom.mp4)
+
+---
 
 ### Complex Normal Shader Animation - Move, Rotate and Zoom - Linear Easing
   - uses same start and length for all animation components
@@ -62,10 +66,12 @@
   - 3 seconds duration at 24 frames per second
   - uses normal shader to visualize normals
 
-![Normal Shader Animation](./examples/complex_normal_shader.gif)
+![Normal Shader Animation](examples/animatons/gif/complex_normal_shader.gif)
 
 
-🔗 [Full-quality MP4](./examples/complex_normal_shader.mp4)
+🔗 [Full-quality MP4](examples/animatons/mp4/complex_normal_shader.mp4)
+
+---
 
 ### Complex Animation - Move, Rotate and Zoom - Linear Easing
   - uses different starting times and durations for each animation component
@@ -73,9 +79,11 @@
   - 17 frames per second
   - total duration 3 seconds
 
-![Complex Animation](./examples/complex_animation.gif)
+![Complex Animation](examples/animatons/gif/complex_animation.gif)
 
-🔗 [Full-quality MP4](./examples/complex_animation.mp4)
+🔗 [Full-quality MP4](examples/animatons/mp4/complex_animation.mp4)
+
+---
 
 #### Used Animation Setup Code Example
 ```python3
@@ -102,6 +110,19 @@ animation_setup = AnimationSetup(
     zoom_duration    = 3.0,
 )
 ```
+
+---
+
+### Multi-Object Animation - Move, Rotate and Zoom - Ease In Out
+  - uses same start and length for all animation components
+  - no anti-aliasing and 5 bounces
+  - 24 frames per second
+  - total duration 2 seconds
+  - glassy sphere
+
+![Multi-Object Animation](examples/animatons/gif/multi_object.gif)
+
+🔗 [Full-quality MP4](examples/animatons/mp4/multi_object.mp4)
 
 ---
 
