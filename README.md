@@ -220,10 +220,14 @@ This log shows the evolution of the raytracer.
 
 ---
 
-![Visitors](https://visitor-badge.laobi.icu/badge?page_id=HonzaSik.educational-ray-tracer)
-
----
-
 # License
 MIT License -
 Copyright (c) 2025 Jan Šik
+
+---
+
+![Visitors](https://visitor-badge.laobi.icu/badge?page_id=HonzaSik.educational-ray-tracer)
+
+<p align="center">
+  <b> Documentation is not complete yet. Works as a example of how to document the project. </b>
+</p>
