@@ -6,9 +6,7 @@ ideas.py
 /*.png
 *.jpg
 *.jpeg
-*.gif
-*.ppm
-*.mp4
+*.ppmzoom
 *.pkl
 prewiew.*
 
@@ -22,6 +20,7 @@ renders/
 notebooks/images/
 notebooks/pickle_data/
 notebooks/animation_frames/
+notebooks/video/
 
 stls/
 
