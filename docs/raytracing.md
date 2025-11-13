@@ -2,6 +2,10 @@
   <img src="./examples/header.png" alt="Educational Ray Tracer" width="2560" />
 </p>
 
+[ **[HOME](../README.md)** &nbsp;|&nbsp;
+  **[⭐️ Theory](./raytracing.md)** &nbsp;|&nbsp;
+  **[Examples](./examples.md)** &nbsp;|&nbsp;
+  **[Docs & API](./docs.md)** ]
 
 <h1 align="center">Theoretical Background Of Ray Tracing</h1>
 

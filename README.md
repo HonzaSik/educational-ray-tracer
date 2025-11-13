@@ -2,6 +2,11 @@
   <img src="docs/examples/header.png" alt="Educational Ray Tracer" width="2560" />
 </p>
 
+[ **[⭐️ HOME](./README.md)** &nbsp;|&nbsp;
+  **[Theory](./docs/raytracing.md)** &nbsp;|&nbsp;
+  **[Examples](./docs/examples.md)** &nbsp;|&nbsp;
+  **[Docs & API](./docs/docs.md)** ]
+
 
 <h1 align="center">Educational Ray Tracer in Python</h1>
 
