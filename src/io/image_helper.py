@@ -41,11 +41,3 @@ def ipynb_display_image(path: str = "./images/phong.png") -> None:
         raise FileNotFoundError(f"Image file {path} not found.")
 
     display(Image(filename=path))
-
-def png_to_mp4(
-    frames_folder: str | Path = "./images/animation_frames",
-    video_path: str | Path = "./images/animation.mp4",
-    fps: int = 24,
-) -> None:
-    #todo Convert a sequence of PNG images to an MP4
-    pass

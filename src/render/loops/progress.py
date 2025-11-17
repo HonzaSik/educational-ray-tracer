@@ -13,6 +13,9 @@ from tqdm.notebook import tqdm as tqdm_nb
 
 
 class ProgressDisplay(Enum):
+    """
+    Progress display modes to choose from.
+    """
     NONE = 0
     TQDM_CONSOLE = 1
     TQDM_BAR = 2
@@ -20,6 +23,9 @@ class ProgressDisplay(Enum):
 
 @dataclass
 class PreviewConfig:
+    """
+    Configuration for specifying how the image preview is displayed during rendering.
+    """
     refresh_interval_rows: int = 10
     fill_missing_rows: bool = True
     show_status: bool = True
@@ -27,6 +33,11 @@ class PreviewConfig:
 
 
 class ProgressUI:
+    """
+    Manages how rendering progress is displayed to the user. Based on ProgressDisplay mode,
+    it can show a console progress bar, a Jupyter notebook progress bar, or an image preview
+    specified by PreviewConfig.
+    """
     def __init__(self,
                  mode: ProgressDisplay,
                  width: int,
@@ -43,6 +54,11 @@ class ProgressUI:
 
 
     def start(self, total_pixels: int) -> None:
+        """
+        Initializes the progress display based on the selected mode.
+        :param total_pixels: Total number of pixels to render.
+        :return: None
+        """
         if self.mode == ProgressDisplay.TQDM_CONSOLE:
             self.progress_bar = tqdm_console(total=total_pixels, desc="Rendering", unit="px", leave=True)
 
@@ -69,13 +85,24 @@ class ProgressUI:
 
             display(widgets.VBox(image))
 
-
+    #User can call this to update progress manually by n pixels to avoid updating each pixel
     def update_pixel(self, n: int = 1) -> None:
+        """
+        Updates the progress bar by n pixels.
+        :param n: Number of pixels rendered since last update.
+        :return: None
+        """
         if self.progress_bar is not None:
             self.progress_bar.update(n)
 
-
+    # Updates the image preview at the end of a row.
     def update_row(self, pixels_u8: List[Tuple[int, int, int]], row: int) -> None:
+        """
+        At the end of a row, update the image preview with the current pixels.
+        :param pixels_u8: List of rendered pixels as (R,G,B) uint8 tuples.
+        :param row: Current row index (number of rows rendered so far).
+        :return: None
+        """
 
         if self.img_widget is None:
             return
@@ -99,6 +126,11 @@ class ProgressUI:
 
 
     def update_end(self, pixels_flat_u8: List[Tuple[int, int, int]]) -> None:
+        """
+        Final update at the end of rendering to display the complete image.
+        :param pixels_flat_u8: List of all rendered pixels as (R,G,B) uint8 tuples.
+        :return:
+        """
         if self.progress_bar is not None:
             self.progress_bar.close()
 

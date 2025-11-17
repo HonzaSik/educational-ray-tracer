@@ -10,7 +10,7 @@ from pathlib import Path
 from src.io.resolution import Resolution
 
 #todo move elsewhere just for testing
-from src.io.image_helper import write_ppm, convert_ppm_to_png, png_to_mp4
+from src.io.image_helper import write_ppm, convert_ppm_to_png
 from IPython.display import Image, display
 from time import time
 from src.shading import BlinnPhongShader, NormalShader, DepthShader, DiffShader, HashMethod, DotProductShader, CurvatureShader

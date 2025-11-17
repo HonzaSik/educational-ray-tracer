@@ -92,7 +92,7 @@ class MultiProcessRowRenderLoop(RenderLoop):
                          max_depth=max_depth,
                          skybox=skybox)
 
-    # todo duplicate code because of worker uses his own pixel function
+    # todo duplicate code because of worker uses his own pixel function (need rework)
     def render_pixel(self, i: int, j: int) -> Tuple[int, int, int]:
         width, height = self.width, self.height
         width_inv  = 1.0 / (width - 1) if width > 1 else 1.0

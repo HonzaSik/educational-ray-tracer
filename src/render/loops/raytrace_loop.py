@@ -70,7 +70,6 @@ class LineRenderLoop(RenderLoop):
 
                 rgb = self.render_pixel(i, row)
                 pixels.append(rgb)
-                self.ui.update_pixel(1)
 
             self.on_row_end_update_preview(row, pixels)
 

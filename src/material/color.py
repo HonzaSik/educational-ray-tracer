@@ -4,6 +4,8 @@ import numpy as np
 from src.math import Vec3
 from src.math.helpers import interpolate
 
+#todo make color not to be Vec3 but make it have unlimited range, and have methods to convert to/from Vec3
+
 DT = np.float32
 _skybox_cache: dict[str, "SkyboxHDR"] = {}
 
