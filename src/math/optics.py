@@ -57,7 +57,7 @@ def fresnel_schlick(normal: Vector, view_dir: Vector, f0: Color) -> Color:
 
 def dielectric_f0(ior: float) -> Color:
     """
-    Calculate base reflectance F0 for dielectric materials based on index of refraction.
+    Calculate base reflectance F0 for dielectric material based on index of refraction.
     :param ior: index of refraction
     :return: base reflectance Color
     """

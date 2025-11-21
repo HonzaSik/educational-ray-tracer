@@ -57,10 +57,10 @@ class PickleManager:
         return LightLibrary(lights)
 
     def save_material_library(self, material_lib: MaterialLibrary) -> None:
-        self.save(material_lib.materials, "materials.pkl")
+        self.save(material_lib.materials, "material.pkl")
 
     def load_material_library(self) -> MaterialLibrary:
-        materials = self.load("materials.pkl")
+        materials = self.load("material.pkl")
         return MaterialLibrary(materials)
 
     def save_world(self, world: World) -> None:

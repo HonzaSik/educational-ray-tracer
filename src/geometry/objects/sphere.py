@@ -7,7 +7,7 @@ from src.geometry.ray import Ray
 from src.geometry.hit_point import HitPoint
 from src.material import Material
 from src.math import Vector
-
+from numba import njit
 
 @dataclass
 class Sphere(Hittable):

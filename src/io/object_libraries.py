@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from src.material.color import Color
 from src.scene.light import Light, LightType
-from src.material.material import Material
+from src.material.material.material import Material
 
 @dataclass
 class ColorLibrary:
@@ -74,7 +74,7 @@ class LightLibrary:
 
 @dataclass
 class MaterialLibrary:
-    """Simple library wrapper so you can access materials as attributes."""
+    """Simple library wrapper so you can access material as attributes."""
     materials: dict[str, Material] = field(default_factory=dict)
 
     def __getattr__(self, name: str) -> Material:

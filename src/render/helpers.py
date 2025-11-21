@@ -1,8 +1,8 @@
 from src.geometry.ray import Ray
 from src.geometry.hit_point import HitPoint
 from src.geometry.world import World
-from src.material.color import Color, interpolate_color, clamp_color01
-from src.material.material import Material
+from src.material.color import Color, clamp_color01
+from src.material.material.material import Material
 from src.scene.light import Light
 from src.math import Vector, dielectric_f0
 from src.math import reflect, refract
@@ -33,9 +33,9 @@ def ray_color(
         # direct lighting
         local_color = shader.shade_multiple_lights(hit, world, lights, -ray.direction).clamp01()
 
-        m = hit.material
-        reflectivity = clamp_float_01(m.reflectivity)
-        transparency = clamp_float_01(m.transparency)
+        material = hit.material
+        reflectivity = material.get_reflectance()
+        transparency = material.get_transparency()
 
         if reflectivity <= 0.0 and transparency <= 0.0:
             return local_color
@@ -43,11 +43,11 @@ def ray_color(
         n = hit.normal.normalize()
 
         if reflectivity >= transparency:
-            reflected_ray, throughput = handle_reflection(ray, hit, n, m, throughput=throughput)
+            reflected_ray, throughput = handle_reflection(ray, hit, n, material, throughput=throughput)
             reflected_color = ray_color(reflected_ray, world, lights, depth - 1, shader=shader, skybox=skybox)
             return clamp_color01(local_color + reflected_color * reflectivity)
         else:
-            refracted_ray, throughput = handle_refraction(ray, hit, n, m, throughput=throughput)
+            refracted_ray, throughput = handle_refraction(ray, hit, n, material, throughput=throughput)
             refracted_color = ray_color(refracted_ray, world, lights, depth - 1, shader=shader, skybox=skybox)
             return clamp_color01(local_color + refracted_color * transparency)
 
