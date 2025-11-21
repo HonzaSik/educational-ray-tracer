@@ -3,7 +3,7 @@ from src.material.color import Color
 from src.material.material.material import Material
 
 
-@dataclass()
+@dataclass
 class PbrMaterial(Material):
     """
     Physically Based Rendering (PBR) material model with properties for realistic surface representation.
@@ -27,3 +27,5 @@ class PbrMaterial(Material):
             if not (0.0 <= value <= 1.0):
                 raise ValueError(f"{attr} must be between 0.0 and 1.0, got {value}")
 
+    def get_reflectance(self) -> float:
+        return self.reflectivity

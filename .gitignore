@@ -21,6 +21,9 @@ notebooks/images/
 notebooks/pickle_data/
 notebooks/animation_frames/
 notebooks/video/
+notebooks/*.png
+notebooks/*.jpg
+notebooks/*.ppm
 
 stls/
 

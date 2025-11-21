@@ -26,10 +26,32 @@ class PreviewConfig:
     """
     Configuration for specifying how the image preview is displayed during rendering.
     """
+    progress_display: ProgressDisplay = ProgressDisplay.TQDM_IMAGE_PREVIEW,
     refresh_interval_rows: int = 10
     fill_missing_rows: bool = True
     show_status: bool = True
     border: str = "1px solid #ddd"
+
+    def __post_init__(self):
+        if self.refresh_interval_rows <= 0:
+            raise ValueError("Refresh interval must be a positive integer.")
+
+    def set_progress_display(self, mode: ProgressDisplay) -> None:
+        self.progress_display = mode
+
+    def set_refresh_interval(self, interval: int) -> None:
+        if interval <= 0:
+            raise ValueError("Refresh interval must be a positive integer.")
+        self.refresh_interval_rows = interval
+
+    def set_fill_missing_rows(self, fill: bool) -> None:
+        self.fill_missing_rows = fill
+
+    def set_show_status(self, show: bool) -> None:
+        self.show_status = show
+
+    def set_border(self, border_style: str) -> None:
+        self.border = border_style
 
 
 class ProgressUI:

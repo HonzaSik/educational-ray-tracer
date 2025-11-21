@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from src.io.resolution import Resolution
+from src.render.resolution import Resolution
 from src.math.vector import Vector
 from src.shading.shader_model import ShadingModel
-from src.scene import Scene, QualityPreset, RenderMethod
+from src.scene import Scene
 from src.scene.camera import Camera
 from .ease import linear, ease_in_out, EaseType
 from src.math.vertex import Vertex

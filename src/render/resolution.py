@@ -70,3 +70,7 @@ class Resolution(Enum):
     def custom(width: int, height: int) -> CustomResolution:
         return CustomResolution(width, height)
 
+    @property
+    def aspect_ratio(self) -> float:
+        return self.width / self.height
+

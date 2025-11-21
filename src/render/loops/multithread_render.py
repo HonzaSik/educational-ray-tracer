@@ -3,13 +3,11 @@ from typing import List, Tuple, Optional
 
 from src.material.color import Color, to_u8
 from src.render.helpers import ray_color
-from src.shading import BlinnPhongShader
-from .progress import ProgressDisplay, PreviewConfig
-from .raytrace_loop import RenderLoop
-from src.scene.camera import Camera
-from src.geometry.world import World
+from .progress import PreviewConfig
+from .linear_ray_caster import RenderLoop
 from src.shading.shader_model import ShadingModel
-from src.scene.light import Light
+from src.render.render_config import RenderConfig
+from src.scene.scene import Scene
 
 # shared globals for worker processes
 _STATE = {}
@@ -68,29 +66,21 @@ def _render_row_worker(j: int):
 
 class MultiProcessRowRenderLoop(RenderLoop):
     """
-    Concrete RenderLoop that renders scanlines in parallel with multiprocessing.
-    - Implements the abstract methods required by RenderLoop.
-    - Uses module-level workers (picklable) with a shared state initializer.
+    A multiprocess ray tracing render loop that processes the image row by row using multiple CPU cores.
+    Inherits from the abstract RenderLoop class and implements the render logic.
     """
-
     def __init__(self,
-                 cam: Camera,
-                 world: World,
-                 lights: List[Light],
-                 shading_model: Optional[ShadingModel] = None,
-                 progress: ProgressDisplay = ProgressDisplay.TQDM_IMAGE_PREVIEW,
-                 preview_config: Optional[PreviewConfig] = None,
-                 samples_per_pixel: int = 4,
-                 max_depth: int = 3,
-                 skybox: Optional[str] = None) -> None:
-
-        super().__init__(cam, world, lights,
-                         shading_model=shading_model or BlinnPhongShader(),
-                         progress=progress,
-                         preview_config=preview_config,
-                         samples_per_pixel=samples_per_pixel,
-                         max_depth=max_depth,
-                         skybox=skybox)
+                    scene: Scene,
+                    shading_model: Optional[ShadingModel] = None,
+                    preview_config: Optional[PreviewConfig] = None,
+                    render_config: Optional[RenderConfig] = None,
+                    ) -> None:
+        super().__init__(
+            scene = scene,
+            shading_model = shading_model,
+            preview_config = preview_config,
+            render_config = render_config
+        )
 
     # todo duplicate code because of worker uses his own pixel function (need rework)
     def render_pixel(self, i: int, j: int) -> Tuple[int, int, int]:
@@ -103,15 +93,15 @@ class MultiProcessRowRenderLoop(RenderLoop):
         v_base = ((height - 1 - j) * height_inv) - 0.5
 
         acc = Color.custom_rgb(0, 0, 0)
-        for s in range(self.samples_per_pixel):
+        for s in range(self.spp):
             ju, jv = jitter[s & 3]
-            ray = self.cam.make_ray(u_base + ju * width_inv, v_base + jv * height_inv)
+            ray = self.camera.make_ray(u_base + ju * width_inv, v_base + jv * height_inv)
             acc += ray_color(ray, self.world, self.lights, depth=self.max_depth,
                              shader=self.shader, skybox=self.skybox)
-        col = acc * (1.0 / self.samples_per_pixel)
+        col = acc * (1.0 / self.spp)
         return (to_u8(col.x), to_u8(col.y), to_u8(col.z))
 
-    def render(self) -> Tuple[List[Tuple[int,int,int]], int, int]:
+    def render_all_pixels(self) -> Tuple[List[Tuple[int,int,int]], int, int]:
         width, height = self.width, self.height
         # Use 'spawn' on macOS to avoid fork-with-threads issues in IPython/Jupyter.
         ctx = mp.get_context("spawn")
@@ -126,8 +116,8 @@ class MultiProcessRowRenderLoop(RenderLoop):
         with ctx.Pool(
             processes=ctx.cpu_count(),
             initializer=_init_worker,
-            initargs=(self.cam, self.world, self.lights, self.shader,
-                      self.samples_per_pixel, self.max_depth, self.skybox,
+            initargs=(self.camera, self.world, self.lights, self.shader,
+                      self.spp, self.max_depth, self.skybox,
                       width, height)
         ) as pool:
             # schedule all rows

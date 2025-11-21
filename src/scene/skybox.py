@@ -34,7 +34,6 @@ def hdr_to_ndarray(path: str) -> np.ndarray:
             header.append(line)
             i += 1
 
-
         # after header, expect resolution line: -Y height +X width (or +Y -X) in format 4 tokens
         res = f.readline().decode("ascii", errors="ignore").strip().split()
 

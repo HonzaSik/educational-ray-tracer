@@ -3,36 +3,34 @@ from typing import Tuple, Optional, List
 from random import random
 from src.material.color import Color, to_u8
 from src.shading.shader_model import ShadingModel
-from src.scene.light import Light
-from src.scene.camera import Camera
-from src.geometry.world import World
-from .loop_model import RenderLoop
-from .progress import ProgressDisplay, PreviewConfig
+from .render_loop import RenderLoop
+from .progress import PreviewConfig
 from src.render.helpers import ray_color
 from dataclasses import dataclass
 
-@dataclass
-class LineRenderLoop(RenderLoop):
-    """
-    Reference implementation using your current ray tracer (Blinn-Phong by default).
-    Only render_pixel() is specific; the loop + UI come from BaseRenderLoop.
-    """
-    def __init__(self,
-                 cam: Camera,
-                 world: World,
-                 lights: List[Light],
-                 samples_per_pixel: int = 10,
-                 max_depth: int = 5,
-                 skybox: Optional[str] = None,
-                 shading_model: Optional[ShadingModel] = None,
-                 progress: ProgressDisplay = ProgressDisplay.TQDM_IMAGE_PREVIEW,
-                 preview_cfg: Optional[PreviewConfig] = None,
-                 ) -> None:
+from src.render.render_config import RenderConfig
+from src.scene.scene import Scene
 
-        super().__init__(cam, world, lights, shading_model, progress, preview_cfg)
-        self.spp = samples_per_pixel
-        self.max_depth = max_depth
-        self.skybox = skybox
+
+@dataclass
+class LinearRayCaster(RenderLoop):
+    """
+    A basic single-threaded ray tracing render loop that processes the image line by line.
+    Inherits from the abstract RenderLoop class and implements the render logic.
+    """
+
+    def __init__(self,
+                 scene: Scene,
+                 shading_model: Optional[ShadingModel] = None,
+                 preview_config: Optional[PreviewConfig] = None,
+                 render_config: Optional[RenderConfig] = None,
+                 ) -> None:
+        super().__init__(
+            scene = scene,
+            shading_model = shading_model,
+            preview_config = preview_config,
+            render_config = render_config
+        )
 
 
     def render_pixel(self, i: int, j: int) -> Tuple[int, int, int]:
@@ -44,7 +42,7 @@ class LineRenderLoop(RenderLoop):
         for _ in range(self.spp):
             du = (random() - 0.5) / (self.width - 1)
             dv = (random() - 0.5) / (self.height - 1)
-            ray = self.cam.make_ray(u_base + du, v_base + dv)
+            ray = self.camera.make_ray(u_base + du, v_base + dv)
 
             acc += ray_color(
                 ray = ray,
@@ -59,7 +57,7 @@ class LineRenderLoop(RenderLoop):
         return to_u8(col.x), to_u8(col.y), to_u8(col.z) #todo color xyz to rgb
 
 
-    def render(self) -> Tuple[List[Tuple[int, int, int]], int, int]:
+    def render_all_pixels(self) -> Tuple[List[Tuple[int, int, int]], int, int]:
         pixels: List[Tuple[int, int, int]] = []
         total = self.width * self.height
 

@@ -1,4 +1,4 @@
-from .raytrace_loop import LineRenderLoop
+from .linear_ray_caster import LinearRayCaster
 from .multithread_render import MultiProcessRowRenderLoop
 
-__all__ = ['LineRenderLoop', 'MultiProcessRowRenderLoop']
+__all__ = ['LinearRayCaster', 'MultiProcessRowRenderLoop']
