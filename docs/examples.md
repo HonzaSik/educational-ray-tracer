@@ -130,9 +130,10 @@ animation_setup = AnimationSetup(
 
 ---
 ### Tours in Shanghai
-![Complex Animation](examples/custom_object.png)
+![Tours in Shanghai](examples/custom_object.png)
 
-### Torus in Drawn 
+### Torus on farm
+![Tours in ](examples/metalic_blue.png)
 
 
 <p align="center">
