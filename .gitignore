@@ -24,6 +24,8 @@ notebooks/video/
 notebooks/*.png
 notebooks/*.jpg
 notebooks/*.ppm
+notebooks/*.mp4
+notebooks/animatons/
 
 stls/
 

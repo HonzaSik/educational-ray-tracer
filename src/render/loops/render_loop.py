@@ -9,12 +9,13 @@ from src.geometry.world import World
 from src.scene.light import Light
 from src.shading.shader_model import ShadingModel
 from src.shading.blinn_phong_shader import BlinnPhongShader
-from .progress import ProgressUI, PreviewConfig
+from .progress import ProgressUI, PreviewConfig, ProgressDisplay
 from src.scene.scene import Scene
 from src.render.render_config import RenderConfig
 from src.io.image_helper import write_ppm, convert_ppm_to_png
 from src.render.post_process.post_process_pipeline import post_process_pipeline
 from src.render.post_process.post_process_config import PostProcessConfig
+from src.render.resolution import Resolution
 
 class ImgFormat(Enum):
     PPM = "ppm"
@@ -45,17 +46,17 @@ class RenderLoop(ABC):
         self.world : World = scene.world
         self.lights : List[Light] = scene.lights
         self.shader : ShadingModel = shading_model if shading_model is not None else BlinnPhongShader()
-        self.spp : int = render_config.samples_per_pixel
-        self.max_depth : int = render_config.max_depth
-        self.skybox : Optional[str] = scene.skybox_path
-        self.width: int = render_config.resolution.width
-        self.height: int = render_config.resolution.height
+        self.spp : int = render_config.samples_per_pixel if render_config is not None else 1
+        self.max_depth : int = render_config.max_depth if render_config is not None else 3
+        self.skybox : Optional[str] = scene.skybox_path if scene.skybox_path is not None else None
+        self.width: int = render_config.resolution.width if render_config is not None else Resolution.R360p.width
+        self.height: int = render_config.resolution.height if render_config is not None else Resolution.R360p.height
         self.post_process_config : PostProcessConfig = post_process_config if post_process_config is not None else PostProcessConfig()
         self.ui : ProgressUI = ProgressUI(
-            mode = preview_config.progress_display,
-            width = self.width,
-            height = self.height,
-            preview = preview_config
+            mode = preview_config.progress_display if preview_config is not None else ProgressDisplay.NONE,
+            width = self.width if preview_config is not None else Resolution.R360p.width,
+            height = self.height if preview_config is not None else Resolution.R360p.height,
+            preview = preview_config if preview_config is not None else PreviewConfig()
         )
 
     def __post_init__(self):

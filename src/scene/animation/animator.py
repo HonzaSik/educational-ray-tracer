@@ -10,6 +10,7 @@ from src.scene import Scene
 from src.scene.camera import Camera
 from .ease import linear, ease_in_out, EaseType
 from src.math.vertex import Vertex
+from src.render.loops.render_loop import RenderLoop
 
 
 @dataclass
@@ -56,7 +57,7 @@ class Animator:
     animation_setup: AnimationSetup = None
     animation_fps: int = 24 #todo move to QualityPreset
     animation_length_seconds: float = 2.0 #todo move to QualityPreset
-    animation_resolution: Resolution = Resolution.R144p #todo move to QualityPreset
+    ray_tracer: RenderLoop | None = None
 
     _total_frames: int = 0
     _frame_duration: float = 0.0
@@ -65,6 +66,9 @@ class Animator:
         if self.animation_setup is None:
             self.animation_setup = AnimationSetup()
         self._total_frames = self.get_total_frames()
+
+        if self.ray_tracer is None:
+            raise ValueError("ray_tracer must be provided to Animator.")
 
     def get_total_frames(self) -> int:
         if self._total_frames == 0:
@@ -85,31 +89,23 @@ class Animator:
 
     def create_png_sequence(
         self,
-        shader: ShadingModel | None = None,
-        scene: Scene | None = None,
         folder: Path | str | None = None,
         ease: EaseType = EaseType.LINEAR,
     ) -> list[Path]:
         """
         Renders the animation frames to PNG files.
         :param ease: Easing type to use for transitions.
-        :param shader: Optional shader model to use for rendering.
-        :param scene: Scene to render.
         :param folder: Folder to save the frames. If None, defaults to "./animation_frames"
         :return: List of paths to the rendered frame PNG files.
         """
 
-        #validation of inputs
-        if scene is None:
-            raise ValueError("Scene must be provided for animation rendering.")
         if self.animation_setup is None:
             raise ValueError("animation_setup must be set before calling animate_to_png().")
 
         # calate other params and sets animation settings
         total_frames = self.get_total_frames()
         frame_duration = self.get_frame_duration()
-        scene.set_camera_resolution(self.animation_resolution)
-        cam: Camera = scene.camera
+        cam: Camera = self.ray_tracer.camera
         last_angle_deg: float = 0.0
         frames: list[Path] = []
 
@@ -189,34 +185,25 @@ class Animator:
                     cam.__post_init__() # recalculate camera parameters after fov change
 
             # reset camera in scene
-            scene.set_camera(cam)
+            self.ray_tracer.camera = cam
 
             # render individual frame as PNG by sequence - frame_0000.png, frame_0001.png, ...
             path = folder / f"frame_{frame_i:04d}.png"
             spp, max_depth = (1, 5) #todo remove hardcode later add to QualityPreset or params
 
-            scene.render_multithreaded(
-                samples_per_pixel=spp,
-                max_depth=max_depth,
-                shading_model=shader,
-                image_png_path=str(path.resolve()),
-            )
+            self.ray_tracer.render(str(path.resolve()))
 
             frames.append(path)
         return frames
 
     def animate_to_mp4(
         self,
-        shader: ShadingModel | None = None,
-        scene: Scene | None = None,
         output_path: Path | str | None = None,
         ease: EaseType = EaseType.LINEAR,
     ) -> Path:
         """
         Renders the animation to an MP4 file.
         :param ease: Easing type to use for transitions.
-        :param shader: Optional shader model to use for rendering.
-        :param scene: Scene to render.
         :param output_path: Path to save the MP4 file. If None, defaults to "./animatons/animation.mp4"
         :return: Path to the rendered MP4 file.
         """
@@ -229,8 +216,6 @@ class Animator:
 
         frames_folder = Path("./animation_frames")
         frames = self.create_png_sequence(
-            shader=shader,
-            scene=scene,
             folder=frames_folder,
             ease=ease,
         )

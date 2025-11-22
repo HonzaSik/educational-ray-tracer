@@ -16,8 +16,9 @@ class World(Hittable):
     def __init__(self, objects: Iterable[Hittable] = ()):
         self.objects: list[Hittable] = list(objects)
 
-    def add(self, obj: Hittable) -> None:
-        self.objects.append(obj)
+    def add(self, *objs: Hittable) -> None:
+        """Add an object or more objects to the world."""
+        self.objects.extend(objs)
 
     def remove(self, obj: Hittable) -> None:
         self.objects.remove(obj)
