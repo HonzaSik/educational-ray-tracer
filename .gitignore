@@ -26,6 +26,8 @@ notebooks/*.jpg
 notebooks/*.ppm
 notebooks/*.mp4
 notebooks/animatons/
+notebooks/skybox/my_skyboxes/
+notebooks/skybox/my_skyboxes/*
 
 stls/
 
