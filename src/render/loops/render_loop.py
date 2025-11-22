@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from pathlib import Path
 from typing import Tuple, List, Optional
+
 from src.scene.camera import Camera
 from src.geometry.world import World
 from src.scene.light import Light
@@ -12,6 +13,8 @@ from .progress import ProgressUI, PreviewConfig
 from src.scene.scene import Scene
 from src.render.render_config import RenderConfig
 from src.io.image_helper import write_ppm, convert_ppm_to_png
+from src.render.post_process.post_process_pipeline import post_process_pipeline
+from src.render.post_process.post_process_config import PostProcessConfig
 
 class ImgFormat(Enum):
     PPM = "ppm"
@@ -28,6 +31,7 @@ class RenderLoop(ABC):
                 shading_model: Optional[ShadingModel] = None,
                 preview_config: Optional[PreviewConfig] = None,
                 render_config: Optional[RenderConfig] = None,
+                post_process_config: Optional[PostProcessConfig] = None
                 ) -> None:
         """
         Initializes the render loop with scene, shading model, preview config, and render config.
@@ -46,6 +50,7 @@ class RenderLoop(ABC):
         self.skybox : Optional[str] = scene.skybox_path
         self.width: int = render_config.resolution.width
         self.height: int = render_config.resolution.height
+        self.post_process_config : PostProcessConfig = post_process_config if post_process_config is not None else PostProcessConfig()
         self.ui : ProgressUI = ProgressUI(
             mode = preview_config.progress_display,
             width = self.width,
@@ -82,7 +87,6 @@ class RenderLoop(ABC):
         :return:
         """
         config = self.ui.preview
-
         #checks if preview is enabled
         if self.ui.img_widget is not None and config.refresh_interval_rows > 0:
             # each interval_rows, update the preview or at the last row
@@ -119,6 +123,13 @@ class RenderLoop(ABC):
         pixels, width, height = self.render_all_pixels()
         saved_paths: [Path] = []
 
+        if self.post_process_config.enabled:
+            pixels, width, height = post_process_pipeline(
+                pixels = pixels,
+                width = width,
+                height = height,
+                config = self.post_process_config
+            )
 
         for img_format in img_format_list:
             if img_format == ImgFormat.PPM:

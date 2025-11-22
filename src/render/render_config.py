@@ -1,7 +1,5 @@
-from enum import Enum
 from dataclasses import dataclass
 from src.render.resolution import Resolution
-from src.render.loops.progress import ProgressDisplay, PreviewConfig
 
 @dataclass
 class RenderConfig:

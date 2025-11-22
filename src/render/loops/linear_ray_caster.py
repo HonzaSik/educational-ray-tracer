@@ -10,6 +10,7 @@ from dataclasses import dataclass
 
 from src.render.render_config import RenderConfig
 from src.scene.scene import Scene
+from src.render.post_process.post_process_config import PostProcessConfig
 
 
 @dataclass
@@ -24,12 +25,14 @@ class LinearRayCaster(RenderLoop):
                  shading_model: Optional[ShadingModel] = None,
                  preview_config: Optional[PreviewConfig] = None,
                  render_config: Optional[RenderConfig] = None,
+                 post_process_config: Optional[PostProcessConfig] = None
                  ) -> None:
         super().__init__(
             scene = scene,
             shading_model = shading_model,
             preview_config = preview_config,
-            render_config = render_config
+            render_config = render_config,
+            post_process_config = post_process_config,
         )
 
 
