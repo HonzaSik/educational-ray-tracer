@@ -7,7 +7,7 @@ from typing import Tuple, List, Optional
 from src.scene.camera import Camera
 from src.geometry.world import World
 from src.scene.light import Light
-from src.shading.shader_model import ShadingModel
+from src.shading.shading_model import ShadingModel
 from src.shading.blinn_phong_shader import BlinnPhongShader
 from .progress import ProgressUI, PreviewConfig, ProgressDisplay
 from src.scene.scene import Scene

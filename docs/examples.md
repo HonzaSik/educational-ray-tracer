@@ -135,6 +135,10 @@ animation_setup = AnimationSetup(
 ### Torus on farm
 ![Tours in ](examples/metalic_blue.png)
 
+### Transparent spheres
+![Transparent spheres](examples/animatons/gif/transparent.gif)
+🔗 [Full-quality MP4](examples/animatons/mp4/transparent.mp4)
+
 
 <p align="center">
   <b> Documentation is not complete yet. Works as a example of how to document the project. </b>

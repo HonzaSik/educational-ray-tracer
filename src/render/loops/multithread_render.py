@@ -1,11 +1,10 @@
 import multiprocessing as mp
 from typing import List, Tuple, Optional
-
 from src.material.color import Color, to_u8
 from src.render.helpers import ray_color
 from .progress import PreviewConfig
 from .linear_ray_caster import RenderLoop
-from src.shading.shader_model import ShadingModel
+from src.shading.shading_model import ShadingModel
 from src.render.render_config import RenderConfig
 from src.scene.scene import Scene
 
@@ -74,12 +73,14 @@ class MultiProcessRowRenderLoop(RenderLoop):
                     shading_model: Optional[ShadingModel] = None,
                     preview_config: Optional[PreviewConfig] = None,
                     render_config: Optional[RenderConfig] = None,
+                    post_process_config: Optional[RenderConfig] = None
                     ) -> None:
         super().__init__(
             scene = scene,
             shading_model = shading_model,
             preview_config = preview_config,
-            render_config = render_config
+            render_config = render_config,
+            post_process_config = post_process_config,
         )
 
     # todo duplicate code because of worker uses his own pixel function (need rework)
@@ -105,14 +106,12 @@ class MultiProcessRowRenderLoop(RenderLoop):
         width, height = self.width, self.height
         # Use 'spawn' on macOS to avoid fork-with-threads issues in IPython/Jupyter.
         ctx = mp.get_context("spawn")
-
         print("------------------------------------------------------------")
         print(f"Using {ctx.cpu_count()} CPU cores for rendering.")
         print("------------------------------------------------------------")
 
         pixels_u8: List[Tuple[int,int,int]] = [None] * (width * height)  # type: ignore
 
-        # We want live previews as rows finish: use imap_unordered and update UI.
         with ctx.Pool(
             processes=ctx.cpu_count(),
             initializer=_init_worker,
@@ -120,12 +119,16 @@ class MultiProcessRowRenderLoop(RenderLoop):
                       self.spp, self.max_depth, self.skybox,
                       width, height)
         ) as pool:
-            # schedule all rows
-            for j, row in pool.imap_unordered(_render_row_worker, range(height), chunksize=1):
+            num_workers = ctx.cpu_count()
+            chunksize = max(1, height // (num_workers * 4))
+
+            for j, row in pool.imap_unordered(_render_row_worker, range(height), chunksize=chunksize):
                 # place row into final buffer
                 base = j * width
                 pixels_u8[base:base+width] = row
                 # preview/progress hook on main process
-                self.on_row_end_update_preview(j, pixels_u8)
+
+                if j % 10 == 0 or j == height - 1:
+                    self.on_row_end_update_preview(j, pixels_u8)
 
         return pixels_u8, width, height

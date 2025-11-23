@@ -1,6 +1,6 @@
 # src/shading/compare_checker_shader.py
 from dataclasses import dataclass
-from .shader_model import ShadingModel
+from .shading_model import ShadingModel
 from src.geometry.hit_point import HitPoint
 from src.geometry.world import World
 from src.scene.light import Light

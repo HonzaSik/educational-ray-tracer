@@ -1,7 +1,7 @@
 # src/shading/blinn_phong_shader.py
 from __future__ import annotations
 from abc import ABC
-from .shader_model import ShadingModel
+from .shading_model import ShadingModel
 from src.geometry.hit_point import HitPoint
 from src.geometry.world import World
 from src.material.color import Color, clamp_color255

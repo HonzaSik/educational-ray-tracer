@@ -3,7 +3,7 @@ from .geometry import World, Plane, Sphere, Triangle, Square
 # helpers and math
 from .math import Vertex, Vector
 # io package
-from .io import ColorLibrary, LightLibrary, MaterialLibrary, PickleManager, Resolution, ipynb_display_image
+from .io import ColorLibrary, LightLibrary, MaterialLibrary, PickleManager, Resolution, ipynb_display_images
 # material
 from .material import Material, Color
 # scene setting
@@ -14,7 +14,7 @@ from .shading import  BlinnPhongShader, DepthShader, NormalShader, DiffShader, C
 __all__ = [
     "Plane", "Sphere", "World", "Square", "Triangle",
     "Vertex", "Vector",
-    "ColorLibrary", "LightLibrary", "MaterialLibrary", "PickleManager", "ipynb_display_image",
+    "ColorLibrary", "LightLibrary", "MaterialLibrary", "PickleManager", "ipynb_display_images",
     "Material", "Color",
     "Scene", "Camera", "AmbientLight", "PointLight", "Resolution", "RenderMethod", "ShadingModel", "QualityPreset",
     "BlinnPhongShader", "DepthShader", "NormalShader", "DiffShader", "CurvatureShader"

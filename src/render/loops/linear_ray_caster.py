@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Tuple, Optional, List
 from random import random
 from src.material.color import Color, to_u8
-from src.shading.shader_model import ShadingModel
+from src.shading.shading_model import ShadingModel
 from .render_loop import RenderLoop
 from .progress import PreviewConfig
 from src.render.helpers import ray_color

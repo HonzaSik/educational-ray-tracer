@@ -28,6 +28,8 @@ notebooks/*.mp4
 notebooks/animatons/
 notebooks/skybox/my_skyboxes/
 notebooks/skybox/my_skyboxes/*
+notebooks/benchmark_data/
+notebooks/benchmark_data/*
 
 stls/
 

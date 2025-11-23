@@ -9,7 +9,7 @@ from src.math import reflect, refract
 from src.math.helpers import clamp_float_01
 from src.math import fresnel_schlick
 from src.shading.blinn_phong_shader import BlinnPhongShader
-from src.shading.shader_model import ShadingModel
+from src.shading.shading_model import ShadingModel
 
 def ray_color(
     ray: Ray,

@@ -1,4 +1,4 @@
-from .shader_model import ShadingModel
+from .shading_model import ShadingModel
 from src.geometry.hit_point import HitPoint
 from src.geometry.world import World
 from src.scene.light import Light

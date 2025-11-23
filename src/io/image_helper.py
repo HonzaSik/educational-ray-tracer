@@ -33,11 +33,18 @@ def write_ppm(filename, pixels, w, h):
             f.write(f"{r} {g} {b}\n")
 
 
-def ipynb_display_image(path: str = "./images/phong.png") -> None:
+def ipynb_display_images(path: str | list[str] | None = None) -> None:
     """
-    Display the rendered image (e.g., in a Jupyter notebook).
+    Display the rendered image or images in a Jupyter notebook.
+    :param path: Path to the image file or list of image file paths.
+    :return: None
     """
-    if not Path(path).exists():
-        raise FileNotFoundError(f"Image file {path} not found.")
 
-    display(Image(filename=path))
+    if isinstance(path, list):
+        for p in path:
+            display(Image(filename=p))
+
+    else:
+        if path is None:
+            raise ValueError("No image path provided for display.")
+        display(Image(filename=path))

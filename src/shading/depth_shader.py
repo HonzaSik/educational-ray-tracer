@@ -1,7 +1,7 @@
 # src/shading/normal_shader.py
 from __future__ import annotations
 from typing import Literal
-from .shader_model import ShadingModel
+from .shading_model import ShadingModel
 from src.geometry.hit_point import HitPoint
 from src.geometry.world import World
 from src.scene.light import Light

@@ -26,7 +26,7 @@ class PreviewConfig:
     """
     Configuration for specifying how the image preview is displayed during rendering.
     """
-    progress_display: ProgressDisplay = ProgressDisplay.TQDM_IMAGE_PREVIEW,
+    progress_display: ProgressDisplay = ProgressDisplay.NONE,
     refresh_interval_rows: int = 10
     fill_missing_rows: bool = True
     show_status: bool = True
