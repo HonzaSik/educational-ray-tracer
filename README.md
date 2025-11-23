@@ -146,13 +146,56 @@ class MyShader(ShadingModel):
 ## Jupyter Notebook custom object definition
 You can define your own objects by creating a new class that inherits from the `Object` base class like:
 ```python
-from src import Object
-#todo
-```
+@dataclass
+class MySphere(Hittable):
+    """
+    Sphere in 3D space defined by center, radius, and color.
+    """
+    center: Vertex
+    radius: float
+    material: Material
 
-### example of custom objects
-#### Custom Tourus - defined in ./notebooks/custom_objet.ipynb [go to notebook](./notebooks/custom_object.ipynb)
-![Custom Torus](docs/examples/custom_torus.png)
+    def normal_at(self, point: Vertex) -> Vector:
+        normal = (point - self.center) / self.radius
+        return normal
+
+    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> HitPoint | None:
+        oc = ray.origin - self.center
+
+        # Quadratic coefficients
+        a = ray.direction.dot(ray.direction)
+        b = 2.0 * oc.dot(ray.direction)
+        c = oc.dot(oc) - self.radius * self.radius
+
+        discriminant = b * b - 4 * a * c
+
+        if discriminant < 0: # no intersection
+            return None
+
+        sqrt_disc = np.sqrt(discriminant)
+
+        # Find the nearest root
+        root = (-b - sqrt_disc) / (2.0 * a)
+        if root < t_min or root > t_max:
+            root = (-b + sqrt_disc) / (2.0 * a)
+            # Point out of bounds
+            if root < t_min or root > t_max:
+                return None
+
+        hit_point = ray.point_at(root)
+
+        normal = self.normal_at(hit_point)
+        # Ensure the normal is facing against the ray
+        if ray.direction.dot(normal) > 0.0:
+            normal = -normal
+
+        return HitPoint(dist=root, point=hit_point, normal=normal, material=self.material, ray_dir=ray.direction)
+
+    def random_point(self) -> Vertex:
+        pass
+```
+![Custom](docs/examples/custom_object.png)
+#### This custom object is defined in ./notebooks/custom_objet.ipynb [go to notebook](./notebooks/custom_object.ipynb)
 
 ---
 

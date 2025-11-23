@@ -10,7 +10,7 @@ from .triangle import Triangle
 import random
 
 
-class Square(Hittable, ABC):
+class Square(Hittable):
     """
     Square in 3D space defined by four vertices and material.
     The square is composed of two triangles for intersection calculations.
