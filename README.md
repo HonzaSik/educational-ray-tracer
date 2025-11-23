@@ -121,27 +121,25 @@
 
 # Custom definitions – Shaders, Objects, Renderloops
 
-## Jupyter Notebook Custom shader definition (in progress)
-You can define your own shaders by creating a new class that inherits from the `Shader` base class like:
+## Jupyter Notebook Custom shader definition
+You can define your own shaders by creating a new class that inherits from the `ShadingModel` base class like:
 ```python
 @dataclass
-class NormalShader(ShadingModel):
-
-    def shade(self, hit: HitPoint, world: World, light: Light| None, view_dir: Vector) -> Color:
-        norm = hit.normal.normalize()
-        red = int((norm.x + 1) * 0.5 * 255)
-        green = int((norm.y + 1) * 0.5 * 255)
-        blue = int((norm.z + 1) * 0.5 * 255)
-        return Color.custom_rgb(red, green, blue)
-
+class MyShader(ShadingModel):
+  
+    def shade(self, hit: HitPoint, world: World, light: Light, view_dir: Vector, light_direction=None) -> Color:
+        return Color.custom_rgb(
+            int((hit.point.x % 1) * 255),
+            int((hit.point.y % 1) * 255),
+            int((hit.point.z % 1) * 255)
+        )
 
     def shade_multiple_lights(self, hit: HitPoint, world: World, lights: list[Light], view_dir: Vector) -> Color:
-        return self.shade(hit=hit, world=world, light=None, view_dir=view_dir)
+        for light in lights:
+            return self.shade(hit, world, light, view_dir)
 ```
-#### example of shaders
-###
-#### Custom Normal Shader - will be defined in ./notebooks/custom_shader.ipynb [go to notebook](./notebooks/custom_shader.ipynb)
-![Custom Normal Shader](docs/examples/custom_normal_shader.png)
+#### Custom Shader - defined in ./notebooks/shaders.ipynb [go to notebook](./notebooks/shaders.ipynb)
+![Custom Shader](docs/examples/my_shader.png)
 
 ---
 
