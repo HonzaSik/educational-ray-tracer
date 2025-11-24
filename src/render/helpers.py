@@ -30,11 +30,11 @@ def cast_ray(
 
     if hit is not None:
         # direct lighting
-        local_color = shader.shade_multiple_lights(hit, world, lights, -ray.direction).clamp01()
+        local_color = shader.shade_multiple_lights(hit, world, lights, -ray.direction).clamp_01()
 
         material = hit.material
-        reflectivity = material.get_reflectance()
-        transparency = material.get_transparency()
+        reflectivity : float = material.get_reflectance()
+        transparency : float = material.get_transparency()
 
         if reflectivity <= 0.0 and transparency <= 0.0:
             return local_color

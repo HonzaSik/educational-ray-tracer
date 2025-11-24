@@ -1,20 +1,28 @@
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, replace
 from src.material.color import Color
 from enum import Enum
 from src.math.vector import Vector
 
-@dataclass()
+@dataclass
 class Material(ABC):
     """
     Abstract base class for materials. Defines common properties for different material types.
     """
     name: str = "default_material"
 
-    def __init__(self):
-        raise NotImplementedError("Material is an abstract base class and cannot be instantiated directly.")
+    def __init__(self, **params):
+        self.params = params # Store parameters for potential use in subclasses
+
+    @abstractmethod
+    def get_color(self) -> Color:
+        """
+        Get the base color of the material as a Color object.
+        :return: Base color
+        """
+        pass
 
     def get_reflectance(self) -> float:
         """
@@ -52,12 +60,3 @@ class Material(ABC):
         :return: Specular color
         """
         raise NotImplementedError("Subclasses must implement get_specular_color method.")
-
-    #todo remove this - temporary
-    def base_color_as_color(self) -> Color:
-        """
-        Get the base color of the material as a Color object.
-        :return: Base color
-        """
-        raise NotImplementedError("Subclasses must implement base_color_as_Color method.")
-

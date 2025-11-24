@@ -44,5 +44,5 @@ class PhongMaterial(Material):
     def get_specular_color(self) -> Color:
         return self.spec_color
 
-    def base_color_as_color(self) -> Color:
+    def get_color(self) -> Color:
         return self.base_color

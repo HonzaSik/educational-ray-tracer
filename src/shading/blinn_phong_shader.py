@@ -60,7 +60,7 @@ class BlinnPhongShader(ShadingModel, ABC):
 
         for light in lights:
             if light.type == AmbientLight:
-                accum += light.intensity_at(hit.point) * material.base_color_as_color()
+                accum += light.intensity_at(hit.point) * material.get_color()
             else:
                 accum += self.shade(hit, world, light, view_dir)
 
@@ -76,7 +76,7 @@ class BlinnPhongShader(ShadingModel, ABC):
         if getattr(m, "transparency", 0.0) > 0.0:
             return Color(0.0, 0.0, 0.0)
         ndotl = max(0.0, n.dot(l))
-        return m.base_color_as_color() * ndotl
+        return m.get_color() * ndotl
 
 
     def _blinn_specular(self, material: Material, n: Vector, l: Vector, v: Vector) -> Color:

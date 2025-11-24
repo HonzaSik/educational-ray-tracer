@@ -1,24 +1,32 @@
 from __future__ import annotations
-from typing import Iterator, Union
+
+from dataclasses import dataclass
+from typing import Union, Iterable, Any
 import numpy as np
 from src.math import Vec3
 from src.math.helpers import interpolate
 
-#todo make color not to be Vec3 but make it have unlimited range, and have methods to convert to/from Vec3
-
 DT = np.float32
 _skybox_cache: dict[str, "SkyboxHDR"] = {}
-
-_LUT_N = 2048
-_gamma_u8 = (255.99 * (np.linspace(0.0, 1.0, _LUT_N+1, dtype=DT) ** (DT(1/2.2)))).astype(np.uint8)
 
 def _to_u8_fast(v: float) -> int:
     if v <= 0.0: return 0
     if v >= 1.0: return 255
-    return int(_gamma_u8[int(v * _LUT_N)])
+    return int(v * 255.0 + 0.5)
 
 def clamp01(x: float) -> float:
     return 0.0 if x < 0.0 else 1.0 if x > 1.0 else x
+
+def clamp_color255(col: Color) -> Color:
+    r, g, b = col.as_rgb()
+    return Color.custom_rgb(
+        clamp255(int(r * 255)),
+        clamp255(int(g * 255)),
+        clamp255(int(b * 255)),
+    )
+
+def clamp_color01(col: Color) -> Color:
+    return Color(np.clip(col.data, 0.0, 1.0))
 
 def clamp255(n: int) -> int:
     return 0 if n < 0 else 255 if n > 255 else n
@@ -27,39 +35,153 @@ def to_u8(v: float) -> int:
     # keep name, route to fast version
     return _to_u8_fast(v)
 
-def _as_np3(v: Union[Vec3, np.ndarray, tuple[float,float,float]]) -> np.ndarray:
-    """Borrow/convert to contiguous float32[3] without surprises."""
+def _as_np3(v: Union[Vec3, Color, np.ndarray, Iterable[float]]) -> np.ndarray:
     if isinstance(v, Vec3):
-        # borrow the components; avoid allocations
         return np.array([v.x, v.y, v.z], dtype=DT)
-    a = np.asarray(v, dtype=DT).reshape(3)
-    return a
+    elif isinstance(v, Color):
+        r, g, b = v.as_rgb()
+        return np.array([float(r), float(g), float(b)], dtype=DT)
+    else:
+        arr = np.asarray(v, dtype=DT).reshape(-1)
+        if arr.shape[0] < 3:
+            # fill missing components
+            filled = np.zeros(3, dtype=DT)
+            for i in range(arr.shape[0]):
+                filled[i] = arr[i]
+            for i in range(arr.shape[0], 3):
+                filled[i] = filled[i-1]
+            return filled
+        return arr[:3]
 
-def interpolate_color(a: "Color", b: "Color", t: float) -> "Color":
+
+def interplate_rgb_color(a: Color, b: Color, t: float) -> Color:
+    ar, ag, ab = a.as_rgb()
+    br, bg, bb = b.as_rgb()
     return Color(
-        interpolate(a.r, b.r, t),
-        interpolate(a.g, b.g, t),
-        interpolate(a.b, b.b, t)
+        interpolate(ar, br, t),
+        interpolate(ag, bg, t),
+        interpolate(ab, bb, t),
     )
 
 def to_u8_color(col: Color) -> Color:
-    return Color.custom_rgb(to_u8(col.x), to_u8(col.y), to_u8(col.z))
-
-def clamp_color01(col: "Color") -> "Color":
-    return Color(clamp01(col.x), clamp01(col.y), clamp01(col.z))
-
-def clamp_color255(col: "Color") -> "Color":
+    r, g, b = col.as_rgb()
     return Color.custom_rgb(
-        clamp255(int(col.x * 255)),
-        clamp255(int(col.y * 255)),
-        clamp255(int(col.z * 255))
+        to_u8(r),
+        to_u8(g),
+        to_u8(b),
     )
 
-class Color(Vec3):
-    """Color = Vec3 in [0..1] with helpers."""
+@dataclass
+class Color:
+    """
+    Represents color whatever way you want: as RGB color, or as 3D vector, also supports numpy array operations.
+    Can be constructed from individual float components, from iterable of floats, or from numpy array.
+    """
+    data: np.ndarray
+
+    def __init__(self, *values: float | Iterable[float] | np.ndarray):
+        if len(values) == 1 and not isinstance(values[0], (int, float)):
+            arr = np.asarray(values[0], dtype=DT).reshape(-1)
+        else:
+            arr = np.asarray(values, dtype=DT).reshape(-1)
+        self.data = arr.astype(DT)
+
+    @property
+    def r(self) -> float:
+        return float(self.data[0])
+
+    @r.setter
+    def r(self, value: float) -> None:
+        self.data[0] = DT(value)
+
+    @property
+    def g(self) -> float:
+        return float(self.data[1])
+
+    @g.setter
+    def g(self, value: float) -> None:
+        self.data[1] = DT(value)
+
+    @property
+    def b(self) -> float:
+        return float(self.data[2])
+
+    @b.setter
+    def b(self, value: float) -> None:
+        self.data[2] = DT(value)
+
+    @property
+    def x(self) -> float:
+        return self.r
+
+    @property
+    def y(self) -> float:
+        return self.g
+
+    @property
+    def z(self) -> float:
+        return self.b
+
+    def __iter__(self):
+        return iter(self.data)
+
+    def __len__(self) -> int:
+        return self.data.shape[0]
+
+    def _binary_operation(self, other: Any, op) -> Color:
+        if isinstance(other, Color):
+            return Color(op(self.data, other.data))
+        else:
+            return Color(op(self.data, other))
+
+    def __add__(self, other: Any) -> Color:
+        return self._binary_operation(other, np.add)
+
+    def __radd__(self, other: Any) -> Color:
+        return self.__add__(other)
+
+    def __sub__(self, other: Any) -> Color:
+        return self._binary_operation(other, np.subtract)
+
+    def __mul__(self, other: Any) -> Color:
+        return self._binary_operation(other, np.multiply)
+
+    def __rmul__(self, other: Any) -> Color:
+        return self.__mul__(other)
+
+    def __truediv__(self, other: Any) -> Color:
+        return self._binary_operation(other, np.divide)
+
+    def to_vec3(self) -> Vec3:
+        if len(self.data) < 3:
+            r = float(self.data[0]) if len(self.data) > 0 else 0.0
+            g = float(self.data[1]) if len(self.data) > 1 else r
+            b = r
+        else:
+            r, g, b = map(float, self.data[:3])
+        return Vec3(r, g, b)
+
+    def as_rgb(self) -> tuple[float, float, float]:
+        """Return (r,g,b) from Color, filling missing components as needed. Or (0,0,0) if empty."""
+        n = len(self.data)
+        if n == 0:
+            return 0.0, 0.0, 0.0
+        if n == 1:
+            v = float(self.data[0])
+            return v, v, v
+        if n == 2:
+            r = float(self.data[0])
+            g = float(self.data[1])
+            return r, g, g
+        r, g, b = map(float, self.data[:3])
+        return r, g, b
+
+    @classmethod
+    def from_vec3(cls, v: Vec3) -> Color:
+        return cls(v.x, v.y, v.z)
 
     @staticmethod
-    def custom_albedo(r: float, g: float, b: float) -> "Color":
+    def custom_albedo(r: float, g: float, b: float) -> Color:
         """
         Create a custom color with specified red, green, and blue components.
         :param r: red component
@@ -70,38 +192,43 @@ class Color(Vec3):
         return Color(clamp01(r), clamp01(g), clamp01(b))
 
     @staticmethod
-    def custom_rgb(r: int, g: int, b: int) -> "Color":
+    def custom_rgb(r: int, g: int, b: int) -> Color:
         return Color(clamp255(r)/255.0, clamp255(g)/255.0, clamp255(b)/255.0)
 
-    # --- Properties ---
-    @property
-    def r(self) -> float: return self.x
-    @property
-    def g(self) -> float: return self.y
-    @property
-    def b(self) -> float: return self.z
-
-    def __iter__(self) -> Iterator[float]:
-        yield self.r; yield self.g; yield self.b
-
     def to_rgb8(self) -> tuple[int, int, int]:
-        return (clamp255(int(self.r * 255)),
-                clamp255(int(self.g * 255)),
-                clamp255(int(self.b * 255)))
+        r, g, b = self.as_rgb()
+        return (
+            clamp255(int(r * 255)),
+            clamp255(int(g * 255)),
+            clamp255(int(b * 255)),
+        )
+
+    def clamp_01(self) -> Color:
+        return Color(np.clip(self.data, 0.0, 1.0))
 
     @classmethod
-    def background_color(cls, direction, skybox=None) -> "Color":
+    def background_color(cls, direction, skybox=None) -> Color:
+        """
+        Generate a background color based on the given direction and optional skybox.
+        :param direction: Vec3 | np.ndarray(3,)
+        :param skybox: str path or SkyboxHDR instance
+        :return: Color
+        """
         if skybox is not None:
             return cls.from_hdr(skybox, direction)
 
-        d = _as_np3(direction)                      # accept Vec3 or np
-        n = float(np.linalg.norm(d))
-        if n > 0: d = d / n
-        t = 0.5 * (d[1] + 1.0)                      # y component
-        return (1.0 - t) * cls.White + t * cls.custom_rgb(100, 100, 255)
+        direction = _as_np3(direction)
+        normal = float(np.linalg.norm(direction))
+
+        if normal > 0:
+            direction = direction / normal
+
+        y_axis = 0.5 * (direction[1] + 1.0)
+        color = (1.0 - y_axis) * cls.custom_rgb(255, 255, 255) + y_axis * cls.custom_rgb(100, 100, 255)
+        return color
 
     @classmethod
-    def from_hdr(cls, skybox, direction) -> "Color":
+    def from_hdr(cls, skybox, direction) -> Color:
         """
         skybox: str path or SkyboxHDR instance
         direction: Vec3 | np.ndarray(3,)
@@ -120,14 +247,20 @@ class Color(Vec3):
             skybox = skybox
 
         col = skybox.color_from_dir(direction)
+
+        if isinstance(col, Color):
+            r, g, b = col.as_rgb()
+            return cls(r, g, b)
+
         if isinstance(col, Vec3):
             return cls(col.x, col.y, col.z)
+
         col_np = _as_np3(col)
         return cls(float(col_np[0]), float(col_np[1]), float(col_np[2]))
 
-# --- Named Presets ---
+# color presets
 Color.Black = Color(0.0, 0.0, 0.0)
 Color.White = Color(1.0, 1.0, 1.0)
-Color.Red   = Color(1.0, 0.0, 0.0)
+Color.Red = Color(1.0, 0.0, 0.0)
 Color.Green = Color(0.0, 1.0, 0.0)
-Color.Blue  = Color(0.0, 0.0, 1.0)
+Color.Blue = Color(0.0, 0.0, 1.0)
