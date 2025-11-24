@@ -5,7 +5,7 @@ from src.material.color import Color, to_u8
 from src.shading.shading_model import ShadingModel
 from .render_loop import RenderLoop
 from .progress import PreviewConfig
-from src.render.helpers import ray_color
+from src.render.helpers import cast_ray
 from dataclasses import dataclass
 
 from src.render.render_config import RenderConfig
@@ -31,7 +31,7 @@ class LinearRayCaster(RenderLoop):
             dv = (random() - 0.5) / (self.height - 1)
             ray = self.camera.make_ray(u_base + du, v_base + dv)
 
-            acc += ray_color(
+            acc += cast_ray(
                 ray = ray,
                 world = self.world,
                 lights = self.lights,

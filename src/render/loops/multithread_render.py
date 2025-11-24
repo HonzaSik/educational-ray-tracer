@@ -1,7 +1,7 @@
 import multiprocessing as mp
 from typing import List, Tuple, Optional
 from src.material.color import Color, to_u8
-from src.render.helpers import ray_color
+from src.render.helpers import cast_ray
 from .progress import PreviewConfig
 from .linear_ray_caster import RenderLoop
 from src.shading.shading_model import ShadingModel
@@ -57,7 +57,7 @@ def _render_row_worker(j: int):
             ju, jv = jitter[s & 3]
             # create ray through pixel with jitter
             ray = camera.make_ray(u_base + ju * width_inv, v_base + jv * height_inv)
-            acc += ray_color(ray, world, lights, depth=max_depth, shader=shader, skybox=skybox)
+            acc += cast_ray(ray, world, lights, depth=max_depth, shader=shader, skybox=skybox)
         # average accumulated color and convert to 0-255 range for PPM output
         col = acc * (1.0 / spp)
         row[i] = (to_u8(col.x), to_u8(col.y), to_u8(col.z))
@@ -83,8 +83,8 @@ class MultiProcessRowRenderLoop(RenderLoop):
         for s in range(self.spp):
             ju, jv = jitter[s & 3]
             ray = self.camera.make_ray(u_base + ju * width_inv, v_base + jv * height_inv)
-            acc += ray_color(ray, self.world, self.lights, depth=self.max_depth,
-                             shader=self.shader, skybox=self.skybox)
+            acc += cast_ray(ray, self.world, self.lights, depth=self.max_depth,
+                            shader=self.shader, skybox=self.skybox)
         col = acc * (1.0 / self.spp)
         return (to_u8(col.x), to_u8(col.y), to_u8(col.z))
 

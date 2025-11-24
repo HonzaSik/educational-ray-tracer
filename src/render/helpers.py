@@ -11,7 +11,7 @@ from src.math import fresnel_schlick
 from src.shading.blinn_phong_shader import BlinnPhongShader
 from src.shading.shading_model import ShadingModel
 
-def ray_color(
+def cast_ray(
     ray: Ray,
     world: World,
     lights: list[Light],
@@ -19,6 +19,7 @@ def ray_color(
     shader: ShadingModel | None = None,
     skybox: str | None = None,
 ) -> Color:
+
     if shader is None:
         shader = BlinnPhongShader()
 
@@ -26,8 +27,6 @@ def ray_color(
         return Color.custom_rgb(0, 0, 0)
 
     hit = world.hit(ray)
-
-    throughput = 1.0
 
     if hit is not None:
         # direct lighting
@@ -43,12 +42,12 @@ def ray_color(
         n = hit.normal.normalize()
 
         if reflectivity >= transparency:
-            reflected_ray, throughput = handle_reflection(ray, hit, n, material, throughput=throughput)
-            reflected_color = ray_color(reflected_ray, world, lights, depth - 1, shader=shader, skybox=skybox)
+            reflected_ray = handle_reflection(ray, hit, n, material)
+            reflected_color = cast_ray(reflected_ray, world, lights, depth - 1, shader=shader, skybox=skybox)
             return clamp_color01(local_color + reflected_color * reflectivity)
         else:
-            refracted_ray, throughput = handle_refraction(ray, hit, n, material, throughput=throughput)
-            refracted_color = ray_color(refracted_ray, world, lights, depth - 1, shader=shader, skybox=skybox)
+            refracted_ray = handle_refraction(ray, hit, n, material)
+            refracted_color = cast_ray(refracted_ray, world, lights, depth - 1, shader=shader, skybox=skybox)
             return clamp_color01(local_color + refracted_color * transparency)
 
     return Color.background_color(ray.direction, skybox=skybox) # background color
@@ -58,7 +57,7 @@ def handle_reflection(ray: Ray,
                       hit: HitPoint,
                       normal: Vector,
                       material: Material,
-                      throughput: float) -> tuple[Ray, float]:
+                      ) -> Ray:
     R = reflect(ray.direction, normal).normalize()
 
     # Fresnel-Schlick
@@ -73,21 +72,18 @@ def handle_reflection(ray: Ray,
     f_avg = luminance(f)
     user_refl = clamp_float_01(getattr(material, "reflectivity", 0.0))
     energy = clamp_float_01(user_refl + (1.0 - user_refl) * f_avg)
-    throughput *= energy
 
     next_dir = R
 
     bias = max(1e-4, 1e-3 * min(1.0, hit.dist))
     origin = hit.point + normal * bias
-    return Ray(origin, next_dir), throughput
-
-
+    return Ray(origin, next_dir)
 
 def handle_refraction(ray: Ray,
                       hit: HitPoint,
                       n_geom: Vector,
                       material: Material,
-                      throughput: float) -> tuple[Ray, float]:
+                      ) -> Ray:
     trans = clamp_float_01(getattr(material, "transparency", 0.0))
     ior_m = getattr(material, "ior", 1.5)
 
@@ -97,14 +93,13 @@ def handle_refraction(ray: Ray,
     ior_in  = ior_m if front_face else 1.0
 
     Tdir = refract(ray.direction, outward_n, ior_out=ior_out, ior_in=ior_in)
-    throughput *= trans
 
     bias = max(1e-4, 1e-3 * min(1.0, hit.dist))
     if Tdir is None:
         # TIR -> reflect
         next_dir = reflect(ray.direction, outward_n).normalize()
         origin = hit.point + outward_n * bias
-        return Ray(origin, next_dir), throughput
+        return Ray(origin, next_dir)
     else:
         origin = hit.point - outward_n * bias
-        return Ray(origin, Tdir.normalize()), throughput
+        return Ray(origin, Tdir.normalize())

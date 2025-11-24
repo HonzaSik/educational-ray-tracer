@@ -153,7 +153,6 @@ class RenderLoop(ABC):
         return saved_paths
 
 
-
     def _save_as_ppm(self, filename: str, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Path:
         """
         Saves the rendered pixels to a PPM file.
