@@ -68,9 +68,9 @@
 - ### **[Setup & Usage](#setup--usage)**
   - [Setup](#setup)
   - [Usage](#usage)
-- ### **[How to Extend](#custom-definitions)**
-  - [Object](#object-definition)
-  - [Shader](#shader-definition)
+- ### **[How to Extend](#Custom-Definitions)**
+  - [Object](#objects)
+  - [Shader](#shaders)
   - [Render Loop](#render-loop-definition)
 - ### **[Roadmap & Progress](#roadmap--progress)**
 - ### **[License](#license)**
@@ -108,10 +108,13 @@
 # todo – coming soon this raytracer is still in development
 ```
 
-# custom-definitions
+<br><br>
 
-## Object definition
-You can define your own objects by creating a new class that inherits from the `Object` base class like:
+# Custom Definitions
+
+## Objects
+You can define your own objects by creating a new class that inherits from the `Hittable` base class like:
+
 <details> <summary><b>Click to expand ⤵️</b></summary>
 
 ```python
@@ -167,11 +170,11 @@ class MySphere(Hittable):
 
 </details>
 
-#### This custom object is defined in ./notebooks/custom_objet.ipynb [go to notebook](./notebooks/custom_object.ipynb)
-
 ---
 
-## Shader definition
+<br><br>
+
+## Shaders
 You can define your own shaders by creating a new class that inherits from the `ShadingModel` base class like:
 
 <details> <summary><b>Click to expand ⤵️</b></summary>
@@ -198,6 +201,8 @@ class MyShader(ShadingModel):
 #### Defined in ./notebooks/shaders.ipynb [go to notebook](./notebooks/shaders.ipynb)
 
 ---
+
+<br><br>
 
 ## Render loop definition
 
@@ -240,6 +245,8 @@ class MySimpleRenderLoop(RenderLoop):
 
 ---
 
+<br><br>
+
 # Roadmap & Progress
 
 This log shows the evolution of the raytracer.   
@@ -247,7 +254,6 @@ This log shows the evolution of the raytracer.
 
 **Github lowers the image quality when displaying them in the README, so for best quality check the images in the `docs/examples` folder.**
 
----
 
 ## Image 5 – Improved Glass + Skybox (Current)
 - **Scene:** spheres with better glass material  
