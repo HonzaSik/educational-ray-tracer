@@ -112,6 +112,8 @@
 
 ## Object definition
 You can define your own objects by creating a new class that inherits from the `Object` base class like:
+<details> <summary><b>Click to expand ⤵️</b></summary>
+
 ```python
 @dataclass
 class MySphere(Hittable):
@@ -162,12 +164,18 @@ class MySphere(Hittable):
         pass
 ```
 ![Custom](docs/examples/custom_object.png)
+
+</details>
+
 #### This custom object is defined in ./notebooks/custom_objet.ipynb [go to notebook](./notebooks/custom_object.ipynb)
 
 ---
 
 ## Shader definition
 You can define your own shaders by creating a new class that inherits from the `ShadingModel` base class like:
+
+<details> <summary><b>Click to expand ⤵️</b></summary>
+
 ```python
 @dataclass
 class MyShader(ShadingModel):
@@ -183,12 +191,18 @@ class MyShader(ShadingModel):
         for light in lights:
             return self.shade(hit, world, light, view_dir)
 ```
-#### Custom Shader - defined in ./notebooks/shaders.ipynb [go to notebook](./notebooks/shaders.ipynb)
 ![Custom Shader](docs/examples/my_shader.png)
+
+</details>
+
+#### Defined in ./notebooks/shaders.ipynb [go to notebook](./notebooks/shaders.ipynb)
 
 ---
 
 ## Render loop definition
+
+<details> <summary><b>Click to expand ⤵️</b></summary>
+
 You can define your own renderloop by creating a new class that inherits from the `RenderLoop` base class like:
 ```python
 @dataclass
@@ -219,6 +233,8 @@ class MySimpleRenderLoop(RenderLoop):
         return pixels, self.width, self.height
 ```
 [![Custom Renderloop](docs/examples/my_simple_render_loop.png)](docs/examples/my_simple_render_loop.png)
+
+</details>
 
 #### Custom Render Loop - defined in ./notebooks/renderloops.ipynb [go to notebook](./notebooks/renderloop.ipynb)
 
