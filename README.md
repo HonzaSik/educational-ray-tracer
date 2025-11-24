@@ -43,54 +43,41 @@
 
 
 
-<br><br><br>
+<br><br>
+
+---
+### 📘 **[Theoretical Background](docs/raytracing.md)**
+> Learn the fundamentals of ray tracing, including concepts like rays, intersections, shading models, and more. Best before diving into the code!
 
 ---
 
-
-### Before You Start - [Theoretical Background Of Ray Tracing](docs/raytracing.md)
-- Go check out the basics before diving into the code. This section provides the theoretical background of ray tracing to better understand the concepts used in this project.
-  - [👉 Theoretical Background](docs/raytracing.md)
-  
----
-
-### Detailed Usage [Documentation Of The Library ](docs/docs.md)
-- Detailed documentation what is this library capable of and how to use it. Goes through all features step by step documenting the current state of the project and its capabilities.
-  - [👉 View Docs And API](docs/docs.md)
+### 📚 **[Documentation of the Library](docs/docs.md)**
+> Comprehensive documentation of the Educational Ray Tracer library, including API references and how each component works.
 
 ---
 
-### Examples [Ray Traced Examples ](docs/examples.md)
-- Examples of scenes rendered with this ray tracer.
-  - [👉 View Examples](docs/examples.md)
+### 🎨 **[Ray-Traced Examples](docs/examples.md)**
+> Gallery of images rendered using the Educational Ray Tracer, showcasing its capabilities and features.
 
 ---
 
-<br><br><br>
+<br>
 
-## Table of Contents
-- **Overview** [about the project](#overview)
-- **Features** [what it can do](#features)
-- **Setup & Usage** [how to set it up and use it](#setup--usage)
-  - Setup [How to set up](#setup)
-  - Usage [How to use](#usage)
-- **Custom definitions – Shaders, Objects, Renderloops** [how to create your own components](#custom-definitions--shaders-objects-renderloops)
-  - Shaders [Jupyter Notebook custom shader definition (in progress)](#jupyter-notebook-custom-shader-definition-in-progress)
-  - Objects [Jupyter Notebook custom object definition](#jupyter-notebook-custom-object-definition)
-  - Render Loops [Jupyter Notebook custom renderloop definition (coming later)](#jupyter-notebook-custom-renderloop-definition-coming-later)
-- **Roadmap & Progress** [development log with images](#roadmap--progress)
-  - **CURRENT** [Image 5 – Improved Glass + Skybox (Current)](#image-5--improved-glass--skybox-current)
-  - **OLD** [Image 4 – Skybox (In Progress)](#image-4--skybox-in-progress)
-  - **OLD** [Image 3 – Glass Spheres v2 (Old)](#image-3--glass-spheres-v2-old-version)
-  - **OLD** [Image 2 – Cornell Box (Old)](#image-2--cornell-box-old-version)
-  - **OLD** [Image 1 – Glass Spheres v1 (Old)](#image-1--glass-spheres-v1-old-version)
-- **More about ray tracing** [additional resources](#more-about-ray-tracing)
-- **License** [MIT License](#license)
+# Table of Contents
+- ### **[Features](#features---current-capabilities)**
+- ### **[Setup & Usage](#setup--usage)**
+  - [Setup](#setup)
+  - [Usage](#usage)
+- ### **[How to Extend](#custom-definitions)**
+  - [Object](#object-definition)
+  - [Shader](#shader-definition)
+  - [Render Loop](#render-loop-definition)
+- ### **[Roadmap & Progress](#roadmap--progress)**
+- ### **[License](#license)**
 
-<br><br><br>
 
-## Overview
-- A simple ray tracer library written in Python, designed for educational purposes. You can find the code in the `src` folder but be aware this project is still in early development and the code structure may change frequently.
+<br>
+
 
 ---
 
@@ -106,7 +93,9 @@
 9. Basic skybox support in HDR format
 10. Configurable rendering parameters: image resolution, max ray depth, samples per pixel
 11. Jupyter Notebook custom object definition
-12. Jupyter Notebook custom shader definition (in progress)
+12. Jupyter Notebook custom shader definition
+13. Jupyter Notebook custom render loop definition
+
 ---
 
 ## Setup & Usage
@@ -119,31 +108,9 @@
 # todo – coming soon this raytracer is still in development
 ```
 
-# Custom definitions – Shaders, Objects, Renderloops
+# custom-definitions
 
-## Jupyter Notebook Custom shader definition
-You can define your own shaders by creating a new class that inherits from the `ShadingModel` base class like:
-```python
-@dataclass
-class MyShader(ShadingModel):
-  
-    def shade(self, hit: HitPoint, world: World, light: Light, view_dir: Vector, light_direction=None) -> Color:
-        return Color.custom_rgb(
-            int((hit.point.x % 1) * 255),
-            int((hit.point.y % 1) * 255),
-            int((hit.point.z % 1) * 255)
-        )
-
-    def shade_multiple_lights(self, hit: HitPoint, world: World, lights: list[Light], view_dir: Vector) -> Color:
-        for light in lights:
-            return self.shade(hit, world, light, view_dir)
-```
-#### Custom Shader - defined in ./notebooks/shaders.ipynb [go to notebook](./notebooks/shaders.ipynb)
-![Custom Shader](docs/examples/my_shader.png)
-
----
-
-## Jupyter Notebook custom object definition
+## Object definition
 You can define your own objects by creating a new class that inherits from the `Object` base class like:
 ```python
 @dataclass
@@ -199,14 +166,61 @@ class MySphere(Hittable):
 
 ---
 
-## Jupyter Notebook custom renderloop definition (coming later)
-You can define your own renderloop by creating a new class that inherits from the `RenderLoop` base class like:
+## Shader definition
+You can define your own shaders by creating a new class that inherits from the `ShadingModel` base class like:
 ```python
-from src import RenderLoop
-#todo
+@dataclass
+class MyShader(ShadingModel):
+  
+    def shade(self, hit: HitPoint, world: World, light: Light, view_dir: Vector, light_direction=None) -> Color:
+        return Color.custom_rgb(
+            int((hit.point.x % 1) * 255),
+            int((hit.point.y % 1) * 255),
+            int((hit.point.z % 1) * 255)
+        )
+
+    def shade_multiple_lights(self, hit: HitPoint, world: World, lights: list[Light], view_dir: Vector) -> Color:
+        for light in lights:
+            return self.shade(hit, world, light, view_dir)
 ```
+#### Custom Shader - defined in ./notebooks/shaders.ipynb [go to notebook](./notebooks/shaders.ipynb)
+![Custom Shader](docs/examples/my_shader.png)
 
 ---
+
+## Render loop definition
+You can define your own renderloop by creating a new class that inherits from the `RenderLoop` base class like:
+```python
+@dataclass
+class MySimpleRenderLoop(RenderLoop):
+    def render_pixel(self, i: int, j: int) -> Tuple[int, int, int]:
+        u = (i / (self.width - 1)) - 0.5
+        v = ((self.height - 1 - j) / (self.height - 1)) - 0.5
+        ray = self.camera.make_ray(u, v)
+
+        col = ray_color(
+                ray = ray,
+                world = self.world,
+                lights = self.lights,
+                depth = self.max_depth,
+                shader = self.shader,
+                skybox = self.skybox
+            )
+        return to_u8(col.r), to_u8(col.g), to_u8(col.b)
+        
+
+    def render_all_pixels(self) -> Tuple[List[Tuple[int, int, int]], int, int]:
+        pixels: List[Tuple[int, int, int]] = []
+
+        for row in range(self.height):
+            for column in range(self.width):
+                pixels.append(self.render_pixel(column, row))
+
+        return pixels, self.width, self.height
+```
+[![Custom Renderloop](docs/examples/my_simple_render_loop.png)](docs/examples/my_simple_render_loop.png)
+
+#### Custom Render Loop - defined in ./notebooks/renderloops.ipynb [go to notebook](./notebooks/renderloop.ipynb)
 
 ---
 
