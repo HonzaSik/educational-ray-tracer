@@ -68,20 +68,6 @@ class MultiProcessRowRenderLoop(RenderLoop):
     A multiprocess ray tracing render loop that processes the image row by row using multiple CPU cores.
     Inherits from the abstract RenderLoop class and implements the render logic.
     """
-    def __init__(self,
-                    scene: Scene,
-                    shading_model: Optional[ShadingModel] = None,
-                    preview_config: Optional[PreviewConfig] = None,
-                    render_config: Optional[RenderConfig] = None,
-                    post_process_config: Optional[RenderConfig] = None
-                    ) -> None:
-        super().__init__(
-            scene = scene,
-            shading_model = shading_model,
-            preview_config = preview_config,
-            render_config = render_config,
-            post_process_config = post_process_config,
-        )
 
     # todo duplicate code because of worker uses his own pixel function (need rework)
     def render_pixel(self, i: int, j: int) -> Tuple[int, int, int]:

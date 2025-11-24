@@ -20,22 +20,6 @@ class LinearRayCaster(RenderLoop):
     Inherits from the abstract RenderLoop class and implements the render logic.
     """
 
-    def __init__(self,
-                 scene: Scene,
-                 shading_model: Optional[ShadingModel] = None,
-                 preview_config: Optional[PreviewConfig] = None,
-                 render_config: Optional[RenderConfig] = None,
-                 post_process_config: Optional[PostProcessConfig] = None
-                 ) -> None:
-        super().__init__(
-            scene = scene,
-            shading_model = shading_model,
-            preview_config = preview_config,
-            render_config = render_config,
-            post_process_config = post_process_config,
-        )
-
-
     def render_pixel(self, i: int, j: int) -> Tuple[int, int, int]:
 
         u_base = (i / (self.width - 1)) - 0.5

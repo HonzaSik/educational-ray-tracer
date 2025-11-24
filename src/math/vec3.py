@@ -15,6 +15,14 @@ class Vec3:
     y: float
     z: float
 
+    #alias rgb for color usage
+    @property
+    def r(self) -> float: return self.x
+    @property
+    def g(self) -> float: return self.y
+    @property
+    def b(self) -> float: return self.z
+
     # basic ops (return new objects)
     def __neg__(self) -> Vec3:
         return Vec3(-self.x, -self.y, -self.z)

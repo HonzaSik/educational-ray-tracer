@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Tuple, List, Optional
@@ -21,45 +22,52 @@ class ImgFormat(Enum):
     PPM = "ppm"
     PNG = "png"
 
+@dataclass
 class RenderLoop(ABC):
     """
     Abstract render loop model.
     Provides basic structure for rendering with a camera, world, lights, and shading model.
     Handles progress reporting and image preview updates.
-    """
-    def __init__(self,
-                scene: Scene,
-                shading_model: Optional[ShadingModel] = None,
-                preview_config: Optional[PreviewConfig] = None,
-                render_config: Optional[RenderConfig] = None,
-                post_process_config: Optional[PostProcessConfig] = None
-                ) -> None:
-        """
-        Initializes the render loop with scene, shading model, preview config, and render config.
-        :param scene: scene containing camera, world, and lights
-        :param shading_model: Optional shading model to use, defaults to Blinn-Phong if None
-        :param preview_config: Optional preview configuration for progress display
-        :param render_config: Optional render configuration for resolution, samples, etc.
-        """
 
-        self.camera : Camera = scene.camera
-        self.world : World = scene.world
-        self.lights : List[Light] = scene.lights
-        self.shader : ShadingModel = shading_model if shading_model is not None else BlinnPhongShader()
-        self.spp : int = render_config.samples_per_pixel if render_config is not None else 1
-        self.max_depth : int = render_config.max_depth if render_config is not None else 3
-        self.skybox : Optional[str] = scene.skybox_path if scene.skybox_path is not None else None
-        self.width: int = render_config.resolution.width if render_config is not None else Resolution.R360p.width
-        self.height: int = render_config.resolution.height if render_config is not None else Resolution.R360p.height
-        self.post_process_config : PostProcessConfig = post_process_config if post_process_config is not None else PostProcessConfig()
-        self.ui : ProgressUI = ProgressUI(
-            mode = preview_config.progress_display if preview_config is not None else ProgressDisplay.NONE,
-            width = self.width if preview_config is not None else Resolution.R360p.width,
-            height = self.height if preview_config is not None else Resolution.R360p.height,
-            preview = preview_config if preview_config is not None else PreviewConfig()
-        )
+    Parameters:
+    - scene: Scene object containing camera, world, and lights.
+    - shading_model: Optional shading model to use. Defaults to Blinn-Phong if None
+    - preview_config: Optional configuration for image preview during rendering.
+    - render_config: Optional configuration for rendering parameters.
+    - post_process_config: Optional configuration for post-processing steps.
+    """
+
+    scene: Scene = None
+    shading_model: Optional[ShadingModel] = None
+    preview_config: Optional[PreviewConfig] = None
+    render_config: Optional[RenderConfig] = None
+    post_process_config: Optional[PostProcessConfig] = None
 
     def __post_init__(self):
+        # Initialize core components from the scene and configurations
+        self.camera : Camera = self.scene.camera
+        self.world : World = self.scene.world
+        self.lights : List[Light] = self.scene.lights
+        self.skybox : Optional[str] = self.scene.skybox_path if self.scene.skybox_path is not None else None
+
+        # Set default shading model if none provided
+        self.shader : ShadingModel = self.shading_model if self.shading_model is not None else BlinnPhongShader()
+
+        # Set rendering parameters from render_config or use defaults
+        self.spp : int = self.render_config.samples_per_pixel if self.render_config is not None else 1
+        self.max_depth : int = self.render_config.max_depth if self.render_config is not None else 3
+        self.width: int = self.render_config.resolution.width if self.render_config is not None else Resolution.R360p.width
+        self.height: int = self.render_config.resolution.height if self.render_config is not None else Resolution.R360p.height
+
+        # Set post-processing configuration
+        self.post_process_config : PostProcessConfig = self.post_process_config if self.post_process_config is not None else PostProcessConfig()
+        self.ui : ProgressUI = ProgressUI(
+            mode = self.preview_config.progress_display if self.preview_config is not None else ProgressDisplay.NONE,
+            width = self.width if self.preview_config is not None else Resolution.R360p.width,
+            height = self.height if self.preview_config is not None else Resolution.R360p.height,
+            preview = self.preview_config if self.preview_config is not None else PreviewConfig()
+        )
+
         if self.spp <= 0:
             raise ValueError("Samples per pixel must be a positive integer.")
         if self.max_depth <= 0:

@@ -42,7 +42,7 @@ def interpolate_color(a: "Color", b: "Color", t: float) -> "Color":
         interpolate(a.b, b.b, t)
     )
 
-def to_u8_color(col: "Color") -> "Color":
+def to_u8_color(col: Color) -> Color:
     return Color.custom_rgb(to_u8(col.x), to_u8(col.y), to_u8(col.z))
 
 def clamp_color01(col: "Color") -> "Color":
