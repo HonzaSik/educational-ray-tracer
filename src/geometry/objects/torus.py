@@ -64,9 +64,8 @@ class Torus(Hittable):
         return GeometryHit(
             point=hit_point,
             normal=normal,
-            material=self.material,
             dist=t,
-            ray_dir=ray.direction
+            front_face=ray.direction.dot(normal) < 0.0,
         )
 
 

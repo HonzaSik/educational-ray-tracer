@@ -81,8 +81,7 @@ class Triangle(Hittable, ABC):
             dist=t,
             point=hit_point,
             normal=normal,
-            material=self.material,
-            ray_dir=ray.direction
+            front_face=ray.direction.dot(normal) < 0.0,
         )
 
 

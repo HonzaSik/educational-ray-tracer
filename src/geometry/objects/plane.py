@@ -39,7 +39,12 @@ class Plane(Hittable):
         if ray.direction.dot(normal) > 0.0:
             normal = -normal
 
-        return GeometryHit(dist=t, point=hit_point, normal=normal, material=self.material, ray_dir=ray.direction)
+        return GeometryHit(
+            dist=t,
+            point=hit_point,
+            normal=normal,
+            front_face=ray.direction.dot(normal) < 0.0,
+        )
 
     def random_point(self) -> Vertex:
         import random

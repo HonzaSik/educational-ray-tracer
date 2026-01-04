@@ -12,7 +12,6 @@ class Ray:
     origin: Vertex    # starting point of the ray
     direction: Vector | Vec3 # normalized direction vector
 
-    # Point on the ray at distance t from the origin
     def point_at(self, dist: float) -> Vertex:
         """
         Calculate point along the ray at distance dist from the origin.

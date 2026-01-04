@@ -61,7 +61,12 @@ class Sphere(Hittable):
         uv = self.compute_uv(hit_point)
         derivatives = self.compute_derivatives(hit_point)
 
-        return GeometryHit(dist=root, point=hit_point, normal=normal, uv = uv, front_face = front_face, geometry_id=geom_id, dpdu=derivatives[0], dpdv=derivatives[1])
+        return GeometryHit(
+            dist=root,
+            point=hit_point,
+            normal=normal,
+            front_face = front_face
+        )
 
     def random_point(self) -> Vertex:
         """

@@ -82,71 +82,13 @@ class Box(Hittable):
         else:
             front_face = True
 
-        # UV + derivatives AT THE HIT POINT
-        uv = self.compute_uv(hit_point)
-        dpdu, dpdv = self.compute_derivatives(hit_point, normal)
 
         return GeometryHit(
             dist=t_hit,
             point=hit_point,
             normal=normal,
-            uv=uv,
             front_face=front_face,
-            geometry_id=id(self),
-            dpdu=dpdu,
-            dpdv=dpdv,
         )
-
-    def compute_uv(self, p: Vertex) -> tuple[float, float]:
-        """
-        Per-face UVs. Each face gets its own (u,v) in [0,1]^2.
-        """
-        # Left / Right: x fixed, map (z,y)
-        if abs(p.x - self.x0) < EPS or abs(p.x - self.x1) < EPS:
-            u = (p.z - self.z0) / (self.z1 - self.z0)
-            v = (p.y - self.y0) / (self.y1 - self.y0)
-            return u, v
-
-        # Bottom / Top: y fixed, map (x,z)
-        if abs(p.y - self.y0) < EPS or abs(p.y - self.y1) < EPS:
-            u = (p.x - self.x0) / (self.x1 - self.x0)
-            v = (p.z - self.z0) / (self.z1 - self.z0)
-            return u, v
-
-        # Front / Back: z fixed, map (x,y)
-        if abs(p.z - self.z0) < EPS or abs(p.z - self.z1) < EPS:
-            u = (p.x - self.x0) / (self.x1 - self.x0)
-            v = (p.y - self.y0) / (self.y1 - self.y0)
-            return u, v
-
-        # Should never happen
-        return 0.0, 0.0
-
-    def compute_derivatives(self, p: Vertex, normal: Vector) -> tuple[Vector, Vector]:
-        """
-        Tangent vectors dpdu, dpdv for the face that contains p.
-        These define the local 2D parameterization used by bump mapping.
-        """
-        # Left / Right faces: normal ±X, tangent axes: Z (u), Y (v)
-        if abs(normal.x) > 0.5:
-            dpdu = Vector(0.0, 0.0, self.z1 - self.z0)  # along +Z
-            dpdv = Vector(0.0, self.y1 - self.y0, 0.0)  # along +Y
-            return dpdu, dpdv
-
-        # Bottom / Top faces: normal ±Y, tangent axes: X (u), Z (v)
-        if abs(normal.y) > 0.5:
-            dpdu = Vector(self.x1 - self.x0, 0.0, 0.0)  # along +X
-            dpdv = Vector(0.0, 0.0, self.z1 - self.z0)  # along +Z
-            return dpdu, dpdv
-
-        # Front / Back faces: normal ±Z, tangent axes: X (u), Y (v)
-        if abs(normal.z) > 0.5:
-            dpdu = Vector(self.x1 - self.x0, 0.0, 0.0)  # along +X
-            dpdv = Vector(0.0, self.y1 - self.y0, 0.0)  # along +Y
-            return dpdu, dpdv
-
-        # fallback – shouldn’t happen
-        return Vector(1, 0, 0), Vector(0, 1, 0)
 
     def random_point(self) -> Vertex:
         raise NotImplementedError("Random point generation not implemented for Box.")

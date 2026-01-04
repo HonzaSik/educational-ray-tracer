@@ -120,15 +120,13 @@ class Cylinder(Hittable):
         if ray.direction.dot(normal) > 0.0:
             normal = -normal
 
-        # UV
-        u, v = self._compute_uv(hit_point)
+        front_face = ray.direction.dot(normal) < 0.0
 
         return GeometryHit(
             dist=root,
             point=hit_point,
             normal=normal,
-            uv=(u, v),
-            ray_dir=ray.direction,
+            front_face=front_face,
         )
 
 
