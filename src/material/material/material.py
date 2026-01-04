@@ -1,17 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, replace
-from typing import TYPE_CHECKING
-
-from src.geometry.geometry_hit import GeometryHit
+from dataclasses import dataclass
 from src.material.color import Color
-from enum import Enum
-from src.material.textures.bump_map import BumpMap
-from src.material.textures.slope_map import SlopeMap
 from src.math.vector import Vector
-if TYPE_CHECKING:
-    from src.scene.surface_interaction import SurfaceInteraction
 
 
 @dataclass

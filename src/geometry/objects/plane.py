@@ -13,7 +13,6 @@ class Plane(Hittable):
     """
     point: Vertex # a point on the plane
     normal: Vector      # normal vector of the plane (should be normalized)
-    material: Material # material properties
 
     def __post_init__(self):
         self.normal = self.normal.normalize_ip()

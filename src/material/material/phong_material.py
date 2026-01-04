@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
 from src.material.color import Color
 from src.material.material.material import Material
-from src.material.textures.slope_map import SlopeMap
-from src.material.textures.bump_map import BumpMap
 from src.math.vector import Vector
 
 
@@ -15,9 +13,6 @@ class PhongMaterial(Material):
     reflectivity: float = 0.0
     transparency: float = 0.0
     ior: float = 1.5
-
-    slope_map: SlopeMap | None = None
-    bump_map: BumpMap | None = None
 
     def __post_init__(self):
         for attr in ['reflectivity', 'transparency']:
