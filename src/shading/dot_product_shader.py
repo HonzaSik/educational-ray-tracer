@@ -1,8 +1,7 @@
 # src/shading/dot_product_shader.py
 from dataclasses import dataclass
 from .shading_model import ShadingModel
-from src.geometry.hit_point import HitPoint
-from src.geometry.world import World
+from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 from src.material.color import Color
 from src.math import Vector
@@ -18,13 +17,13 @@ class DotProductShader(ShadingModel):
     use_light: bool = False
     frequency: float = 8.0
 
-    def shade(self, hit: HitPoint, world: World, light: Light|None, view_dir: Vector) -> Color:
+    def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector) -> Color:
         """
         Shade based on the dot product between the normal and light/view direction.
         """
-        norm = hit.normal.normalize()
+        norm = hit.geom.normal.normalize()
         if self.use_light and light:
-            light = (light.position - hit.point).normalize()
+            light = (light.position - hit.geom.point).normalize()
             # measures how much the normal faces the light
             view = max(norm.dot(light), -1.0)
         else:
@@ -37,10 +36,10 @@ class DotProductShader(ShadingModel):
 
         # apply sine wave for color variation for better visualization of angles
         color = Color(math.sin(t * self.frequency) * 0.5 + 0.5, t, 1.0 - t)
-        return color.clamp01()
+        return color.clamp_01()
 
-    def shade_multiple_lights(self, hit, world, lights, view_dir):
+    def shade_multiple_lights(self, hit : SurfaceInteraction, lights, view_dir):
         """
         Shade using the first light in the list if use_light is True; otherwise, ignore lights.
         """
-        return self.shade(hit, world, lights[0] if lights else None, view_dir)
+        return self.shade(hit, lights[0] if lights else None, view_dir)

@@ -1,20 +1,13 @@
 from dataclasses import dataclass, field
 from src.material.color import Color
 from src.material.material.material import Material
+from src.material.textures.slope_map import SlopeMap
+from src.material.textures.bump_map import BumpMap
 from src.math.vector import Vector
 
 
 @dataclass
 class PhongMaterial(Material):
-    """
-    Phong material model with properties for specular highlights, reflectivity, and transparency.
-    1. base_color: The base color of the material.
-    2. spec_color: The specular color of the material.
-    3. shininess: Controls the size of the specular highlight.
-    4. reflectivity: The reflectivity of the material (0.0 to 1.0).
-    5. transparency: The transparency of the material (0.0 to 1.0).
-    6. ior: Index of refraction for transparent materials
-    """
     name: str = "phong_material"
     base_color: Color = field(default_factory=lambda: Color.custom_rgb(200, 200, 200))
     spec_color: Color = field(default_factory=lambda: Color.custom_rgb(255, 255, 255))
@@ -22,6 +15,9 @@ class PhongMaterial(Material):
     reflectivity: float = 0.0
     transparency: float = 0.0
     ior: float = 1.5
+
+    slope_map: SlopeMap | None = None
+    bump_map: BumpMap | None = None
 
     def __post_init__(self):
         for attr in ['reflectivity', 'transparency']:
@@ -33,7 +29,7 @@ class PhongMaterial(Material):
         return self.reflectivity
 
     def get_reflectance_vector(self) -> Vector:
-        raise NotImplementedError("PhongMaterial does not implement get_reflectance_vector method.")
+        raise NotImplementedError
 
     def get_transparency(self) -> float:
         return self.transparency

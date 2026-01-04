@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Tuple, List, Optional
 
 from src.scene.camera import Camera
-from src.geometry.world import World
 from src.scene.light import Light
 from src.shading.shading_model import ShadingModel
 from src.shading.blinn_phong_shader import BlinnPhongShader
@@ -46,7 +45,6 @@ class RenderLoop(ABC):
     def __post_init__(self):
         # Initialize core components from the scene and configurations
         self.camera : Camera = self.scene.camera
-        self.world : World = self.scene.world
         self.lights : List[Light] = self.scene.lights
         self.skybox : Optional[str] = self.scene.skybox_path if self.scene.skybox_path is not None else None
 
@@ -78,8 +76,6 @@ class RenderLoop(ABC):
             raise ValueError("Progress UI must be initialized.")
         if self.camera is None:
             raise ValueError("Camera must be provided.")
-        if self.world is None:
-            raise ValueError("World must be provided.")
         if self.lights is None:
             raise ValueError("Lights must be provided.")
         if self.shader is None:

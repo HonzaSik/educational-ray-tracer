@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from src.math import Vertex, Vector
 from src.material import Material
 from src.geometry.ray import Ray
-from src.geometry.hit_point import HitPoint
+from src.geometry.geometry_hit import GeometryHit
 from src.geometry.hittable import Hittable
 
 @dataclass
@@ -18,7 +18,7 @@ class Plane(Hittable):
     def __post_init__(self):
         self.normal = self.normal.normalize_ip()
 
-    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> HitPoint | None:
+    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
         """
         Calculate intersection of ray with plane.
         :param ray: Ray to test intersection with
@@ -39,7 +39,7 @@ class Plane(Hittable):
         if ray.direction.dot(normal) > 0.0:
             normal = -normal
 
-        return HitPoint(dist=t, point=hit_point, normal=normal, material=self.material, ray_dir=ray.direction)
+        return GeometryHit(dist=t, point=hit_point, normal=normal, material=self.material, ray_dir=ray.direction)
 
     def random_point(self) -> Vertex:
         import random

@@ -1,13 +1,15 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from math import sqrt
+
+from numpy import acos, atan2, pi, sin, cos
+
 from src.math import Vertex
 from src.geometry.hittable import Hittable
 from src.geometry.ray import Ray
-from src.geometry.hit_point import HitPoint
+from src.geometry.geometry_hit import GeometryHit
 from src.material import Material
 from src.math import Vector
-from numba import njit
 
 @dataclass
 class Sphere(Hittable):
@@ -16,11 +18,9 @@ class Sphere(Hittable):
     """
     center: Vertex # center of the sphere
     radius: float # radius of the sphere
-    material: Material # material properties
-    # default reflectivity is 0 (matte)
 
     # Ray-sphere intersection
-    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> HitPoint | None:
+    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
         """
         Calculate intersection of ray with sphere.
         :param ray: Ray to test intersection with
@@ -56,7 +56,12 @@ class Sphere(Hittable):
         if ray.direction.dot(normal) > 0.0:
             normal = -normal
 
-        return HitPoint(dist=root, point=hit_point, normal=normal, material=self.material, ray_dir=ray.direction)
+        front_face = ray.direction.dot(normal) < 0.0
+        geom_id = id(self)
+        uv = self.compute_uv(hit_point)
+        derivatives = self.compute_derivatives(hit_point)
+
+        return GeometryHit(dist=root, point=hit_point, normal=normal, uv = uv, front_face = front_face, geometry_id=geom_id, dpdu=derivatives[0], dpdv=derivatives[1])
 
     def random_point(self) -> Vertex:
         """
@@ -77,6 +82,49 @@ class Sphere(Hittable):
         z = self.radius * math.cos(phi)
 
         return Vertex(self.center.x + x, self.center.y + y, self.center.z + z)
+
+    def compute_uv(self, point: Vertex):
+        # Convert to local coordinates
+        p_local = (point - self.center) / self.radius
+        x, y, z = p_local.x, p_local.y, p_local.z
+
+        # Spherical coordinates
+        theta = acos(max(-1.0, min(1.0, y)))  # polar (0 at top, pi at bottom)
+        phi = atan2(z, x)  # azimuth [-pi, pi]
+
+        # Map to [0,1]
+        u = (phi + pi) / (2.0 * pi)
+        v = theta / pi
+
+        return u, v
+
+    def compute_derivatives(self, p):
+        # Local coords
+        p_local = (p - self.center) / self.radius
+        x, y, z = p_local.x, p_local.y, p_local.z
+
+        theta = acos(max(-1.0, min(1.0, y)))
+        phi = atan2(z, x)
+
+        sin_theta = sin(theta)
+        cos_theta = cos(theta)
+        sin_phi = sin(phi)
+        cos_phi = cos(phi)
+
+        # PBRT derivatives
+        dpdu = 2.0 * pi * self.radius * Vector(
+            -sin_theta * sin_phi,
+            0.0,
+            sin_theta * cos_phi
+        )
+
+        dpdv = pi * self.radius * Vector(
+            cos_theta * cos_phi,
+            -sin_theta,
+            cos_theta * sin_phi
+        )
+
+        return dpdu, dpdv
 
     def normal_at(self, point: Vertex) -> Vector:
         """

@@ -198,3 +198,10 @@ class Vec3:
                    k.cross(v) * sin_theta +
                    k * (k.dot(v)) * (1 - cos_theta))
         return rotated
+
+    def length(self):
+        """
+        Return the length of the vector.
+        :return: float
+        """
+        return sqrt(self.x*self.x + self.y*self.y + self.z*self.z)

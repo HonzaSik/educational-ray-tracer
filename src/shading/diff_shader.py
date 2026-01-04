@@ -1,8 +1,7 @@
 # src/shading/compare_checker_shader.py
 from dataclasses import dataclass
 from .shading_model import ShadingModel
-from src.geometry.hit_point import HitPoint
-from src.geometry.world import World
+from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 from src.material.color import Color
 from src.math import Vector, Vertex
@@ -80,19 +79,19 @@ class DiffShader(ShadingModel):
             return 0
 
 
-    def shade(self, hit: HitPoint, world: World, light: Light | None, view_dir: Vector) -> Color:
+    def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector) -> Color:
         """
         Shade using either shader A or B based on the selected pattern using hashing.
         0 = shader A, 1 = shader B
         """
-        use_a = self._select_hash(hit.point) == 0
-        color = (self.a if use_a else self.b).shade(hit, world, light, view_dir)
-        return color.clamp01_ip()
+        use_a = self._select_hash(hit.geom.point) == 0
+        color = (self.a if use_a else self.b).shade(hit, light, view_dir)
+        return color.clamp_01()
 
-    def shade_multiple_lights(self, hit, world, lights, view_dir) -> Color:
+    def shade_multiple_lights(self, hit, lights, view_dir) -> Color:
         """
         Shade using either shader A or B based on the selected pattern using hashing.
         0 = shader A, 1 = shader B
         """
-        use_a = self._select_hash(hit.point) == 0
-        return (self.a if use_a else self.b).shade_multiple_lights(hit, world, lights, view_dir)
+        use_a = self._select_hash(hit.geom.point) == 0
+        return (self.a if use_a else self.b).shade_multiple_lights(view_dir = view_dir, lights = lights, hit = hit)

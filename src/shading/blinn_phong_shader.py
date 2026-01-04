@@ -2,14 +2,14 @@
 from __future__ import annotations
 from abc import ABC
 from .shading_model import ShadingModel
-from src.geometry.hit_point import HitPoint
-from src.geometry.world import World
+from src.scene.surface_interaction import SurfaceInteraction
 from src.material.color import Color, clamp_color255
 from src.material.material.material import Material
 from src.scene.light import Light, AmbientLight
 from src.math import Vector
 from src.math import fresnel_schlick, dielectric_f0
 from .helpers import shadow_trace, light_dir_dist
+from src.scene.scene import Scene
 
 
 class BlinnPhongShader(ShadingModel, ABC):
@@ -22,37 +22,46 @@ class BlinnPhongShader(ShadingModel, ABC):
     ) -> None:
         self.use_fresnel = use_fresnel
 
+    def shade(self, hit: SurfaceInteraction, light: Light, view_dir: Vector, scene: Scene | None = None) -> Color:
+        if scene is None:
+            raise ValueError("Scene must be provided for shading.")
 
-    def shade(self, hit: HitPoint, world: World, light: Light, view_dir: Vector) -> Color:
-        """
-        Shade a single light with shadows, attenuation, diffuse, and specular.
-        """
-        if light.type == AmbientLight: # Ambient light is handled in shade_multiple_lights
+        material = hit.material
+
+        if light.type == AmbientLight:
             return Color(0, 0, 0)
 
         light_direction, light_distance = light_dir_dist(hit, light)
 
-        # Shadow
-        if shadow_trace(hit, light_direction, light_distance, world):
+        if shadow_trace(hit, light_direction, light_distance, scene=scene):
             return Color.custom_rgb(0, 0, 0)
 
         light_intensity = light.intensity_at(hit.point)
         if light_intensity <= 0.0:
             return Color.custom_rgb(0, 0, 0)
 
+        # --- NORMALS & PERTURBATION ---
+
+        # geometric normal from SurfaceInteraction
+        n_geom = hit.normal
+
+        # let material tweak it
+        if hasattr(material, "perturb_normal"):
+            n = material.perturb_normal(hit, n_geom)
+        else:
+            n = n_geom
 
         # Normalize vectors
-        n = hit.normal.normalize_ip()
+        n = n.normalize_ip()
         l = light_direction.normalize_ip()
         v = view_dir.normalize_ip()
 
-        diffuse = self._lambert_diffuse(hit.material, n, l)
-        specular = self._blinn_specular(hit.material, n, l, v)
+        diffuse = self._lambert_diffuse(material, n, l)
+        specular = self._blinn_specular(material, n, l, v)
 
         return (diffuse + specular) * light_intensity
 
-
-    def shade_multiple_lights(self, hit, world, lights, view_dir) -> Color:
+    def shade_multiple_lights(self, hit: SurfaceInteraction, lights: list[Light], view_dir: Vector, scene: Scene | None = None) -> Color:
         material = hit.material
         is_transmissive = getattr(material, "transparency", 0.0) > 0.0 and getattr(material, "ior", 1.0) > 1.0
 
@@ -60,15 +69,22 @@ class BlinnPhongShader(ShadingModel, ABC):
 
         for light in lights:
             if light.type == AmbientLight:
-                accum += light.intensity_at(hit.point) * material.get_color()
+                accum += light.intensity_at(hit.geom.point) * material.get_color()
             else:
-                accum += self.shade(hit, world, light, view_dir)
+                accum += self.shade(hit, light, view_dir, scene=scene)
 
+        # transmissive "extra" specular: also better to use perturbed normal
         if is_transmissive:
-            accum += self._blinn_specular(material, hit.normal, -view_dir, view_dir)
+            # use perturbed normal here as well
+            n_geom = hit.geom.normal
+            if hasattr(material, "perturb_normal"):
+                n_spec = material.perturb_normal(hit, n_geom).normalize_ip()
+            else:
+                n_spec = n_geom.normalize_ip()
+
+            accum += self._blinn_specular(material, n_spec, -view_dir, view_dir)
 
         return clamp_color255(accum)
-
 
     @staticmethod
     def _lambert_diffuse(m: Material, n: Vector, l: Vector) -> Color:
@@ -77,7 +93,6 @@ class BlinnPhongShader(ShadingModel, ABC):
             return Color(0.0, 0.0, 0.0)
         ndotl = max(0.0, n.dot(l))
         return m.get_color() * ndotl
-
 
     def _blinn_specular(self, material: Material, n: Vector, l: Vector, v: Vector) -> Color:
         """

@@ -6,7 +6,7 @@ from math import sqrt
 from src.math import Vertex, Vector
 from src.geometry.hittable import Hittable
 from src.geometry.ray import Ray
-from src.geometry.hit_point import HitPoint
+from src.geometry.geometry_hit import GeometryHit
 from src.material import Material
 import random
 
@@ -29,7 +29,7 @@ class Triangle(Hittable, ABC):
         self.edge_2 = self.v2 - self.v0
 
 
-    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> HitPoint | None:
+    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
         """
         Möller–Trumbore ray-triangle intersection algorithm implementation.
         :param ray: Ray to test intersection with
@@ -77,7 +77,7 @@ class Triangle(Hittable, ABC):
         if ray.direction.dot(normal) > 0.0:
             normal = -normal
 
-        return HitPoint(
+        return GeometryHit(
             dist=t,
             point=hit_point,
             normal=normal,

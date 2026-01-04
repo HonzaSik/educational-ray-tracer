@@ -33,11 +33,11 @@ class LinearRayCaster(RenderLoop):
 
             acc += cast_ray(
                 ray = ray,
-                world = self.world,
                 lights = self.lights,
                 depth = self.max_depth,
                 shader = self.shader,
-                skybox = self.skybox
+                skybox = self.skybox,
+                scene = self.scene,
             )
 
         col = acc / self.spp

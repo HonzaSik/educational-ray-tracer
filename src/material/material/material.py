@@ -2,9 +2,17 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, replace
+from typing import TYPE_CHECKING
+
+from src.geometry.geometry_hit import GeometryHit
 from src.material.color import Color
 from enum import Enum
+from src.material.textures.bump_map import BumpMap
+from src.material.textures.slope_map import SlopeMap
 from src.math.vector import Vector
+if TYPE_CHECKING:
+    from src.scene.surface_interaction import SurfaceInteraction
+
 
 @dataclass
 class Material(ABC):
@@ -13,8 +21,28 @@ class Material(ABC):
     """
     name: str = "default_material"
 
-    def __init__(self, **params):
-        self.params = params # Store parameters for potential use in subclasses
+    slope_map: SlopeMap | None = None
+    bump_map: BumpMap | None = None
+
+    _up_vector: Vector = field(default_factory=lambda: Vector(0.0, 1.0, 0.0))
+
+    def perturb_normal(self, hit: SurfaceInteraction, normal: Vector) -> Vector:
+        """
+        Default implementation: apply slope_map then bump_map if present.
+        Subclasses can override if needed, but usually this is enough.
+        """
+        N = normal
+
+        geom = hit.geom
+        if self.slope_map is not None and getattr(geom, "uv", None) is not None:
+            _, v = geom.uv
+            slope_vec = self.slope_map.sample(v)
+            N = (N + slope_vec * 0.2).normalize()
+
+        if self.bump_map is not None:
+            N = self.bump_map.perturb_normal(hit, N)
+
+        return N
 
     @abstractmethod
     def get_color(self) -> Color:

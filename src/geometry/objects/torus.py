@@ -2,7 +2,7 @@ from __future__ import annotations
 from src.math import Vertex, Vector
 from src.geometry.hittable import Hittable
 from src.geometry.ray import Ray
-from src.geometry.hit_point import HitPoint
+from src.geometry.geometry_hit import GeometryHit
 import random
 import numpy as np
 from dataclasses import dataclass
@@ -28,7 +28,7 @@ class Torus(Hittable):
         return Vector(nx, ny, nz).normalize()
 
 
-    def intersect(self, ray: Ray, t_min=1e-3, t_max=float('inf')) -> HitPoint | None:
+    def intersect(self, ray: Ray, t_min=1e-3, t_max=float('inf')) -> GeometryHit | None:
         ray_origin = ray.origin - self.center
         rd = ray.direction
 
@@ -61,7 +61,7 @@ class Torus(Hittable):
 
         normal = self.normal_at(hit_point)
 
-        return HitPoint(
+        return GeometryHit(
             point=hit_point,
             normal=normal,
             material=self.material,

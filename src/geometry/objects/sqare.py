@@ -4,7 +4,7 @@ from abc import ABC
 from src.math import Vertex, Vector
 from src.geometry.hittable import Hittable
 from src.geometry.ray import Ray
-from src.geometry.hit_point import HitPoint
+from src.geometry.geometry_hit import GeometryHit
 from src.material import Material
 from .triangle import Triangle
 import random
@@ -37,7 +37,7 @@ class Square(Hittable):
         self.tri1 = Triangle(self.v0, self.v1, self.v2, self.material)
         self.tri2 = Triangle(self.v0, self.v2, self.v3, self.material)
 
-    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> HitPoint | None:
+    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
         """
         Check intersection with both triangles composing the square.
         :param ray: Ray to test intersection with
@@ -51,6 +51,29 @@ class Square(Hittable):
         if hit1 and hit2:
             return hit1 if hit1.dist < hit2.dist else hit2
         return hit1 or hit2
+
+    def compute_uv(self, point: Vertex) -> tuple[float, float]:
+        """
+        Compute UV coordinates for the given point on the square.
+        :param point: Point on the square
+        :return: Tuple of (u, v) coordinates
+        """
+        # Assuming the square is axis-aligned, compute UV based on vertex positions
+        u = (point.x - self.v0.x) / (self.v2.x - self.v0.x)
+        v = (point.y - self.v0.y) / (self.v2.y - self.v0.y)
+        return u, v
+
+    def compute_derivatives(self, point: Vertex) -> tuple[Vector, Vector]:
+        """
+        Compute the partial derivatives dpdu and dpdv at the given point on the square.
+        :param point: Point on the square
+        :return: Tuple of (dpdu, dpdv) vectors
+        """
+        # Assuming the square is axis-aligned, compute derivatives based on vertex positions
+        dpdu = Vector(self.v1.x - self.v0.x, self.v1.y - self.v0.y, self.v1.z - self.v0.z)
+        dpdv = Vector(self.v3.x - self.v0.x, self.v3.y - self.v0.y, self.v3.z - self.v0.z)
+        return dpdu, dpdv
+
 
     def random_point(self) -> Vertex:
         u = random.uniform(0, 1)
