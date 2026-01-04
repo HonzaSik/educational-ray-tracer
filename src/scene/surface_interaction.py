@@ -18,9 +18,3 @@ class SurfaceInteraction:
     def point(self): return self.geom.point
     @property
     def normal(self): return self.geom.normal
-    @property
-    def uv(self): return self.geom.uv
-    @property
-    def dpdu(self): return self.geom.dpdu
-    @property
-    def dpdv(self): return self.geom.dpdv

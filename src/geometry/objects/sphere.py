@@ -57,9 +57,6 @@ class Sphere(Hittable):
             normal = -normal
 
         front_face = ray.direction.dot(normal) < 0.0
-        geom_id = id(self)
-        uv = self.compute_uv(hit_point)
-        derivatives = self.compute_derivatives(hit_point)
 
         return GeometryHit(
             dist=root,
@@ -87,49 +84,6 @@ class Sphere(Hittable):
         z = self.radius * math.cos(phi)
 
         return Vertex(self.center.x + x, self.center.y + y, self.center.z + z)
-
-    def compute_uv(self, point: Vertex):
-        # Convert to local coordinates
-        p_local = (point - self.center) / self.radius
-        x, y, z = p_local.x, p_local.y, p_local.z
-
-        # Spherical coordinates
-        theta = acos(max(-1.0, min(1.0, y)))  # polar (0 at top, pi at bottom)
-        phi = atan2(z, x)  # azimuth [-pi, pi]
-
-        # Map to [0,1]
-        u = (phi + pi) / (2.0 * pi)
-        v = theta / pi
-
-        return u, v
-
-    def compute_derivatives(self, p):
-        # Local coords
-        p_local = (p - self.center) / self.radius
-        x, y, z = p_local.x, p_local.y, p_local.z
-
-        theta = acos(max(-1.0, min(1.0, y)))
-        phi = atan2(z, x)
-
-        sin_theta = sin(theta)
-        cos_theta = cos(theta)
-        sin_phi = sin(phi)
-        cos_phi = cos(phi)
-
-        # PBRT derivatives
-        dpdu = 2.0 * pi * self.radius * Vector(
-            -sin_theta * sin_phi,
-            0.0,
-            sin_theta * cos_phi
-        )
-
-        dpdv = pi * self.radius * Vector(
-            cos_theta * cos_phi,
-            -sin_theta,
-            cos_theta * sin_phi
-        )
-
-        return dpdu, dpdv
 
     def normal_at(self, point: Vertex) -> Vector:
         """

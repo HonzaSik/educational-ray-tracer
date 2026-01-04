@@ -36,47 +36,6 @@ class Cylinder(Hittable):
         normal = (point - closest_point_on_axis).normalize()
         return normal
 
-    def _compute_uv(self, point: Vertex) -> tuple[float, float]:
-        # axis and its length
-        axis = self.cap_point - self.base_point
-        axis_length = sqrt(axis.dot(axis))
-        axis_normalized = axis / axis_length
-
-        # vector from base to point
-        rel = point - self.base_point
-
-        # height along axis (0..axis_length)
-        h = rel.dot(axis_normalized)
-
-        # closest point on axis, radial direction
-        closest_point_on_axis = self.base_point + h * axis_normalized
-        radial = (point - closest_point_on_axis).normalize()
-
-        # build an orthonormal basis around the axis
-        # pick any reference not parallel to axis
-        if abs(axis_normalized.x) > 0.9:
-            ref = Vector(0, 1, 0)
-        else:
-            ref = Vector(1, 0, 0)
-
-        tangent0 = axis_normalized.cross(ref).normalize()
-        tangent1 = axis_normalized.cross(tangent0).normalize()
-
-        # coordinates of radial in this basis
-        x = radial.dot(tangent0)
-        y = radial.dot(tangent1)
-
-        # angle in [-pi, pi]
-        theta = atan2(y, x)
-
-        # wrap to [0,1]
-        u = (theta / (2.0 * pi)) % 1.0
-
-        # v = 0 at base, 1 at cap
-        v = h / axis_length
-
-        return u, v
-
     def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
         # Vector along the cylinder axis
         axis = self.cap_point - self.base_point
