@@ -5,9 +5,9 @@ import imageio as imageio
 
 
 def frames_to_mp4(
-    frames: Sequence[Path | str],
-    output_path: Path | str,
-    fps: int = 24,
+        frames: Sequence[Path | str],
+        output_path: Path | str,
+        fps: int = 24,
 ) -> Path:
     """
     Takes a sequence of image frames and compiles them into an MP4 animatons file.
@@ -28,9 +28,9 @@ def frames_to_mp4(
 
     # It uses ffmpeg inside #todo how to do it without installing imageio
     with imageio.get_writer(
-        output_path.as_posix(),
-        fps=fps,
-        codec="libx264",
+            output_path.as_posix(),
+            fps=fps,
+            codec="libx264",
     ) as writer:
         for frame in frame_paths:
             img = imageio.imread(frame.as_posix())

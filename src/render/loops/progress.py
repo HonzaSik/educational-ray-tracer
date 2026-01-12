@@ -1,4 +1,3 @@
-# src/render/loops/progress.py
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
@@ -20,6 +19,7 @@ class ProgressDisplay(Enum):
     TQDM_CONSOLE = 1
     TQDM_BAR = 2
     TQDM_IMAGE_PREVIEW = 3
+
 
 @dataclass
 class PreviewConfig:
@@ -60,6 +60,7 @@ class ProgressUI:
     it can show a console progress bar, a Jupyter notebook progress bar, or an image preview
     specified by PreviewConfig.
     """
+
     def __init__(self,
                  mode: ProgressDisplay,
                  width: int,
@@ -73,7 +74,6 @@ class ProgressUI:
         self.progress_bar = None
         self.img_widget: widgets.Image | None = None
         self.status_widget: widgets.HTML | None = None
-
 
     def start(self, total_pixels: int) -> None:
         """
@@ -107,7 +107,7 @@ class ProgressUI:
 
             display(widgets.VBox(image))
 
-    #User can call this to update progress manually by n pixels to avoid updating each pixel
+    # User can call this to update progress manually by n pixels to avoid updating each pixel
     def update_pixel(self, n: int = 1) -> None:
         """
         Updates the progress bar by n pixels.
@@ -145,7 +145,6 @@ class ProgressUI:
 
         if self.status_widget is not None:
             self.status_widget.value = f"Rendering - {row}/{height} rows"
-
 
     def update_end(self, pixels_flat_u8: List[Tuple[int, int, int]]) -> None:
         """

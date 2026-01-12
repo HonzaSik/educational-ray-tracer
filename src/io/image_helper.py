@@ -1,10 +1,7 @@
-from pathlib import Path
-
 from IPython.core.display_functions import display
 from PIL import Image as PILImage
 from IPython.display import Image
 
-# helper functions for image processing
 
 def convert_ppm_to_png(ppm_path, png_path):
     """

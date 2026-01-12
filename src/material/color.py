@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import Union, Iterable, Any
 import numpy as np
@@ -9,13 +8,16 @@ from src.math.helpers import interpolate
 DT = np.float32
 _skybox_cache: dict[str, "SkyboxHDR"] = {}
 
+
 def _to_u8_fast(v: float) -> int:
     if v <= 0.0: return 0
     if v >= 1.0: return 255
     return int(v * 255.0 + 0.5)
 
+
 def clamp01(x: float) -> float:
     return 0.0 if x < 0.0 else 1.0 if x > 1.0 else x
+
 
 def clamp_color255(col: Color) -> Color:
     r, g, b = col.as_rgb()
@@ -25,15 +27,18 @@ def clamp_color255(col: Color) -> Color:
         clamp255(int(b * 255)),
     )
 
+
 def clamp_color01(col: Color) -> Color:
     return Color(np.clip(col.data, 0.0, 1.0))
+
 
 def clamp255(n: int) -> int:
     return 0 if n < 0 else 255 if n > 255 else n
 
+
 def to_u8(v: float) -> int:
-    # keep name, route to fast version
     return _to_u8_fast(v)
+
 
 def _as_np3(v: Union[Vec3, Color, np.ndarray, Iterable[float]]) -> np.ndarray:
     if isinstance(v, Vec3):
@@ -49,12 +54,12 @@ def _as_np3(v: Union[Vec3, Color, np.ndarray, Iterable[float]]) -> np.ndarray:
             for i in range(arr.shape[0]):
                 filled[i] = arr[i]
             for i in range(arr.shape[0], 3):
-                filled[i] = filled[i-1]
+                filled[i] = filled[i - 1]
             return filled
         return arr[:3]
 
 
-def interplate_rgb_color(a: Color, b: Color, t: float) -> Color:
+def interpolate_rgb_color(a: Color, b: Color, t: float) -> Color:
     ar, ag, ab = a.as_rgb()
     br, bg, bb = b.as_rgb()
     return Color(
@@ -63,6 +68,7 @@ def interplate_rgb_color(a: Color, b: Color, t: float) -> Color:
         interpolate(ab, bb, t),
     )
 
+
 def to_u8_color(col: Color) -> Color:
     r, g, b = col.as_rgb()
     return Color.custom_rgb(
@@ -70,6 +76,7 @@ def to_u8_color(col: Color) -> Color:
         to_u8(g),
         to_u8(b),
     )
+
 
 @dataclass
 class Color:
@@ -193,7 +200,7 @@ class Color:
 
     @staticmethod
     def custom_rgb(r: int, g: int, b: int) -> Color:
-        return Color(clamp255(r)/255.0, clamp255(g)/255.0, clamp255(b)/255.0)
+        return Color(clamp255(r) / 255.0, clamp255(g) / 255.0, clamp255(b) / 255.0)
 
     def to_rgb8(self) -> tuple[int, int, int]:
         r, g, b = self.as_rgb()
@@ -233,7 +240,7 @@ class Color:
         skybox: str path or SkyboxHDR instance
         direction: Vec3 | np.ndarray(3,)
         """
-        # lazy import here to avoid cycles
+        # lazy import here to avoid cycles #todo fix cycles
         if isinstance(skybox, str):
             from src.scene.skybox import SkyboxHDR
             try:
@@ -257,6 +264,7 @@ class Color:
 
         col_np = _as_np3(col)
         return cls(float(col_np[0]), float(col_np[1]), float(col_np[2]))
+
 
 # color presets
 Color.Black = Color(0.0, 0.0, 0.0)

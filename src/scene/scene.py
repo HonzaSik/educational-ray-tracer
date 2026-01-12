@@ -1,37 +1,12 @@
 from dataclasses import dataclass
-
 from src.geometry.ray import Ray
 from src.scene.camera import Camera
 from src.scene.light import Light, LightType
 from src.math import Vector
 from src.math import Vertex
 from pathlib import Path
-from enum import Enum
-
 from src.scene.primitive import Primitive
 from src.scene.surface_interaction import SurfaceInteraction
-
-
-# enum of render methods
-class RenderMethod(Enum):
-    SHADOW_TRACE = "phong"
-    SHADOW_TRACE_MULTITHREADED = "phong_multithreaded"
-    RASTERIZE = "rasterize"
-    PBR = "pbr"
-
-
-class ShadingModel(Enum):
-    BLINN_PHONG = "blinn_phong"
-    PREVIEW = "preview"
-    PBR = "pbr"
-
-
-class QualityPreset(Enum):
-    ULTRA_LOW = "ultra_low"
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    ULTRA = "ultra"
 
 
 @dataclass
@@ -58,7 +33,7 @@ class Scene:
         if self.primitives is None:
             self.primitives = []
 
-        if isinstance( primitives, Primitive):
+        if isinstance(primitives, Primitive):
             self.primitives.append(primitives)
         elif isinstance(primitives, list):
             self.primitives.extend(primitives)
@@ -159,7 +134,6 @@ class Scene:
         """
         self.camera.translate(translation)
 
-
     def set_camera_fov(self, fov: float) -> None:
         """
         Set the field of view of the camera.
@@ -237,7 +211,7 @@ class Scene:
         if not self.lights:
             raise ValueError("Scene must have at least one light.")
 
-        #todo more validations
+        # todo add more validations
 
         print("Scene validation passed.")
 

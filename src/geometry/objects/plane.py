@@ -1,18 +1,18 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from src.math import Vertex, Vector
-from src.material import Material
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 from src.geometry.hittable import Hittable
+
 
 @dataclass
 class Plane(Hittable):
     """
     Plane in 3D space defined by a point, normal, and color.
     """
-    point: Vertex # a point on the plane
-    normal: Vector      # normal vector of the plane (should be normalized)
+    point: Vertex  # a point on the plane
+    normal: Vector  # normal vector of the plane (should be normalized)
 
     def __post_init__(self):
         self.normal = self.normal.normalize_ip()
@@ -27,11 +27,11 @@ class Plane(Hittable):
         """
         denom = ray.direction.dot(self.normal)
         if abs(denom) < 1e-6:
-            return None # Ray is parallel to the plane
+            return None  # Ray is parallel to the plane
 
         t = (self.point - ray.origin).dot(self.normal) / denom
         if t < t_min or t > t_max:
-            return None # Intersection is out of bounds
+            return None  # Intersection is out of bounds
 
         hit_point = ray.point_at(t)
         normal = self.normal
@@ -47,8 +47,6 @@ class Plane(Hittable):
 
     def random_point(self) -> Vertex:
         import random
-        # Generate a random point on the plane within a certain range
-        # This is a simple implementation and may need to be adjusted based on specific requirements
         d = random.uniform(-10, 10)
         u = Vector(1, 0, 0) if abs(self.normal.x) < 0.9 else Vector(0, 1, 0)
         v = self.normal.cross(u).normalize_ip()

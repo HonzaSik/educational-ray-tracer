@@ -4,8 +4,10 @@ from src.geometry.geometry_hit import GeometryHit
 from src.geometry.ray import Ray
 from src.math import Vertex
 
+
 class Hittable(ABC):
     """Anything that can be intersected by a ray."""
+
     @abstractmethod
     def intersect(self, ray: Ray, t_min: float = 1e-3, t_max: float = float('inf')) -> GeometryHit | None:
         """Calculate intersection of ray with the object.

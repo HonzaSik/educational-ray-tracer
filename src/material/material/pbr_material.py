@@ -14,6 +14,10 @@ class PbrMaterial(Material):
     5. transparency: The transparency of the material (0.0 to 1.0).
     6. ior: Index of refraction for transparent materials
     """
+
+    def get_color(self) -> Color:
+        pass  # todo
+
     base_color: Color = field(default_factory=lambda: Color.custom_rgb(200, 200, 200))
     metallic: float = 0.0
     roughness: float = 0.5

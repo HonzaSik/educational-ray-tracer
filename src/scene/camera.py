@@ -4,6 +4,7 @@ from math import tan, radians
 from src.math import Vertex, Vector
 from src.geometry.ray import Ray
 
+
 @dataclass
 class Camera:
     """
@@ -14,8 +15,8 @@ class Camera:
     fov: float = 70.0
     aspect_ratio: float = 16.0 / 9.0
     origin: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))
-    direction: Vector = field(default_factory=lambda: Vector(0, 0, -1)) # looking down -Z
-    up_hint: Vector = field(default_factory=lambda: Vector(0, 1, 0)) # up direction
+    direction: Vector = field(default_factory=lambda: Vector(0, 0, -1))  # looking down -Z
+    up_hint: Vector = field(default_factory=lambda: Vector(0, 1, 0))  # up direction
 
     def __post_init__(self):
         """
@@ -26,16 +27,16 @@ class Camera:
         fwd = self.direction.normalize()
         # guard against collinearity with up
         if abs(fwd.dot(self.up_hint)) > 0.999:
-            self.up_hint = Vector(1, 0, 0) # use right vector if collinear
+            self.up_hint = Vector(1, 0, 0)  # use right vector if collinear
 
         # build ONB (right, true_up, forward)
-        w = (-fwd).normalize()                       # camera looks along -w
+        w = (-fwd).normalize()  # camera looks along -w
         right = self.up_hint.cross(w).normalize()
         true_up = w.cross(right)
 
         theta = radians(self.fov)
         half_height = tan(theta * 0.5)
-        half_width  = self.aspect_ratio * half_height
+        half_width = self.aspect_ratio * half_height
 
         self.fwd = fwd
         self.right = right
@@ -75,7 +76,6 @@ class Camera:
 
         self.__post_init__()
         pass
-
 
     def zoom(self, factor: float) -> None:
         """

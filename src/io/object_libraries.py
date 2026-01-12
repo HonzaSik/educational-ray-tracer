@@ -3,6 +3,7 @@ from src.material.color import Color
 from src.scene.light import Light, LightType
 from src.material.material.material import Material
 
+
 @dataclass
 class ColorLibrary:
     """Simple library wrapper so you can access colors as attributes."""
@@ -25,6 +26,7 @@ class ColorLibrary:
 class LightLibrary:
     """Container for various object libraries."""
     lights: dict[str, Light] = field(default_factory=dict)
+
     def __getattr__(self, name: str) -> Light:
         try:
             return self.lights[name]
@@ -59,7 +61,8 @@ class LightLibrary:
         Get all point lights from the library.
         :return: List of Point Lights
         """
-        return [light for light in self.lights.values() if isinstance(light.type, LightType) and light.type == LightType.POINT]
+        return [light for light in self.lights.values() if
+                isinstance(light.type, LightType) and light.type == LightType.POINT]
 
     def get_ambient_light(self) -> Light | None:
         """

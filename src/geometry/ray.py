@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
-
 from src.math import Vertex, Vector, Vec3
+
 
 @dataclass
 class Ray:
@@ -9,8 +9,8 @@ class Ray:
     Ray in 3D space defined by an origin and a direction.
     """
 
-    origin: Vertex    # starting point of the ray
-    direction: Vector | Vec3 # normalized direction vector
+    origin: Vertex  # starting point of the ray
+    direction: Vector | Vec3  # normalized direction vector
 
     def point_at(self, dist: float) -> Vertex:
         """

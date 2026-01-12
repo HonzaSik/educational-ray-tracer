@@ -4,6 +4,7 @@ from numpy import cos, sin, sqrt
 
 Number = float | int
 
+
 @dataclass(slots=True)
 class Vec3:
     """
@@ -15,32 +16,37 @@ class Vec3:
     y: float
     z: float
 
-    #alias rgb for color usage
+    # alias rgb for color usage
     @property
-    def r(self) -> float: return self.x
+    def r(self) -> float:
+        return self.x
+
     @property
-    def g(self) -> float: return self.y
+    def g(self) -> float:
+        return self.y
+
     @property
-    def b(self) -> float: return self.z
+    def b(self) -> float:
+        return self.z
 
     # basic ops (return new objects)
     def __neg__(self) -> Vec3:
         return Vec3(-self.x, -self.y, -self.z)
 
     def __add__(self, o: Vec3) -> Vec3:
-        return Vec3(self.x+o.x, self.y+o.y, self.z+o.z)
+        return Vec3(self.x + o.x, self.y + o.y, self.z + o.z)
 
     def __sub__(self, o: Vec3) -> Vec3:
-        return Vec3(self.x-o.x, self.y-o.y, self.z-o.z)
+        return Vec3(self.x - o.x, self.y - o.y, self.z - o.z)
 
     def __mul__(self, s: Number) -> Vec3:
-        return Vec3(self.x*s, self.y*s, self.z*s)
+        return Vec3(self.x * s, self.y * s, self.z * s)
 
     __rmul__ = __mul__
 
     def __truediv__(self, s: Number) -> Vec3:
-        inv = 1.0/float(s)
-        return Vec3(self.x*inv, self.y*inv, self.z*inv)
+        inv = 1.0 / float(s)
+        return Vec3(self.x * inv, self.y * inv, self.z * inv)
 
     # in-place ops (modify self, return self)
     def iadd(self, o: Vec3) -> Vec3:
@@ -63,7 +69,7 @@ class Vec3:
         return self
 
     def idiv(self, s: Number) -> Vec3:
-        inv = 1.0/float(s)
+        inv = 1.0 / float(s)
         self.x *= inv
         self.y *= inv
         self.z *= inv
@@ -71,28 +77,28 @@ class Vec3:
 
     # Hadamard products (component-wise multiplication)
     def hadamard(self, o: Vec3) -> Vec3:
-        return Vec3(self.x*o.x, self.y*o.y, self.z*o.z)
+        return Vec3(self.x * o.x, self.y * o.y, self.z * o.z)
 
     def hadamard_ip(self, o: Vec3) -> Vec3:
-        self.x*=o.x
-        self.y*=o.y
-        self.z*=o.z
+        self.x *= o.x
+        self.y *= o.y
+        self.z *= o.z
         return self
 
     # vector operations
     def dot(self, o: Vec3) -> float:
-        return self.x*o.x + self.y*o.y + self.z*o.z
+        return self.x * o.x + self.y * o.y + self.z * o.z
 
     def cross(self, o: Vec3) -> Vec3:
         return Vec3(
-            self.y*o.z - self.z*o.y,
-            self.z*o.x - self.x*o.z,
-            self.x*o.y - self.y*o.x
+            self.y * o.z - self.z * o.y,
+            self.z * o.x - self.x * o.z,
+            self.x * o.y - self.y * o.x
         )
 
     # length and normalization
     def norm(self) -> float:
-        return sqrt(self.x*self.x + self.y*self.y + self.z*self.z)
+        return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
     def normalize(self) -> Vec3:
         """
@@ -104,10 +110,10 @@ class Vec3:
         10,0,0 -> 1,0,0
         :return:
         """
-        n2 = self.x*self.x + self.y*self.y + self.z*self.z
-        if n2 == 0.0: return Vec3(0.0,0.0,0.0)
+        n2 = self.x * self.x + self.y * self.y + self.z * self.z
+        if n2 == 0.0: return Vec3(0.0, 0.0, 0.0)
         inv = 1.0 / sqrt(n2)
-        return Vec3(self.x*inv, self.y*inv, self.z*inv)
+        return Vec3(self.x * inv, self.y * inv, self.z * inv)
 
     def normalize_ip(self) -> Vec3:
         """
@@ -115,11 +121,14 @@ class Vec3:
         If the vector has zero length, sets it to zero vector.
         :return:
         """
-        n2 = self.x*self.x + self.y*self.y + self.z*self.z
-        if n2 == 0.0: self.x = self.y = self.z = 0.0
+        n2 = self.x * self.x + self.y * self.y + self.z * self.z
+        if n2 == 0.0:
+            self.x = self.y = self.z = 0.0
         else:
             inv = 1.0 / sqrt(n2)
-            self.x *= inv; self.y *= inv; self.z *= inv
+            self.x *= inv;
+            self.y *= inv;
+            self.z *= inv
         return self
 
     def clamp01(self) -> Vec3:
@@ -148,7 +157,7 @@ class Vec3:
             self.z + (b.z - self.z) * t,
         )
 
-    def orthonormal_basis(self) -> tuple[Vec3,Vec3,Vec3]:
+    def orthonormal_basis(self) -> tuple[Vec3, Vec3, Vec3]:
         n = self.normalize_ip()
         if abs(n.x) > abs(n.z):
             t = Vec3(-n.y, n.x, 0.0).normalize_ip()
@@ -163,7 +172,6 @@ class Vec3:
         :return: str
         """
         return f"Vec3({self.x:.3f}, {self.y:.3f}, {self.z:.3f})"
-
 
     def __radd__(self, o):
         """
@@ -185,7 +193,6 @@ class Vec3:
         if isinstance(o, Vec3):
             return Vec3(self.x * o.x, self.y * o.y, self.z * o.z)
 
-
     def rotate_around_axis(self, axis: Vec3, angle_rad: float) -> Vec3:
         """
         Rotate this vector around given axis by angle in radians using Rodrigues' rotation formula.
@@ -204,4 +211,4 @@ class Vec3:
         Return the length of the vector.
         :return: float
         """
-        return sqrt(self.x*self.x + self.y*self.y + self.z*self.z)
+        return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)

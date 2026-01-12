@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from src.geometry.geometry_hit import GeometryHit
 from src.material import Material
 
+
 @dataclass
 class SurfaceInteraction:
     geom: GeometryHit
@@ -16,5 +17,6 @@ class SurfaceInteraction:
 
     @property
     def point(self): return self.geom.point
+
     @property
     def normal(self): return self.geom.normal

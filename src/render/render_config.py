@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from src.render.resolution import Resolution
 
+
 @dataclass
 class RenderConfig:
     """

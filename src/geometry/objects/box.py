@@ -13,31 +13,42 @@ class Box(Hittable):
     corner2: Vertex
 
     @property
-    def x0(self): return min(self.corner1.x, self.corner2.x)
+    def x0(self):
+        return min(self.corner1.x, self.corner2.x)
+
     @property
-    def x1(self): return max(self.corner1.x, self.corner2.x)
+    def x1(self):
+        return max(self.corner1.x, self.corner2.x)
+
     @property
-    def y0(self): return min(self.corner1.y, self.corner2.y)
+    def y0(self):
+        return min(self.corner1.y, self.corner2.y)
+
     @property
-    def y1(self): return max(self.corner1.y, self.corner2.y)
+    def y1(self):
+        return max(self.corner1.y, self.corner2.y)
+
     @property
-    def z0(self): return min(self.corner1.z, self.corner2.z)
+    def z0(self):
+        return min(self.corner1.z, self.corner2.z)
+
     @property
-    def z1(self): return max(self.corner1.z, self.corner2.z)
+    def z1(self):
+        return max(self.corner1.z, self.corner2.z)
 
     def normal_at(self, point: Vertex) -> Vector:
         if abs(point.x - self.x0) < EPS:
             return Vector(-1, 0, 0)  # left
         if abs(point.x - self.x1) < EPS:
-            return Vector(1, 0, 0)   # right
+            return Vector(1, 0, 0)  # right
         if abs(point.y - self.y0) < EPS:
             return Vector(0, -1, 0)  # bottom
         if abs(point.y - self.y1) < EPS:
-            return Vector(0, 1, 0)   # top
+            return Vector(0, 1, 0)  # top
         if abs(point.z - self.z0) < EPS:
             return Vector(0, 0, -1)  # back
         if abs(point.z - self.z1) < EPS:
-            return Vector(0, 0, 1)   # front
+            return Vector(0, 0, 1)  # front
         raise ValueError("Point is not on the surface of the box.")
 
     def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
@@ -81,7 +92,6 @@ class Box(Hittable):
             front_face = False
         else:
             front_face = True
-
 
         return GeometryHit(
             dist=t_hit,

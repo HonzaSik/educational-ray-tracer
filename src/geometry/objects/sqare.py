@@ -1,6 +1,4 @@
 from __future__ import annotations
-
-from abc import ABC
 from src.math import Vertex, Vector
 from src.geometry.hittable import Hittable
 from src.geometry.ray import Ray

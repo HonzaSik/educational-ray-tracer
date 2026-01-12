@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass
-from math import sqrt
 from src.math import Vertex, Vector
 from src.geometry.hittable import Hittable
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 from src.material import Material
 import random
+
 
 @dataclass
 class Triangle(Hittable, ABC):
@@ -27,7 +27,6 @@ class Triangle(Hittable, ABC):
     def __post_init__(self):
         self.edge_1 = self.v1 - self.v0
         self.edge_2 = self.v2 - self.v0
-
 
     def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
         """
@@ -84,7 +83,6 @@ class Triangle(Hittable, ABC):
             front_face=ray.direction.dot(normal) < 0.0,
         )
 
-
     def translate(self, offset: Vector) -> None:
         """
         Move triangle by offset vector.
@@ -93,7 +91,6 @@ class Triangle(Hittable, ABC):
         self.v1 += offset
         self.v2 += offset
         self.__post_init__()
-
 
     def random_point(self) -> Vertex:
         u = random.uniform(0, 1)

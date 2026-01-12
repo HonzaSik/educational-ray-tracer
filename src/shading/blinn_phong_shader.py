@@ -1,4 +1,3 @@
-# src/shading/blinn_phong_shader.py
 from __future__ import annotations
 from abc import ABC
 from .shading_model import ShadingModel
@@ -16,9 +15,10 @@ class BlinnPhongShader(ShadingModel, ABC):
     """
     Blinn–Phong shader with optional Fresnel for dielectrics. Supports multiple lights, ambient, and emission.
     """
+
     def __init__(
-        self,
-        use_fresnel: bool = True,
+            self,
+            use_fresnel: bool = True,
     ) -> None:
         self.use_fresnel = use_fresnel
 
@@ -40,19 +40,7 @@ class BlinnPhongShader(ShadingModel, ABC):
         if light_intensity <= 0.0:
             return Color.custom_rgb(0, 0, 0)
 
-        # --- NORMALS & PERTURBATION ---
-
-        # geometric normal from SurfaceInteraction
-        n_geom = hit.normal
-
-        # let material tweak it
-        if hasattr(material, "perturb_normal"):
-            n = material.perturb_normal(hit, n_geom)
-        else:
-            n = n_geom
-
-        # Normalize vectors
-        n = n.normalize_ip()
+        n = hit.normal.normalize_ip()
         l = light_direction.normalize_ip()
         v = view_dir.normalize_ip()
 
@@ -61,7 +49,8 @@ class BlinnPhongShader(ShadingModel, ABC):
 
         return (diffuse + specular) * light_intensity
 
-    def shade_multiple_lights(self, hit: SurfaceInteraction, lights: list[Light], view_dir: Vector, scene: Scene | None = None) -> Color:
+    def shade_multiple_lights(self, hit: SurfaceInteraction, lights: list[Light], view_dir: Vector,
+                              scene: Scene | None = None) -> Color:
         material = hit.material
         is_transmissive = getattr(material, "transparency", 0.0) > 0.0 and getattr(material, "ior", 1.0) > 1.0
 
@@ -73,16 +62,9 @@ class BlinnPhongShader(ShadingModel, ABC):
             else:
                 accum += self.shade(hit, light, view_dir, scene=scene)
 
-        # transmissive "extra" specular: also better to use perturbed normal
         if is_transmissive:
-            # use perturbed normal here as well
-            n_geom = hit.geom.normal
-            if hasattr(material, "perturb_normal"):
-                n_spec = material.perturb_normal(hit, n_geom).normalize_ip()
-            else:
-                n_spec = n_geom.normalize_ip()
-
-            accum += self._blinn_specular(material, n_spec, -view_dir, view_dir)
+            n = hit.normal.normalize_ip()
+            accum += self._blinn_specular(material, n, -view_dir, view_dir)
 
         return clamp_color255(accum)
 
@@ -91,6 +73,7 @@ class BlinnPhongShader(ShadingModel, ABC):
         # turn off diffuse when the material is transmissive (glass)
         if getattr(m, "transparency", 0.0) > 0.0:
             return Color(0.0, 0.0, 0.0)
+
         ndotl = max(0.0, n.dot(l))
         return m.get_color() * ndotl
 
@@ -102,7 +85,6 @@ class BlinnPhongShader(ShadingModel, ABC):
         ndoth = max(0.0, n.dot(h))
         shininess = max(2.0, getattr(material, "shininess", 32.0))
 
-        # Just use the specular color
         spec = material.get_specular_color() * (ndoth ** shininess)
 
         if self.use_fresnel and getattr(material, "ior", 1.0) > 1.0:

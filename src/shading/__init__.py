@@ -4,6 +4,7 @@ from .depth_shader import DepthShader
 from .diff_shader import DiffShader, HashMethod
 from .dot_product_shader import DotProductShader
 from .curvature_shader import CurvatureShader
+
 __all__ = [
     "BlinnPhongShader",
     "NormalShader",
@@ -13,4 +14,3 @@ __all__ = [
     "DotProductShader",
     "CurvatureShader",
 ]
-

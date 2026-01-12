@@ -7,13 +7,15 @@ from math import pi
 from numpy import sqrt
 from dataclasses import field
 
-#enum types of lights
+
+# enum types of lights
 class LightType(Enum):
     POINT = "point"
     AMBIENT = "ambient"
     DIRECTIONAL = "directional"
     SPOT = "spot"
     AREA = "area"
+
 
 @dataclass
 class Light(ABC):

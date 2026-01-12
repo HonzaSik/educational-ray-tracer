@@ -1,4 +1,3 @@
-# src/shading/dot_product_shader.py
 from dataclasses import dataclass
 from .shading_model import ShadingModel
 from src.scene.surface_interaction import SurfaceInteraction
@@ -6,6 +5,7 @@ from src.scene.light import Light
 from src.material.color import Color
 from src.math import Vector
 import math
+
 
 @dataclass
 class DotProductShader(ShadingModel):
@@ -38,7 +38,7 @@ class DotProductShader(ShadingModel):
         color = Color(math.sin(t * self.frequency) * 0.5 + 0.5, t, 1.0 - t)
         return color.clamp_01()
 
-    def shade_multiple_lights(self, hit : SurfaceInteraction, lights, view_dir):
+    def shade_multiple_lights(self, hit: SurfaceInteraction, lights, view_dir):
         """
         Shade using the first light in the list if use_light is True; otherwise, ignore lights.
         """

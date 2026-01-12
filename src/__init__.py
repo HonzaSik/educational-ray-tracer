@@ -1,4 +1,4 @@
-#geometry package
+# geometry package
 from .geometry import Plane, Sphere, Triangle, Square
 # helpers and math
 from .math import Vertex, Vector
@@ -7,15 +7,15 @@ from .io import ColorLibrary, LightLibrary, MaterialLibrary, PickleManager, Reso
 # material
 from .material import Material, Color
 # scene setting
-from .scene import Scene, Camera, AmbientLight, PointLight, RenderMethod, ShadingModel, QualityPreset
+from .scene import Scene, Camera, AmbientLight, PointLight
 
-from .shading import  BlinnPhongShader, DepthShader, NormalShader, DiffShader, CurvatureShader
+from .shading import BlinnPhongShader, DepthShader, NormalShader, DiffShader, CurvatureShader
 
 __all__ = [
     "Plane", "Sphere", "Square", "Triangle",
     "Vertex", "Vector",
     "ColorLibrary", "LightLibrary", "MaterialLibrary", "PickleManager", "ipynb_display_images",
     "Material", "Color",
-    "Scene", "Camera", "AmbientLight", "PointLight", "Resolution", "RenderMethod", "ShadingModel", "QualityPreset",
+    "Scene", "Camera", "AmbientLight", "PointLight", "Resolution",
     "BlinnPhongShader", "DepthShader", "NormalShader", "DiffShader", "CurvatureShader"
 ]

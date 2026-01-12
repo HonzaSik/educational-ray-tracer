@@ -4,7 +4,8 @@ import numpy as np
 from src.render.post_process.post_process_config import PostProcessConfig
 
 
-def post_process_pipeline(config: PostProcessConfig, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Tuple[
+def post_process_pipeline(config: PostProcessConfig, pixels: List[Tuple[int, int, int]], width: int, height: int) -> \
+Tuple[
     List[Tuple[int, int, int]], int, int]:
     """
     Applies post-processing steps to the rendered image based on the configuration.
@@ -24,10 +25,10 @@ def post_process_pipeline(config: PostProcessConfig, pixels: List[Tuple[int, int
 
 
 def _upscale_image(
-    pixels: List[Tuple[int, int, int]],
-    width: int,
-    height: int,
-    scale_factor: int,
+        pixels: List[Tuple[int, int, int]],
+        width: int,
+        height: int,
+        scale_factor: int,
 ) -> Tuple[List[Tuple[int, int, int]], int, int]:
     """
     Upscale an image represented as a flat list of RGB tuples.
@@ -49,11 +50,10 @@ def _upscale_image(
     # Resampling.LANCZOS,
     # Resampling.BOX,
     # Resampling.HAMMING,
-    scaled_pixels = img.resize((scale_factor*width, scale_factor*height), resample=Image.BICUBIC)
+    scaled_pixels = img.resize((scale_factor * width, scale_factor * height), resample=Image.BICUBIC)
 
     # convert back
     scaled_array = np.asarray(scaled_pixels, dtype=np.uint8)
     scaled_pixels = [tuple(px) for row in scaled_array for px in row]
 
     return scaled_pixels, scale_factor * width, scale_factor * height
-

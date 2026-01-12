@@ -1,4 +1,3 @@
-# src/shading/compare_checker_shader.py
 from dataclasses import dataclass
 from .shading_model import ShadingModel
 from src.scene.surface_interaction import SurfaceInteraction
@@ -62,7 +61,6 @@ class DiffShader(ShadingModel):
     scale: float = 4.0
     hash_method: HashMethod = HashMethod.CHECKER
 
-
     def _select_hash(self, v: Vertex) -> int:
         """Return 0/1 based on the selected pattern."""
         if self.hash_method == HashMethod.CHECKER:
@@ -77,7 +75,6 @@ class DiffShader(ShadingModel):
             return _half_left_right(v.x)
         else:
             return 0
-
 
     def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector) -> Color:
         """
@@ -94,4 +91,4 @@ class DiffShader(ShadingModel):
         0 = shader A, 1 = shader B
         """
         use_a = self._select_hash(hit.geom.point) == 0
-        return (self.a if use_a else self.b).shade_multiple_lights(view_dir = view_dir, lights = lights, hit = hit)
+        return (self.a if use_a else self.b).shade_multiple_lights(view_dir=view_dir, lights=lights, hit=hit)

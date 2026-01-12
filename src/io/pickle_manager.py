@@ -3,9 +3,8 @@ from pickle import dump, load
 from pprint import pprint
 from typing import Any
 from src.scene import Scene
-
-# type imports
 from src.io.object_libraries import ColorLibrary, LightLibrary, MaterialLibrary
+
 
 class PickleManager:
     """

@@ -1,12 +1,7 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 from pathlib import Path
-
-from src.render.resolution import Resolution
 from src.math.vector import Vector
-from src.shading.shading_model import ShadingModel
-from src.scene import Scene
 from src.scene.camera import Camera
 from .ease import linear, ease_in_out, EaseType
 from src.math.vertex import Vertex
@@ -55,8 +50,8 @@ class Animator:
     Handles animation setup and frame generation.
     """
     animation_setup: AnimationSetup = None
-    animation_fps: int = 24 #todo move to QualityPreset
-    animation_length_seconds: float = 2.0 #todo move to QualityPreset
+    animation_fps: int = 24  # todo move to QualityPreset
+    animation_length_seconds: float = 2.0  # todo move to QualityPreset
     ray_tracer: RenderLoop | None = None
 
     _total_frames: int = 0
@@ -85,12 +80,13 @@ class Animator:
         elif ease == EaseType.EASE_IN_OUT:
             return ease_in_out(t)
         return t
-    #todo add more easing functions if needed in ease.py and here _apply_ease mb move to ease.py
+
+    # todo add more easing functions if needed in ease.py and here _apply_ease mb move to ease.py
 
     def create_png_sequence(
-        self,
-        folder: Path | str | None = None,
-        ease: EaseType = EaseType.LINEAR,
+            self,
+            folder: Path | str | None = None,
+            ease: EaseType = EaseType.LINEAR,
     ) -> list[Path]:
         """
         Renders the animation frames to PNG files.
@@ -127,69 +123,68 @@ class Animator:
 
             # move camera
             if (
-                self.animation_setup.move_from is not None
-                and self.animation_setup.move_to is not None
-                and self.animation_setup.move_duration is not None
-                and self.animation_setup.move_duration > 0.0
+                    self.animation_setup.move_from is not None
+                    and self.animation_setup.move_to is not None
+                    and self.animation_setup.move_duration is not None
+                    and self.animation_setup.move_duration > 0.0
             ):
                 start = self.animation_setup.move_start_delay
                 duration = self.animation_setup.move_duration
                 if start <= current_time <= start + duration:
                     t = (current_time - start) / duration  # 0-1 time normalized
-                    t_eased = self._ease_apply(t, ease) # apply easing function to t
+                    t_eased = self._ease_apply(t, ease)  # apply easing function to t
                     new_position = self.animation_setup.move_from.lerp(
-                        self.animation_setup.move_to, t_eased # linear interpolation between from and to
+                        self.animation_setup.move_to, t_eased  # linear interpolation between from and to
                     )
-                    cam.origin = new_position #todo update vec3/vertex/vector mismatch
-
+                    cam.origin = new_position  # todo update vec3/vertex/vector mismatch
 
             rotate_duration = self.animation_setup.rotate_duration
             # rotate camera
             if (
-                self.animation_setup.rotate_axis is not None
-                and self.animation_setup.rotate_angle_deg is not None
-                and rotate_duration is not None
-                and rotate_duration > 0.0
+                    self.animation_setup.rotate_axis is not None
+                    and self.animation_setup.rotate_angle_deg is not None
+                    and rotate_duration is not None
+                    and rotate_duration > 0.0
             ):
                 start = self.animation_setup.rotate_start_delay
                 duration = rotate_duration
 
                 if start <= current_time <= start + duration:
-                    t = (current_time - start) / duration # 0-1 time normalized
+                    t = (current_time - start) / duration  # 0-1 time normalized
                     t_eased = self._ease_apply(t, ease)
 
-                    total_angle = self.animation_setup.rotate_angle_deg # total rotation angle in degrees
-                    target_angle_deg = total_angle * t_eased # target angle at current time
+                    total_angle = self.animation_setup.rotate_angle_deg  # total rotation angle in degrees
+                    target_angle_deg = total_angle * t_eased  # target angle at current time
 
-                    delta_angle_deg = target_angle_deg - last_angle_deg # change in angle since last frame
-                    if abs(delta_angle_deg) > 1e-6: # if there is almost no change, skip rotation
+                    delta_angle_deg = target_angle_deg - last_angle_deg  # change in angle since last frame
+                    if abs(delta_angle_deg) > 1e-6:  # if there is almost no change, skip rotation
                         cam.rotate_around_axis(self.animation_setup.rotate_axis, delta_angle_deg)
-                    last_angle_deg = target_angle_deg # for next frame
+                    last_angle_deg = target_angle_deg  # for next frame
 
             # zoom camera
             if (
-                self.animation_setup.zoom_from is not None
-                and self.animation_setup.zoom_to is not None
-                and self.animation_setup.zoom_duration is not None
-                and self.animation_setup.zoom_duration > 0.0
+                    self.animation_setup.zoom_from is not None
+                    and self.animation_setup.zoom_to is not None
+                    and self.animation_setup.zoom_duration is not None
+                    and self.animation_setup.zoom_duration > 0.0
             ):
                 start = self.animation_setup.zoom_start_delay
                 duration = self.animation_setup.zoom_duration
                 if start <= current_time <= start + duration:
-                    t = (current_time - start) / duration # 0-1 time normalized
-                    t_eased = self._ease_apply(t, ease) # apply easing function to t
+                    t = (current_time - start) / duration  # 0-1 time normalized
+                    t_eased = self._ease_apply(t, ease)  # apply easing function to t
                     new_fov = self.animation_setup.zoom_from + (
-                        self.animation_setup.zoom_to - self.animation_setup.zoom_from # linear interpolation of fov
+                            self.animation_setup.zoom_to - self.animation_setup.zoom_from  # linear interpolation of fov
                     ) * t_eased
                     cam.fov = new_fov
-                    cam.__post_init__() # recalculate camera parameters after fov change
+                    cam.__post_init__()  # recalculate camera parameters after fov change
 
             # reset camera in scene
             self.ray_tracer.camera = cam
 
             # render individual frame as PNG by sequence - frame_0000.png, frame_0001.png, ...
             path = folder / f"frame_{frame_i:04d}.png"
-            spp, max_depth = (1, 5) #todo remove hardcode later add to QualityPreset or params
+            spp, max_depth = (1, 5)  # todo remove hardcode later add to QualityPreset or params
 
             self.ray_tracer.render(str(path.resolve()))
 
@@ -197,9 +192,9 @@ class Animator:
         return frames
 
     def animate_to_mp4(
-        self,
-        output_path: Path | str | None = None,
-        ease: EaseType = EaseType.LINEAR,
+            self,
+            output_path: Path | str | None = None,
+            ease: EaseType = EaseType.LINEAR,
     ) -> Path:
         """
         Renders the animation to an MP4 file.

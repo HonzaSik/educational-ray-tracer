@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Tuple, List, Optional
-
 from src.scene.camera import Camera
 from src.scene.light import Light
 from src.shading.shading_model import ShadingModel
@@ -17,9 +16,11 @@ from src.render.post_process.post_process_pipeline import post_process_pipeline
 from src.render.post_process.post_process_config import PostProcessConfig
 from src.render.resolution import Resolution
 
+
 class ImgFormat(Enum):
     PPM = "ppm"
     PNG = "png"
+
 
 @dataclass
 class RenderLoop(ABC):
@@ -44,26 +45,26 @@ class RenderLoop(ABC):
 
     def __post_init__(self):
         # Initialize core components from the scene and configurations
-        self.camera : Camera = self.scene.camera
-        self.lights : List[Light] = self.scene.lights
-        self.skybox : Optional[str] = self.scene.skybox_path if self.scene.skybox_path is not None else None
+        self.camera: Camera = self.scene.camera
+        self.lights: List[Light] = self.scene.lights
+        self.skybox: Optional[str] = self.scene.skybox_path if self.scene.skybox_path is not None else None
 
         # Set default shading model if none provided
-        self.shader : ShadingModel = self.shading_model if self.shading_model is not None else BlinnPhongShader()
+        self.shader: ShadingModel = self.shading_model if self.shading_model is not None else BlinnPhongShader()
 
         # Set rendering parameters from render_config or use defaults
-        self.spp : int = self.render_config.samples_per_pixel if self.render_config is not None else 1
-        self.max_depth : int = self.render_config.max_depth if self.render_config is not None else 3
+        self.spp: int = self.render_config.samples_per_pixel if self.render_config is not None else 1
+        self.max_depth: int = self.render_config.max_depth if self.render_config is not None else 3
         self.width: int = self.render_config.resolution.width if self.render_config is not None else Resolution.R360p.width
         self.height: int = self.render_config.resolution.height if self.render_config is not None else Resolution.R360p.height
 
         # Set post-processing configuration
-        self.post_process_config : PostProcessConfig = self.post_process_config if self.post_process_config is not None else PostProcessConfig()
-        self.ui : ProgressUI = ProgressUI(
-            mode = self.preview_config.progress_display if self.preview_config is not None else ProgressDisplay.NONE,
-            width = self.width if self.preview_config is not None else Resolution.R360p.width,
-            height = self.height if self.preview_config is not None else Resolution.R360p.height,
-            preview = self.preview_config if self.preview_config is not None else PreviewConfig()
+        self.post_process_config: PostProcessConfig = self.post_process_config if self.post_process_config is not None else PostProcessConfig()
+        self.ui: ProgressUI = ProgressUI(
+            mode=self.preview_config.progress_display if self.preview_config is not None else ProgressDisplay.NONE,
+            width=self.width if self.preview_config is not None else Resolution.R360p.width,
+            height=self.height if self.preview_config is not None else Resolution.R360p.height,
+            preview=self.preview_config if self.preview_config is not None else PreviewConfig()
         )
 
         if self.spp <= 0:
@@ -83,7 +84,6 @@ class RenderLoop(ABC):
 
         self.camera.set_aspect_ratio(self.width / self.height)
 
-
     def on_row_end_update_preview(self, current_row: int, pixels_u8: List[Tuple[int, int, int]]) -> None:
         """
         Called at the end of each row to update preview if needed.
@@ -92,7 +92,7 @@ class RenderLoop(ABC):
         :return:
         """
         config = self.ui.preview
-        #checks if preview is enabled
+        # checks if preview is enabled
         if self.ui.img_widget is not None and config.refresh_interval_rows > 0:
             # each interval_rows, update the preview or at the last row
             if ((current_row + 1) % config.refresh_interval_rows == 0) or (current_row + 1 == self.height):
@@ -124,16 +124,16 @@ class RenderLoop(ABC):
             else:
                 raise ValueError("Unsupported file extension. Please use .ppm or .png or specify img_format_list.")
 
-        #render all pixels only once
+        # render all pixels only once
         pixels, width, height = self.render_all_pixels()
         saved_paths: [Path] = []
 
         if self.post_process_config.enabled:
             pixels, width, height = post_process_pipeline(
-                pixels = pixels,
-                width = width,
-                height = height,
-                config = self.post_process_config
+                pixels=pixels,
+                width=width,
+                height=height,
+                config=self.post_process_config
             )
 
         for img_format in img_format_list:
@@ -148,7 +148,6 @@ class RenderLoop(ABC):
             raise RuntimeError("No image was saved. Please check the image format.")
         return saved_paths
 
-
     def _save_as_ppm(self, filename: str, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Path:
         """
         Saves the rendered pixels to a PPM file.
@@ -161,7 +160,6 @@ class RenderLoop(ABC):
         Path(filename).parent.mkdir(parents=True, exist_ok=True)
         write_ppm(filename, pixels, width, height)
         return Path(filename)
-
 
     def _save_as_png(self, filename: str, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Path:
         """
@@ -178,8 +176,7 @@ class RenderLoop(ABC):
         png_path = Path(filename)
         convert_ppm_to_png(ppm_temp_path.as_posix(), png_path.as_posix())
 
-        #remove temporary ppm file
+        # remove temporary ppm file
         ppm_temp_path.unlink(missing_ok=True)
 
         return png_path
-

@@ -5,6 +5,7 @@ from src.material.color import Color
 from src.math import Vector
 from dataclasses import dataclass
 
+
 @dataclass
 class NormalShader(ShadingModel):
     """
@@ -22,7 +23,6 @@ class NormalShader(ShadingModel):
         blue = int((norm.z + 1) * 0.5 * 255)
 
         return Color.custom_rgb(red, green, blue)
-
 
     def shade_multiple_lights(self, hit: SurfaceInteraction, lights: list[Light], view_dir: Vector) -> Color:
         """

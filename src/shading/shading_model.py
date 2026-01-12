@@ -5,6 +5,7 @@ from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 from src.math import Vector
 
+
 class ShadingModel(ABC):
     @abstractmethod
     def shade(self, hit: SurfaceInteraction, light: Light, view_dir: Vector) -> Color:

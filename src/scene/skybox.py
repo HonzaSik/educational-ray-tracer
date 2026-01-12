@@ -1,9 +1,9 @@
 from __future__ import annotations
 import math
 import numpy as np
-
 from src import Color
 from src.math.vec3 import Vec3
+
 
 def hdr_to_ndarray(path: str) -> np.ndarray:
     """
@@ -24,7 +24,7 @@ def hdr_to_ndarray(path: str) -> np.ndarray:
                 raise Exception("End of file before HDR header")
             # gets rid of non-ascii characters and trailing whitespace
             line = line.decode("ascii", errors="ignore").strip()
-            #check first line for valid signature
+            # check first line for valid signature
             if i == 0 and line != "#?RADIANCE":
                 raise Exception("Not a valid HDR file.")
             # empty line indicates end of header
@@ -41,11 +41,10 @@ def hdr_to_ndarray(path: str) -> np.ndarray:
         if len(res) != 4:
             raise Exception("Unexpected data after HDR header.")
 
-
         if res[0] not in ("-Y", "+Y") or res[2] not in ("-X", "+X"):
             raise Exception("Doesnt contain valid HDR resolution info.")
 
-        #gets hdr width and height can be in value from 1 to 65535
+        # gets hdr width and height can be in value from 1 to 65535
         hdr_height = int(res[1])
         hdr_width = int(res[3])
 
@@ -77,9 +76,9 @@ def hdr_to_ndarray(path: str) -> np.ndarray:
                 raise Exception("HDR scanline width mismatch.")
 
             # check all four channels (R, G, B, E) and decode each one
-            chan = [np.zeros(hdr_width, dtype=np.uint8) for _ in range(4)] # for r, g, b, e
+            chan = [np.zeros(hdr_width, dtype=np.uint8) for _ in range(4)]  # for r, g, b, e
 
-            #hdr stores pixel = (R/256, G/256, B/256) * 2^(E-128) in 4 channels
+            # hdr stores pixel = (R/256, G/256, B/256) * 2^(E-128) in 4 channels
             # read each channel
             for c in range(4):
                 x = 0
@@ -96,18 +95,18 @@ def hdr_to_ndarray(path: str) -> np.ndarray:
                     if count > 128:
                         # 128-255 is a num_to_read so we read one value and repeat it count-128 times
                         num_to_read = count - 128
-                        val_b = f.read(1) # read the value what we repeat
+                        val_b = f.read(1)  # read the value what we repeat
                         if not val_b:
                             raise Exception("Unexpected EOF in num_to_read.")
-                        chan[c][x:x+num_to_read] = val_b[0] # from x to x+num_to_read we set the values
+                        chan[c][x:x + num_to_read] = val_b[0]  # from x to x+num_to_read we set the values
                         x += num_to_read
                     else:
                         # 0-128 is a literal, so we read count values directly into the channel
-                        num_to_read = count # number of literal values to read
+                        num_to_read = count  # number of literal values to read
                         vals = f.read(num_to_read)
                         if len(vals) != num_to_read:
                             raise Exception("Unexpected EOF in literal.")
-                        chan[c][x:x+num_to_read] = np.frombuffer(vals, dtype=np.uint8)
+                        chan[c][x:x + num_to_read] = np.frombuffer(vals, dtype=np.uint8)
                         x += num_to_read
 
             # save one scanline of pixels to data array as float32
@@ -117,11 +116,13 @@ def hdr_to_ndarray(path: str) -> np.ndarray:
             E = chan[3].astype(np.float32)
 
             # convert from RGBE to float32 linear RGB
-            mask = (E > 0) # avoid invalid ldexp for zero exponent
-            scale = np.zeros_like(E, dtype=np.float32) # default scale is 0
+            mask = (E > 0)  # avoid invalid ldexp for zero exponent
+            scale = np.zeros_like(E, dtype=np.float32)  # default scale is 0
 
-            scale[mask] = np.ldexp(1.0, (E[mask] - 136).astype(np.int32)) # counts how many times to multiply by 2^(E-128)/256 = 2^(E-136) to get final scale for R,G,B
-            rgb_row = np.stack([R*scale, G*scale, B*scale], axis=-1) # transform to RGB float32 row (H x 3, float32)
+            scale[mask] = np.ldexp(1.0, (E[mask] - 136).astype(
+                np.int32))  # counts how many times to multiply by 2^(E-128)/256 = 2^(E-136) to get final scale for R,G,B
+            rgb_row = np.stack([R * scale, G * scale, B * scale],
+                               axis=-1)  # transform to RGB float32 row (H x 3, float32)
 
             # handle flipping if needed
             correct_y = hdr_height - 1 - y if flip_y else y
@@ -138,7 +139,8 @@ class SkyboxHDR:
     """
     Create a skybox from an HDR image file and can sample colors based on 3D direction vectors.
     """
-    def __init__(self, path: str,  yaw_deg: float = 90): #todo handle rotation after moove to scene
+
+    def __init__(self, path: str, yaw_deg: float = 90):  # todo handle rotation after moove to scene
 
         arr = hdr_to_ndarray(path)
         self.data = arr
@@ -154,14 +156,14 @@ class SkyboxHDR:
         :return: (u, v) coordinates in [0, 1] range
         """
         direction = direction.normalize_ip()
-        x,y,z = direction.x, direction.y, direction.z
+        x, y, z = direction.x, direction.y, direction.z
 
-        # apply yaw rotation around Y axis to direction vector sy = sin(yaw), cy = cos(yaw)
+        # yaw rotation around Y axis to direction vector sy = sin(yaw), cy = cos(yaw)
         cos_yaw = math.sin(self.yaw)
         sin_yaw = math.cos(self.yaw)
 
         # rotate direction vector
-        x_rotated =  cos_yaw * x + sin_yaw * z
+        x_rotated = cos_yaw * x + sin_yaw * z
         z_rotated = -sin_yaw * x + cos_yaw * z
         y_rotated = max(-1.0, min(1.0, y))
 
@@ -170,8 +172,8 @@ class SkyboxHDR:
         v = 0.5 - math.asin(y_rotated) / math.pi
 
         # wrap u to [0, 1]
-        u = u % 1.0 # can be negative or >1 then wraps around
-        v = max(0.0, min(1.0, v)) # clamp v to [0, 1]
+        u = u % 1.0  # can be negative or >1 then wraps around
+        v = max(0.0, min(1.0, v))  # clamp v to [0, 1]
         return u, v
 
     def color_from_dir(self, d: Vec3) -> Color:
@@ -201,7 +203,7 @@ class SkyboxHDR:
         # interpolate color from four pixels and return as Color
         c0 = (1 - tx) * c00 + tx * c10
         c1 = (1 - tx) * c01 + tx * c11
-        c  = (1 - ty) * c0  + ty * c1
+        c = (1 - ty) * c0 + ty * c1
 
         return Color(float(c[0]), float(c[1]), float(c[2]))
 

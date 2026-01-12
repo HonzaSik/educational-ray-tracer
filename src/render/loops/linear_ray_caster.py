@@ -8,10 +8,6 @@ from .progress import PreviewConfig
 from src.render.helpers import cast_ray
 from dataclasses import dataclass
 
-from src.render.render_config import RenderConfig
-from src.scene.scene import Scene
-from src.render.post_process.post_process_config import PostProcessConfig
-
 
 @dataclass
 class LinearRayCaster(RenderLoop):
@@ -32,17 +28,16 @@ class LinearRayCaster(RenderLoop):
             ray = self.camera.make_ray(u_base + du, v_base + dv)
 
             acc += cast_ray(
-                ray = ray,
-                lights = self.lights,
-                depth = self.max_depth,
-                shader = self.shader,
-                skybox = self.skybox,
-                scene = self.scene,
+                ray=ray,
+                lights=self.lights,
+                depth=self.max_depth,
+                shader=self.shader,
+                skybox=self.skybox,
+                scene=self.scene,
             )
 
         col = acc / self.spp
-        return to_u8(col.x), to_u8(col.y), to_u8(col.z) #todo color xyz to rgb
-
+        return to_u8(col.x), to_u8(col.y), to_u8(col.z)  # todo color xyz to rgb
 
     def render_all_pixels(self) -> Tuple[List[Tuple[int, int, int]], int, int]:
         pixels: List[Tuple[int, int, int]] = []
@@ -52,7 +47,6 @@ class LinearRayCaster(RenderLoop):
 
         for row in range(self.height):
             for i in range(self.width):
-
                 rgb = self.render_pixel(i, row)
                 pixels.append(rgb)
 

@@ -6,6 +6,7 @@ def clamp_float_01(x: float) -> float:
     """
     return 0.0 if x < 0.0 else (1.0 if x > 1.0 else x)
 
+
 def interpolate(a: float, b: float, t: float) -> float:
     """
     Linear interpolation between a and b by factor t in [0, 1].

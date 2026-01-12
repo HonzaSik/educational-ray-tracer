@@ -1,16 +1,20 @@
 from .vec3 import Vec3
 
+
 class Vector(Vec3):
     """
     Vector inheriting from Vec3, with vector-specific methods.
     """
-    #aliases for vector components
+
+    # aliases for vector components
     @property
     def i(self) -> float:
         return self.x
+
     @property
     def j(self) -> float:
         return self.y
+
     @property
     def k(self) -> float:
         return self.z
@@ -18,9 +22,11 @@ class Vector(Vec3):
     @i.setter
     def i(self, value: float) -> None:
         self.x = value
+
     @j.setter
     def j(self, value: float) -> None:
         self.y = value
+
     @k.setter
     def k(self, value: float) -> None:
         self.z = value

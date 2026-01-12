@@ -1,12 +1,11 @@
-# src/shading/normal_shader.py
 from __future__ import annotations
-from typing import Literal
 from .shading_model import ShadingModel
 from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 from src.material.color import Color
 from src.math import Vector
 from dataclasses import dataclass
+
 
 @dataclass
 class DepthShader(ShadingModel):
