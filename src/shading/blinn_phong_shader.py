@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC
-from .shading_model import ShadingModel
+from .shading_model import ShadingModel, apply_noise_normal_perturbation
 from src.scene.surface_interaction import SurfaceInteraction
 from src.material.color import Color, clamp_color255
 from src.material.material.material import Material
@@ -40,9 +40,12 @@ class BlinnPhongShader(ShadingModel, ABC):
         if light_intensity <= 0.0:
             return Color.custom_rgb(0, 0, 0)
 
-        n = hit.normal.normalize_ip()
-        l = light_direction.normalize_ip()
-        v = view_dir.normalize_ip()
+        n = hit.normal.normalize()
+
+        n = apply_noise_normal_perturbation(hit, material, n)
+
+        l = light_direction.normalize()
+        v = view_dir.normalize()
 
         diffuse = self._lambert_diffuse(material, n, l)
         specular = self._blinn_specular(material, n, l, v)
@@ -63,14 +66,13 @@ class BlinnPhongShader(ShadingModel, ABC):
                 accum += self.shade(hit, light, view_dir, scene=scene)
 
         if is_transmissive:
-            n = hit.normal.normalize_ip()
+            n = hit.normal.normalize()
             accum += self._blinn_specular(material, n, -view_dir, view_dir)
 
         return clamp_color255(accum)
 
     @staticmethod
     def _lambert_diffuse(m: Material, n: Vector, l: Vector) -> Color:
-        # turn off diffuse when the material is transmissive (glass)
         if getattr(m, "transparency", 0.0) > 0.0:
             return Color(0.0, 0.0, 0.0)
 
@@ -81,7 +83,7 @@ class BlinnPhongShader(ShadingModel, ABC):
         """
         Classic Blinn–Phong specular: (n·h)^shininess with optional Fresnel.
         """
-        h = (l + v).normalize_ip()
+        h = ((l + v).normalize())
         ndoth = max(0.0, n.dot(h))
         shininess = max(2.0, getattr(material, "shininess", 32.0))
 

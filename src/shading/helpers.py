@@ -4,8 +4,20 @@ from src.geometry.ray import Ray
 from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 
-# shadow bias to avoid self-intersection
-_BIAS = 1e-6
+_BIAS = 1e-3
+
+def tangent_basis(vec: Vector) -> tuple[Vector, Vector]:
+    """
+    Create a tangent basis (T, B) given a normal vector (vec).
+    :param vec: Normal vector
+    :return: (Tangent Vector, Bitangent Vector)
+    """
+    #helper vector to avoid degenerate cross product
+    up = Vector(0, 1, 0) if abs(vec.y) < 0.999 else Vector(1, 0, 0)
+    # compute tangent and bitangent
+    tangent = up.cross(vec).normalize_ip()
+    bitangent = vec.cross(tangent)
+    return tangent, bitangent
 
 
 def shadow_trace(geometry_hit: SurfaceInteraction, light_direction: Vector, light_distance: float,
@@ -18,6 +30,7 @@ def shadow_trace(geometry_hit: SurfaceInteraction, light_direction: Vector, ligh
     :param scene: Scene containing the objects to check for shadows
     :return: true if in shadow, false otherwise
     """
+
     if scene is None:
         raise ValueError("Scene must not be None for shadow tracing.")
 

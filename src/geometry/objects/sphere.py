@@ -2,14 +2,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from math import sqrt
 from src.math import Vertex
-from src.geometry.hittable import Hittable
+from src.geometry.object_geometry import ObjectGeometry
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 from src.math import Vector
 
 
 @dataclass
-class Sphere(Hittable):
+class Sphere(ObjectGeometry):
     """
     Sphere in 3D space defined by center, radius, and color.
     """

@@ -7,7 +7,7 @@ from src.scene.light import Light
 from src.math import Vector
 from src.math import reflect, refract
 from src.shading.blinn_phong_shader import BlinnPhongShader
-from src.shading.shading_model import ShadingModel
+from src.shading.shading_model import ShadingModel, apply_noise_normal_perturbation
 
 
 def cast_ray(
@@ -40,8 +40,8 @@ def cast_ray(
 
         n_geom = hit.geom.normal.normalize()
 
-        if hasattr(material, "perturb_normal"):
-            n_shade = material.perturb_normal(hit, n_geom).normalize()
+        if hasattr(material, "noise"):
+            n_shade = apply_noise_normal_perturbation(hit, material, n_geom)
         else:
             n_shade = n_geom
 
@@ -50,7 +50,7 @@ def cast_ray(
             reflected_color = cast_ray(reflected_ray, lights, depth - 1, shader=shader, skybox=skybox, scene=scene)
             return clamp_color01(local_color + reflected_color * reflectivity)
         else:
-            refracted_ray = handle_refraction(ray, hit, n_geom, material)
+            refracted_ray = handle_refraction(ray, hit, n_geom, n_shade, material)
             refracted_color = cast_ray(refracted_ray, lights, depth - 1, shader=shader, skybox=skybox, scene=scene)
             return clamp_color01(local_color + refracted_color * transparency)
 
@@ -78,12 +78,17 @@ def handle_refraction(
         ray: Ray,
         hit: SurfaceInteraction,
         n_geom: Vector,
+        n_shade: Vector,
         material: Material,
 ) -> Ray:
     ior_m = getattr(material, "ior", 1.5)
 
-    front_face = n_geom.dot(ray.direction) < 0.0
-    outward_n = n_geom if front_face else -n_geom
+    n = n_shade.normalize()
+    if n.dot(ray.direction) > 0.0:
+        n = -n
+
+    front_face = n.dot(ray.direction) < 0.0
+    outward_n = n if front_face else -n
     ior_out = 1.0 if front_face else ior_m
     ior_in = ior_m if front_face else 1.0
 
@@ -93,8 +98,8 @@ def handle_refraction(
 
     if Tdir is None:
         next_dir = reflect(ray.direction, outward_n).normalize()
-        origin = hit.geom.point + outward_n * bias
+        origin = hit.geom.point + n_geom.normalize() * bias
         return Ray(origin, next_dir)
     else:
-        origin = hit.geom.point - outward_n * bias
+        origin = hit.geom.point - n_geom.normalize() * bias
         return Ray(origin, Tdir.normalize())

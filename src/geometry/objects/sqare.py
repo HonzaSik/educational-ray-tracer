@@ -1,14 +1,13 @@
 from __future__ import annotations
 from src.math import Vertex, Vector
-from src.geometry.hittable import Hittable
+from src.geometry.object_geometry import ObjectGeometry
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
-from src.material import Material
 from .triangle import Triangle
 import random
 
 
-class Square(Hittable):
+class Square(ObjectGeometry):
     """
     Square in 3D space defined by four vertices and material.
     The square is composed of two triangles for intersection calculations.
@@ -17,23 +16,21 @@ class Square(Hittable):
     v1: Vertex
     v2: Vertex
     v3: Vertex
-    material: Material
 
     tri1: Triangle = None
     tri2: Triangle = None
 
-    def __init__(self, vertex: Vertex, diagonal_vertex: Vertex, material: Material):
+    def __init__(self, vertex: Vertex, diagonal_vertex: Vertex):
         self.v0 = vertex
         self.v2 = diagonal_vertex
         self.v1 = Vertex(diagonal_vertex.x, vertex.y, vertex.z)
         self.v3 = Vertex(vertex.x, diagonal_vertex.y, diagonal_vertex.z)
-        self.material = material
         self.__post_init__()
 
     def __post_init__(self):
         # Create two triangles from the square's vertices
-        self.tri1 = Triangle(self.v0, self.v1, self.v2, self.material)
-        self.tri2 = Triangle(self.v0, self.v2, self.v3, self.material)
+        self.tri1 = Triangle(self.v0, self.v1, self.v2)
+        self.tri2 = Triangle(self.v0, self.v2, self.v3)
 
     def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
         """

@@ -15,4 +15,11 @@ def interpolate(a: float, b: float, t: float) -> float:
     :param t: interpolation factor
     :return: interpolated value
     """
-    return a * (1.0 - t) + b * t
+    return (1.0 - t) * a + b * t
+
+
+def perlin_fade(t: float) -> float:
+    # Fade function as defined by Ken Perlin.
+    return t * t * t * (t * (t * 6 - 15) + 10)
+
+lerp = interpolate

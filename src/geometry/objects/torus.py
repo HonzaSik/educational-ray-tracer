@@ -1,6 +1,6 @@
 from __future__ import annotations
 from src.math import Vertex, Vector
-from src.geometry.hittable import Hittable
+from src.geometry.object_geometry import ObjectGeometry
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 import random
@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Torus(Hittable):
+class Torus(ObjectGeometry):
     """
     A torus object. Donut shape defined by a major radius (distance from center to tube center) and a minor radius (tube radius). Uses as example of custom Hittable implementation. in jupyter notebook.
     The torus is centered at 'center' vertex and l
@@ -17,7 +17,6 @@ class Torus(Hittable):
     center: Vertex
     radius_major: float  # Major radius (distance from center to tube center)
     radius_tube: float  # Minor radius (tube radius)
-    material: any
 
     def normal_at(self, point: Vertex) -> Vector:
         local_hit = point - self.center

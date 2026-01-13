@@ -1,14 +1,14 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from src.math import Vertex, Vector
-from src.geometry.hittable import Hittable
+from src.geometry.object_geometry import ObjectGeometry
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 
 EPS = 1e-6
 
 @dataclass
-class Box(Hittable):
+class Box(ObjectGeometry):
     corner1: Vertex
     corner2: Vertex
 

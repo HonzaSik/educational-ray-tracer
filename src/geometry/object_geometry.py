@@ -5,8 +5,8 @@ from src.geometry.ray import Ray
 from src.math import Vertex
 
 
-class Hittable(ABC):
-    """Anything that can be intersected by a ray."""
+class ObjectGeometry(ABC):
+    """Geometric object interface for ray tracing intersections"""
 
     @abstractmethod
     def intersect(self, ray: Ray, t_min: float = 1e-3, t_max: float = float('inf')) -> GeometryHit | None:
@@ -16,11 +16,6 @@ class Hittable(ABC):
         :param t_max: maximum valid distance for intersection
         :return: Hit record if intersection occurs, else None
         """
-        pass
-
-    @abstractmethod
-    def random_point(self) -> Vertex:
-        """Generate a random point on the surface of the object."""
         pass
 
     @abstractmethod

@@ -1,7 +1,11 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Optional
+
+from src.math.vertex import Vertex
 from src.material.color import Color
+from src.material.textures.normal_base import Noise
 from src.math.vector import Vector
 
 
@@ -12,6 +16,8 @@ class Material(ABC):
     """
     name: str = "default_material"
 
+    normal_noise: Optional[Noise] = None
+
     @abstractmethod
     def get_color(self) -> Color:
         """
@@ -20,6 +26,7 @@ class Material(ABC):
         """
         pass
 
+    @abstractmethod
     def get_reflectance(self) -> float:
         """
         Get the reflectance of the material.
@@ -32,7 +39,7 @@ class Material(ABC):
         Get the reflectance color vector of the material.
         :return: Reflectance color
         """
-        raise NotImplementedError("Subclasses must implement get_refflectance_vector method.")
+        raise NotImplementedError("Subclasses must implement get_reflectance_vector method.")
 
     def get_transparency(self) -> float:
         """
@@ -41,7 +48,7 @@ class Material(ABC):
         """
         raise NotImplementedError("Subclasses must implement get_transparency method.")
 
-    #todo remove this - temporary
+    # todo remove this - temporary
     def get_ior(self) -> float:
         """
         Get the index of refraction of the material.
@@ -49,7 +56,7 @@ class Material(ABC):
         """
         raise NotImplementedError("Subclasses must implement get_ior method.")
 
-    #todo remove this - temporary
+    # todo remove this - temporary
     def get_specular_color(self) -> Color:
         """
         Get the specular color of the material.

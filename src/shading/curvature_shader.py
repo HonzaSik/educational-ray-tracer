@@ -4,6 +4,7 @@ from .shading_model import ShadingModel
 from src.scene.surface_interaction import SurfaceInteraction
 from src.material.color import Color
 from src.math import Vector
+from src.scene.scene import Scene
 from ..scene import Light
 
 
@@ -15,7 +16,7 @@ class CurvatureShader(ShadingModel):
     """
     _bias: float = 0.005
 
-    def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector) -> Color:
+    def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector, scene: Scene | None = None) -> Color:
         # """
         # Shade based on the curvature approximated by finite differences of normals.
         # """
@@ -32,7 +33,7 @@ class CurvatureShader(ShadingModel):
         # return color.clamp_01()
         raise NotImplementedError("CurvatureShader is not implemented after world refactor.")
 
-    def shade_multiple_lights(self, hit, lights, view_dir):
+    def shade_multiple_lights(self, hit, lights, view_dir, scene: Scene | None = None) -> Color:
         """
         Shade ignoring multiple lights. Curvature is independent of lighting.
         """

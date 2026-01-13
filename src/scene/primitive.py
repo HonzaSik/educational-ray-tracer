@@ -1,13 +1,13 @@
 from dataclasses import dataclass
-from src.geometry.hittable import Hittable
-from src.material import Material
+from src.geometry.object_geometry import ObjectGeometry
+from src.material.material.material import Material
 from src.geometry.ray import Ray
 from src.scene.surface_interaction import SurfaceInteraction
 
 
 @dataclass
 class Primitive:
-    geometry: Hittable
+    geometry: ObjectGeometry
     material: Material
     _id: int = -1  # internal ID for tracking purposes
 

@@ -3,22 +3,20 @@ from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass
 from src.math import Vertex, Vector
-from src.geometry.hittable import Hittable
+from src.geometry.object_geometry import ObjectGeometry
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
-from src.material import Material
 import random
 
 
 @dataclass
-class Triangle(Hittable, ABC):
+class Triangle(ObjectGeometry, ABC):
     """
     Triangle in 3D space defined by three vertices and material.
     """
     v0: Vertex
     v1: Vertex
     v2: Vertex
-    material: Material
 
     edge_1: Vector = None
     edge_2: Vector = None

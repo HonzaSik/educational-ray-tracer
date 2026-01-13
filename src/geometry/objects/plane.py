@@ -3,11 +3,11 @@ from dataclasses import dataclass
 from src.math import Vertex, Vector
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
-from src.geometry.hittable import Hittable
+from src.geometry.object_geometry import ObjectGeometry
 
 
 @dataclass
-class Plane(Hittable):
+class Plane(ObjectGeometry):
     """
     Plane in 3D space defined by a point, normal, and color.
     """
