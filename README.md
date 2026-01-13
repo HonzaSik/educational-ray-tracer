@@ -256,19 +256,25 @@ This log shows the evolution of the raytracer.
 
 **Github lowers the image quality when displaying them in the README, so for best quality check the images in the `docs/examples` folder.**
 
+## Image 6 – Perlin Noise Scene (Current)
+- **Scene:** beach with perlin noise textured objects
+- **Features:** working perlin noise texture mapping
 
-## Image 5 – Improved Glass + Skybox (Current)
+![Render of a beach scene with perlin noise textured objects using the Educational Python Ray Tracer](docs/examples/perlin_multiobject.png)
+
+
+## Image 5 – Improved Glass + Skybox (Old Version)
 - **Scene:** spheres with better glass material  
 - **Features:** experimental reflections/refractions, working skybox  
-- **Status:** current development stage  
+- **Status:** improved glass material with reflections and refractions
 
 ![Render of glass spheres with reflections and skybox using the Educational Python Ray Tracer](docs/examples/image5.png)
 
 ---
 
-## Image 4 – Skybox (In Progress)
+## Image 4 – Skybox (Old Version)
 - **Scene:** early skybox experiments  
-- **Status:** partial implementation  
+- **Status:** initial test of skybox environment mapping
 
 ![Early test of skybox environment mapping in the Educational Python Ray Tracer](docs/examples/image4.png)
 
