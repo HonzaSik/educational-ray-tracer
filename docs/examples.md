@@ -29,10 +29,17 @@
 
 ## Basic Scenes
 
+- Simple scene with a sphere displaying base perlin noise texture in normal shader mode
+
+![Perlin sphere normal shader](examples/perlin_normal.png)
+
 ---
 
-## Advanced Scenes
+## Complex Scenes
 
+- Perlin multiobject scene with different materials and 3 sources of light
+
+![Perlin multiobject scene](examples/perlin_multiobject.png)
 ---
 
 ## Demonstrations
@@ -126,7 +133,7 @@ animation_setup = AnimationSetup(
 
 ---
 
-# Interesting Renders
+# Interesting Renders & other Examples
 
 ---
 ### Tours in Shanghai
@@ -137,7 +144,10 @@ animation_setup = AnimationSetup(
 
 ### Transparent spheres
 ![Transparent spheres](examples/animatons/gif/transparent.gif)
+
 🔗 [Full-quality MP4](examples/animatons/mp4/transparent.mp4)
+
+
 
 
 <p align="center">
