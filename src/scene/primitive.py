@@ -9,6 +9,7 @@ from src.scene.surface_interaction import SurfaceInteraction
 class Primitive:
     geometry: ObjectGeometry
     material: Material
+
     _id: int = -1  # internal ID for tracking purposes
 
     def intersect(self, ray: Ray, t_min=0.001, t_max=float("inf")):

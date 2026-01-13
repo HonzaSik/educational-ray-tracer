@@ -11,4 +11,4 @@
 </p>
 
 ---
-[example of usage](../../notebooks/04_scene.ipynb)
+[example of usage](../../notebooks/complex_scene_creation/04_scene.ipynb)

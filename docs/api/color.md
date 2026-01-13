@@ -38,5 +38,5 @@ Color.to_rgb8()
 ...
 
 ---
-[example of usage](../../notebooks/01_material.ipynb)
+[example of usage](../../notebooks/complex_scene_creation/01_material.ipynb)
 

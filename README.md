@@ -170,7 +170,7 @@ class MySphere(Hittable):
 
 </details>
 
-#### Defined in ./notebooks/objects.ipynb [go to notebook](./notebooks/custom_object.ipynb)
+#### Defined in ./notebooks/objects.ipynb [go to notebook](notebooks/custom_definitions/custom_object.ipynb)
 
 ---
 
