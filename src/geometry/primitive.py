@@ -5,7 +5,7 @@ from src.geometry.ray import Ray
 from src.math import Vertex
 
 
-class ObjectGeometry(ABC):
+class Primitive(ABC):
     """Geometric object interface for ray tracing intersections"""
 
     @abstractmethod

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from src.render.resolution import Resolution
+from src.render.resolution import Resolution, CustomResolution
 
 
 @dataclass
@@ -11,7 +11,7 @@ class RenderConfig:
         samples_per_pixel (int): Number of samples per pixel for antialiasing.
         max_depth (int): Maximum recursion depth for ray tracing.
     """
-    resolution: Resolution = Resolution.R360p
+    resolution: Resolution | CustomResolution = Resolution.R360p
     samples_per_pixel: int = 1
     max_depth: int = 5
 

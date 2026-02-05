@@ -8,9 +8,8 @@ from .linear_ray_caster import RenderLoop
 _STATE = {}
 
 
-def _init_worker(camera, world, lights, shader, spp, max_depth, skybox, width, height):
+def _init_worker(camera, lights, shader, spp, max_depth, skybox, width, height):
     _STATE["cam"] = camera
-    _STATE["world"] = world
     _STATE["lights"] = lights
     _STATE["shader"] = shader
     _STATE["spp"] = spp
@@ -22,7 +21,6 @@ def _init_worker(camera, world, lights, shader, spp, max_depth, skybox, width, h
 
 def _render_row_worker(j: int):
     camera = _STATE["cam"]
-    world = _STATE["world"]
     lights = _STATE["lights"]
     shader = _STATE["shader"]
     spp = _STATE["spp"]
@@ -53,7 +51,7 @@ def _render_row_worker(j: int):
             ju, jv = jitter[s & 3]
             # create ray through pixel with jitter
             ray = camera.make_ray(u_base + ju * width_inv, v_base + jv * height_inv)
-            acc += cast_ray(ray, world, lights, shader=shader, skybox=skybox)
+            acc += cast_ray(ray, lights, shader=shader, skybox=skybox)
         # average accumulated color and convert to 0-255 range for PPM output
         col = acc * (1.0 / spp)
         row[i] = (to_u8(col.x), to_u8(col.y), to_u8(col.z))
@@ -80,7 +78,7 @@ class MultiProcessRowRenderLoop(RenderLoop):
         for s in range(self.spp):
             ju, jv = jitter[s & 3]
             ray = self.camera.make_ray(u_base + ju * width_inv, v_base + jv * height_inv)
-            acc += cast_ray(ray, self.world, self.lights, depth=self.max_depth,
+            acc += cast_ray(ray, self.lights, depth=self.max_depth,
                             shader=self.shader, skybox=self.skybox)
         col = acc * (1.0 / self.spp)
         return (to_u8(col.x), to_u8(col.y), to_u8(col.z))
@@ -98,7 +96,7 @@ class MultiProcessRowRenderLoop(RenderLoop):
         with ctx.Pool(
                 processes=ctx.cpu_count(),
                 initializer=_init_worker,
-                initargs=(self.camera, self.world, self.lights, self.shader,
+                initargs=(self.camera, self.lights, self.shader,
                           self.spp, self.max_depth, self.skybox,
                           width, height)
         ) as pool:

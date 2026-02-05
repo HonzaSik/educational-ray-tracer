@@ -7,11 +7,10 @@ from src.math import Vertex, Vector
 class GeometryHit:
     """
     Record of a ray-object intersection.
-    Stores intersection distance, point, normal, and color at thepoint.
     """
-    dist: float  # distance from ray origin to intersection
-    point: Vertex  # intersection point
-    normal: Vector  # normal at intersection point
+    dist: float
+    point: Vertex
+    normal: Vector
     front_face: bool
     geometry_id: int | None = None
 

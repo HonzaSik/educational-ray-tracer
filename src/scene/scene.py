@@ -1,61 +1,62 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from src.geometry.ray import Ray
 from src.scene.camera import Camera
 from src.scene.light import Light, LightType
 from src.math import Vector
 from src.math import Vertex
 from pathlib import Path
-from src.scene.primitive import Primitive
+from src.scene.object import Object
 from src.scene.surface_interaction import SurfaceInteraction
 
 
 @dataclass
 class Scene:
     camera: Camera
-    lights: list[Light]
-    primitives: list[Primitive] = None
+    lights: list[Light] = field(default_factory=list)
+    objects: list[Object] = field(default_factory=list)
     skybox_path: str | None = None
 
+
     def __str__(self) -> str:
-        return f"Scene(camera={self.camera}, lights={self.lights}, primitives={self.primitives}, skybox_path={self.skybox_path})"
+        return f"Scene(camera={self.camera}, lights={self.lights}, primitives={self.objects}, skybox_path={self.skybox_path})"
 
     def __repr__(self) -> str:
         return self.__str__()
 
     # -------- Scene add/remove methods --------
-    def add_primitives(self, primitives: Primitive | list[Primitive]) -> None:
+    def add_objects(self, objects: Object | list[Object]) -> None:
         """
         Add one or more primitives to the scene.
         If the scene has no primitives, it initializes the list.
-        :param primitives:
+        :param objects:
         :return: None
         """
-        if self.primitives is None:
-            self.primitives = []
+        if self.objects is None:
+            self.objects = []
 
-        if isinstance(primitives, Primitive):
-            self.primitives.append(primitives)
-        elif isinstance(primitives, list):
-            self.primitives.extend(primitives)
+        if isinstance(objects, Object):
+            self.objects.append(objects)
+        elif isinstance(objects, list):
+            self.objects.extend(objects)
         else:
             raise TypeError("primitives must be a Primitive or a list of Primitives")
 
-    def remove_primitive(self, obj: Primitive) -> None:
+    def remove_object(self, obj: Object) -> None:
         """
         Remove an object from the scene.
         :param obj: Object to remove
         :return: None
         """
-        if self.primitives is not None and obj in self.primitives:
-            self.primitives.remove(obj)
+        if self.objects is not None and obj in self.objects:
+            self.objects.remove(obj)
 
-    def clear_primitives(self) -> None:
+    def clear_objects(self) -> None:
         """
         Clear all objects from the scene.
         :return: None
         """
-        if self.primitives is not None:
-            self.primitives.clear()
+        if self.objects is not None:
+            self.objects.clear()
 
     def intersect(self, ray: Ray) -> SurfaceInteraction | None:
         """
@@ -63,13 +64,13 @@ class Scene:
         :param ray: Ray to intersect
         :return: SurfaceInteraction if hit, None otherwise
         """
-        if self.primitives is None:
+        if self.objects is None:
             return None
 
         closest_hit = None
         closest_distance = float('inf')
 
-        for primitive in self.primitives:
+        for primitive in self.objects:
             hit = primitive.intersect(ray)
             if hit and hit.geom.dist < closest_distance:
                 closest_distance = hit.geom.dist
@@ -77,12 +78,12 @@ class Scene:
 
         return closest_hit
 
-    def get_objects(self) -> list[Primitive]:
+    def get_objects(self) -> list[Object]:
         """
         Get all objects in the scene.
         :return: List of objects
         """
-        return self.primitives if self.primitives is not None else []
+        return self.objects if self.objects is not None else []
 
     def add_light(self, light: Light) -> None:
         """

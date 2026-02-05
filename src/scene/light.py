@@ -3,8 +3,7 @@ from src.math import Vertex
 from enum import Enum
 from src.math import Vector
 from abc import ABC, abstractmethod
-from math import pi
-from numpy import sqrt
+from math import pi, cos
 from dataclasses import field
 
 
@@ -61,7 +60,7 @@ class PointLight(Light):
         dx = point.x - self.position.x
         dy = point.y - self.position.y
         dz = point.z - self.position.z
-        r2 = sqrt(dx ** 2 + dy ** 2 + dz ** 2) ** 2
+        r2 = dx*dx + dy*dy + dz*dz
         if r2 < 1e-8:
             return 0.0
         inv_square = self.intensity / (4.0 * pi * r2)
@@ -80,3 +79,34 @@ class AmbientLight(Light):
     def intensity_at(self, point: Vertex) -> float:
         # Ambient light has constant intensity everywhere
         return self.intensity
+
+@dataclass
+class DirectionalLight(Light):
+    """
+    Represents a directional light source in a 3D scene.
+    """
+    direction: Vector = field(default_factory=lambda: Vector(0.0, -1.0, 0.0))
+    type: LightType = LightType.DIRECTIONAL
+
+    def intensity_at(self, point: Vertex) -> float:
+        # Directional light has constant intensity everywhere
+        return self.intensity
+
+@dataclass
+class SpotLight(Light):
+    """
+    Represents a spotlight source in a 3D scene.
+    """
+    direction: Vector = field(default_factory=lambda: Vector(0.0, -1.0, 0.0))
+    angle: float = pi / 6  # spotlight cone angle in radians
+    type: LightType = LightType.SPOT
+
+    def intensity_at(self, point: Vertex) -> float:
+        # Calculate direction to point
+        to_point = (point - self.position).normalize()
+
+        spot_effect = (self.direction.normalize()).dot(to_point)
+
+        if spot_effect > cos(self.angle):
+            return self.intensity * spot_effect
+        return 0.0

@@ -34,11 +34,16 @@ class CustomResolution:
     def __repr__(self) -> str:
         return f"CustomResolution({self._w}x{self._h})"
 
+    @property
+    def aspect_ratio(self) -> float:
+        return self._w / self._h
+
 
 class Resolution(Enum):
     """
     Common screen resolutions as (width, height) tuples. You can also create custom resolutions with Resolution.custom(width, height).
     """
+    # Common 16:9 resolutions
     R144p = (256, 144)
     R240p = (426, 240)
     R360p = (640, 360)
@@ -47,8 +52,29 @@ class Resolution(Enum):
     FullHD = (1920, 1080)
     QHD = (2560, 1440)
     UHD4K = (3840, 2160)
+
+    # Common 4:3 resolutions
+    R240p_4_3 = (320, 240)  # QVGA
+    R360p_4_3 = (480, 360)
+    R480p_4_3 = (640, 480)  # VGA
+    SVGA = (800, 600)
     XGA = (1024, 768)
-    SXGA = (1280, 1024)
+    SXGA_4_3 = (1280, 960)
+    UXGA = (1600, 1200)
+    QXGA = (2048, 1536)
+
+    # 1:1 resolutions
+    R256p_1_1 = (256, 256)
+    R512p_1_1 = (512, 512)
+    R1024p_1_1 = (1024, 1024)
+    R2048p_1_1 = (2048, 2048)
+    R4096p_1_1 = (4096, 4096)
+
+    # Ultrawide resolutions
+    UW_HD = (2560, 1080)  # Ultrawide Full HD
+    UW_QHD = (3440, 1440)  # Ultrawide QHD
+    UW_4K = (5120, 2160)  # Ultrawide 4K
+
 
     def __iter__(self):
         # makes unpacking work wihnout .value

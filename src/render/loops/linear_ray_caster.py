@@ -1,10 +1,8 @@
 from __future__ import annotations
-from typing import Tuple, Optional, List
+from typing import Tuple, List
 from random import random
 from src.material.color import Color, to_u8
-from src.shading.shading_model import ShadingModel
 from .render_loop import RenderLoop
-from .progress import PreviewConfig
 from src.render.helpers import cast_ray
 from dataclasses import dataclass
 
@@ -37,7 +35,7 @@ class LinearRayCaster(RenderLoop):
             )
 
         col = acc / self.spp
-        return to_u8(col.x), to_u8(col.y), to_u8(col.z)  # todo color xyz to rgb
+        return to_u8(col.r), to_u8(col.g), to_u8(col.b)  # todo color xyz to rgb
 
     def render_all_pixels(self) -> Tuple[List[Tuple[int, int, int]], int, int]:
         pixels: List[Tuple[int, int, int]] = []

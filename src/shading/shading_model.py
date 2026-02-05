@@ -1,5 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+
+from src.material.textures.noise.normal_base import Noise
 from src.shading.helpers import tangent_basis
 from src.scene.scene import Scene
 from src.material.material.material import Material
@@ -9,35 +11,37 @@ from src.scene.light import Light
 from src.math import Vector
 
 
-def apply_noise_normal_perturbation(hit : SurfaceInteraction, material : Material, vec : Vector) -> Vector:
-    noise = material.normal_noise if hasattr(material, "noise") else None
-    strength = material.noise_strength if hasattr(material, "noise_strength") else 0.0
-
-    if noise is None or strength == 0.0:
+def apply_noise_normal_perturbation(
+    hit: SurfaceInteraction,
+    noise_override: Noise | None,
+    vec: Vector
+) -> Vector:
+    noise = noise_override
+    if noise is None:
         return vec
 
-    scale = material.noise_scale if hasattr(material, "noise_scale") else 1.0
-    eps = material.noise_eps if hasattr(material, "noise_eps") else 1e-3
+    strength = getattr(noise, "strength", 0.0)
+    if strength == 0.0:
+        return vec
+
+    scale = getattr(noise, "scale", 1.0)
+    eps = getattr(noise, "eps", 1e-3)
     inv_eps = 1.0 / eps
 
-    point = hit.point
-    tangent, bitangent = tangent_basis(vec)
+    n = vec.normalize()
+    tangent, bitangent = tangent_basis(n)
 
-    # point on the noise texture
-    p = point * scale
-    # central height
-    h0 = noise.value(p)
-    # heights at offset positions
-    ht = noise.value((point + tangent * eps) * scale)
-    hb = noise.value((point + bitangent * eps) * scale)
+    # sphere-friendly mapping (works great for planets)
+    p = hit.normal.normalize()
 
-    # compute height differences on shifted positions
+    h0 = noise.value(p * scale)
+    ht = noise.value((p + tangent * eps) * scale)
+    hb = noise.value((p + bitangent * eps) * scale)
+
     dht = (ht - h0) * inv_eps
     dhb = (hb - h0) * inv_eps
 
-    # perturbed normal adjusted by height differences and strength
-    perturbed_normal = (vec - tangent * (strength * dht) - bitangent * (strength * dhb)).normalize_ip()
-    return perturbed_normal
+    return (n - tangent * (strength * dht) - bitangent * (strength * dhb)).normalize()
 
 
 class ShadingModel(ABC):

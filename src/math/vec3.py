@@ -126,8 +126,8 @@ class Vec3:
             self.x = self.y = self.z = 0.0
         else:
             inv = 1.0 / sqrt(n2)
-            self.x *= inv;
-            self.y *= inv;
+            self.x *= inv
+            self.y *= inv
             self.z *= inv
         return self
 

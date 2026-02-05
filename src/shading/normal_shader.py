@@ -20,9 +20,10 @@ class NormalShader(ShadingModel):
         Shade based on the normal vector at the hit point.
         """
         material = hit.material
-        n = hit.geom.normal
+        n = hit.normal.normalize()
 
-        norm = apply_noise_normal_perturbation(hit, material, n)
+        noise = getattr(material, "normal_noise", None)
+        norm = apply_noise_normal_perturbation(hit, noise, n)
 
         red = int((norm.x + 1) * 0.5 * 255)
         green = int((norm.y + 1) * 0.5 * 255)

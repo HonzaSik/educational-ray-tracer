@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import math
 from src import Vertex
-from src.material.textures.normal_base import Noise
+from src.material.textures.noise.normal_base import Noise
 from src.math.helpers import interpolate, perlin_fade
 import random
 

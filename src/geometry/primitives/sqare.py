@@ -1,13 +1,13 @@
 from __future__ import annotations
 from src.math import Vertex, Vector
-from src.geometry.object_geometry import ObjectGeometry
+from src.geometry.primitive import Primitive
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 from .triangle import Triangle
 import random
 
 
-class Square(ObjectGeometry):
+class Square(Primitive):
     """
     Square in 3D space defined by four vertices and material.
     The square is composed of two triangles for intersection calculations.

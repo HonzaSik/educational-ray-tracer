@@ -1,16 +1,14 @@
 from __future__ import annotations
-
-from abc import ABC
 from dataclasses import dataclass
 from src.math import Vertex, Vector
-from src.geometry.object_geometry import ObjectGeometry
+from src.geometry.primitive import Primitive
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 import random
 
 
 @dataclass
-class Triangle(ObjectGeometry, ABC):
+class Triangle(Primitive):
     """
     Triangle in 3D space defined by three vertices and material.
     """

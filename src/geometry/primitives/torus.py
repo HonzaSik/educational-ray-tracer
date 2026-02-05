@@ -1,6 +1,6 @@
 from __future__ import annotations
 from src.math import Vertex, Vector
-from src.geometry.object_geometry import ObjectGeometry
+from src.geometry.primitive import Primitive
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 import random
@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Torus(ObjectGeometry):
+class Torus(Primitive):
     """
     A torus object. Donut shape defined by a major radius (distance from center to tube center) and a minor radius (tube radius). Uses as example of custom Hittable implementation. in jupyter notebook.
     The torus is centered at 'center' vertex and l

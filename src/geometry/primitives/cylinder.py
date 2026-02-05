@@ -2,14 +2,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from math import sqrt
 from src.math import Vertex
-from src.geometry.object_geometry import ObjectGeometry
+from src.geometry.primitive import Primitive
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 from src.math import Vector
 
 
 @dataclass
-class Cylinder(ObjectGeometry):
+class Cylinder(Primitive):
     base_point: Vertex  # Center of the cylinder base
     cap_point: Vertex  # Center of the cylinder cap
     radius: float  # Radius of the cylinder

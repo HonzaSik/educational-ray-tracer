@@ -8,7 +8,6 @@ class Ray:
     """
     Ray in 3D space defined by an origin and a direction.
     """
-
     origin: Vertex  # starting point of the ray
     direction: Vector | Vec3  # normalized direction vector
 
