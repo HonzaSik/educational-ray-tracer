@@ -188,7 +188,7 @@ class Color:
         return cls(v.x, v.y, v.z)
 
     @staticmethod
-    def custom_albedo(r: float, g: float, b: float) -> Color:
+    def linear_rgb(r: float, g: float, b: float) -> Color:
         """
         Create a custom color with specified red, green, and blue components.
         :param r: red component

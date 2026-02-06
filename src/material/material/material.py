@@ -34,7 +34,6 @@ class Material(ABC):
         """
         pass
 
-    @abstractmethod
     def get_reflectance(self) -> float:
         """
         Get the reflectance of the material.

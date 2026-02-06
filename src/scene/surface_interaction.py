@@ -2,14 +2,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from src.geometry.geometry_hit import GeometryHit
 from src.material import Material
-from src.scene.object import Object
 
 
 @dataclass
 class SurfaceInteraction:
     geom: GeometryHit
     material: Material
-    object: Object
 
     def replace_material(self, new_material: Material) -> SurfaceInteraction:
         return SurfaceInteraction(geom=self.geom, material=new_material)
