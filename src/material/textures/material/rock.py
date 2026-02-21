@@ -5,6 +5,7 @@ from src.material.material.phong_material import PhongMaterial
 
 from src.material.textures.noise.normal_base import Noise
 from src.material.textures.noise.perlin_noise import PerlinNoise
+from src.scene.surface_interaction import SurfaceInteraction
 
 
 def clamp01(x: float) -> float:
@@ -23,7 +24,7 @@ class RockMaterial(PhongMaterial):
     # noise driving bump (normal perturbation)
     bump_noise: Noise | None = None
 
-    def sample(self, hit: "SurfaceInteraction") -> MaterialSample:
+    def sample(self, hit: SurfaceInteraction) -> MaterialSample:
         p = hit.point  # world mapping for rocks; for planets use hit.normal.normalize()
 
         t = 0.5 * self.color_noise.value(p * self.color_scale) + 0.5  # -> [0,1]

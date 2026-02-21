@@ -141,7 +141,7 @@ class Scene:
         :param fov: Field of view in degrees
         :return: None
         """
-        self.camera.fov = fov
+        self.camera.fov_deg = fov
         self.camera.__post_init__()
 
     def move_camera_to(self, position: Vertex) -> None:

@@ -39,29 +39,28 @@ class Material(ABC):
         Get the reflectance of the material.
         :return: Reflectance value
         """
-        raise NotImplementedError("Subclasses must implement get_reflectance method.")
+        pass
 
     def get_reflectance_vector(self) -> Vector:
         """
         Get the reflectance color vector of the material.
         :return: Reflectance color
         """
-        raise NotImplementedError("Subclasses must implement get_reflectance_vector method.")
+        pass
 
     def get_transparency(self) -> float:
         """
         Get the transparency of the material.
         :return: Transparency value
         """
-        raise NotImplementedError("Subclasses must implement get_transparency method.")
+        pass
 
-    # todo remove this - temporary
     def get_ior(self) -> float:
         """
         Get the index of refraction of the material.
         :return: Index of refraction
         """
-        raise NotImplementedError("Subclasses must implement get_ior method.")
+        pass
 
     # todo remove this - temporary
     def get_specular_color(self) -> Color:
@@ -69,7 +68,7 @@ class Material(ABC):
         Get the specular color of the material.
         :return: Specular color
         """
-        raise NotImplementedError("Subclasses must implement get_specular_color method.")
+        pass
 
     def sample(self, hit) -> MaterialSample:
         """

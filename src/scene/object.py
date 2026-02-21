@@ -18,7 +18,7 @@ class Object:
         geom_hit = self.geometry.intersect(ray, t_min, t_max)
         if geom_hit is None:
             return None
-        return SurfaceInteraction(geom=geom_hit, material=self.material, object=self)
+        return SurfaceInteraction(geom=geom_hit, material=self.material)
 
     def normal_at(self, point):
         return self.geometry.normal_at(point)

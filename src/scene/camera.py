@@ -12,29 +12,39 @@ class Camera:
     fov: vertical field of view in degrees
     resolution: image resolution (width, height)
     """
-    fov: float = 70.0
+    fov_deg: float = 70.0
     aspect_ratio: float = 16.0 / 9.0
     origin: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))
     direction: Vector = field(default_factory=lambda: Vector(0, 0, -1))  # looking down -Z
     up_hint: Vector = field(default_factory=lambda: Vector(0, 1, 0))  # up direction
 
-    def __post_init__(self):
-        """
-        Calculate camera basis vectors and image plane dimensions.
-        :return: None
-        """
-        # normalize forward
-        fwd = self.direction.normalize()
-        # guard against collinearity with up
-        if abs(fwd.dot(self.up_hint)) > 0.999:
-            self.up_hint = Vector(1, 0, 0)  # use right vector if collinear
+    fwd: Vector = field(init=False)
+    right: Vector = field(init=False)
+    up: Vector = field(init=False)
+    half_width: float = field(init=False)
+    half_height: float = field(init=False)
 
-        # build ONB (right, true_up, forward)
-        w = (-fwd).normalize()  # camera looks along -w
-        right = self.up_hint.cross(w).normalize()
+    def __post_init__(self):
+        self.update_camera()
+
+    def update_camera(self) -> None:
+        """
+            Calculate camera basis vectors and image plane dimensions.
+            :return: None
+        """
+        fwd = self.direction.normalize()
+
+        up = self.up_hint
+        # if direction is parallel to up_hint, choose a different up vector
+        if abs(fwd.dot(up)) > 0.999:
+            up = Vector(1, 0, 0)
+
+        # build orthonormal basis
+        w = -fwd
+        right = up.cross(w).normalize()
         true_up = w.cross(right)
 
-        theta = radians(self.fov)
+        theta = radians(self.fov_deg)
         half_height = tan(theta * 0.5)
         half_width = self.aspect_ratio * half_height
 
@@ -44,17 +54,21 @@ class Camera:
         self.half_width = half_width
         self.half_height = half_height
 
+
     def make_ray(self, u: float, v: float) -> Ray:
         """
-        u, v in [-0.5, 0.5]; (-0.5,-0.5)=bottom-left, (+0.5,+0.5)=top-right
+        u, v in [-1, 1]
+        (-1,-1)=bottom-left, (1,1)=top-right
         Image plane is 1 unit in front of the camera.
         """
-        # point on image plane: origin + (-w) + x*right + y*up
-        x = u * (2.0 * self.half_width)
-        y = v * (2.0 * self.half_height)
-        img_plane_center = self.origin + self.fwd  # 1 unit ahead
-        pixel_pos = img_plane_center + self.right * x + self.up * y
-        return Ray(self.origin, (pixel_pos - self.origin).normalize())
+        center_plane = self.origin + self.fwd
+
+        position = (
+                center_plane
+                + self.right * (u * self.half_width)
+                + self.up * (v * self.half_height)
+        )
+        return Ray(self.origin, (position - self.origin).normalize())
 
     def translate(self, offset: Vector) -> None:
         """
@@ -74,26 +88,26 @@ class Camera:
         new_up = self.up_hint.rotate_around_axis(axis, angle_rad).normalize()
         self.up_hint = new_up
 
-        self.__post_init__()
+        self.update_camera()
         pass
 
     def zoom(self, factor: float) -> None:
         """
         Zoom camera by changing fov. factor < 1.0 zooms in, > 1.0 zooms out.
         """
-        self.fov *= factor
-        self.__post_init__()
+        self.fov_deg *= factor
+        self.update_camera()
 
     def set_aspect_ratio(self, aspect_ratio: float) -> None:
         """
         Set camera aspect ratio and recalculate image plane dimensions.
         """
         self.aspect_ratio = aspect_ratio
-        self.__post_init__()
+        self.update_camera()
 
     def copy(self) -> Camera:
         return Camera(
-            fov=self.fov,
+            fov_deg=self.fov_deg,
             aspect_ratio=self.aspect_ratio,
             origin=Vertex(self.origin.x, self.origin.y, self.origin.z),
             direction=Vector(self.direction.x, self.direction.y, self.direction.z),

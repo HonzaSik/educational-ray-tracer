@@ -176,7 +176,7 @@ class Animator:
                     new_fov = self.animation_setup.zoom_from + (
                             self.animation_setup.zoom_to - self.animation_setup.zoom_from  # linear interpolation of fov
                     ) * t_eased
-                    cam.fov = new_fov
+                    cam.fov_deg = new_fov
                     cam.__post_init__()  # recalculate camera parameters after fov change
 
             # reset camera in scene
