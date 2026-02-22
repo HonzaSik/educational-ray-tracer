@@ -3,9 +3,7 @@ from typing import Tuple, List
 from random import random
 from src.material.color import Color, to_u8
 from .render_loop import RenderLoop
-from src.render.helpers import cast_ray
 from dataclasses import dataclass
-
 
 @dataclass
 class LinearRayCaster(RenderLoop):
@@ -25,17 +23,13 @@ class LinearRayCaster(RenderLoop):
             dv = (random() - 0.5) / (self.height - 1)
             ray = self.camera.make_ray(u_base + du, v_base + dv)
 
-            acc += cast_ray(
+            acc += self.ray_tracer.cast_ray(
                 ray=ray,
-                lights=self.lights,
                 depth=self.max_depth,
-                shader=self.shader,
-                skybox=self.skybox,
-                scene=self.scene,
             )
 
         col = acc / self.spp
-        return to_u8(col.r), to_u8(col.g), to_u8(col.b)  # todo color xyz to rgb
+        return to_u8(col.r), to_u8(col.g), to_u8(col.b)
 
     def render_all_pixels(self) -> Tuple[List[Tuple[int, int, int]], int, int]:
         pixels: List[Tuple[int, int, int]] = []

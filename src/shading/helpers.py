@@ -21,7 +21,7 @@ def tangent_basis(vec: Vector) -> tuple[Vector, Vector]:
 
 
 def shadow_trace(geometry_hit: SurfaceInteraction, light_direction: Vector, light_distance: float,
-                 scene: Scene) -> bool:
+                 scene: Scene | None) -> bool:
     """
     Trace a shadow ray from the hit point towards the light source.
     :param geometry_hit: HitPoint where the primary ray hit an object

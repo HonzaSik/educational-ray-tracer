@@ -18,7 +18,7 @@ class Camera:
     direction: Vector = field(default_factory=lambda: Vector(0, 0, -1))  # looking down -Z
     up_hint: Vector = field(default_factory=lambda: Vector(0, 1, 0))  # up direction
 
-    fwd: Vector = field(init=False)
+    forward: Vector = field(init=False)
     right: Vector = field(init=False)
     up: Vector = field(init=False)
     half_width: float = field(init=False)
@@ -48,7 +48,7 @@ class Camera:
         half_height = tan(theta * 0.5)
         half_width = self.aspect_ratio * half_height
 
-        self.fwd = fwd
+        self.forward = fwd
         self.right = right
         self.up = true_up
         self.half_width = half_width
@@ -61,7 +61,7 @@ class Camera:
         (-1,-1)=bottom-left, (1,1)=top-right
         Image plane is 1 unit in front of the camera.
         """
-        center_plane = self.origin + self.fwd
+        center_plane = self.origin + self.forward
 
         position = (
                 center_plane

@@ -15,6 +15,7 @@ from src.io.image_helper import write_ppm, convert_ppm_to_png
 from src.render.post_process.post_process_pipeline import post_process_pipeline
 from src.render.post_process.post_process_config import PostProcessConfig
 from src.render.resolution import Resolution
+from ..helpers import RayTracer
 
 
 class ImgFormat(Enum):
@@ -42,6 +43,7 @@ class RenderLoop(ABC):
     preview_config: Optional[PreviewConfig] = None
     render_config: Optional[RenderConfig] = None
     post_process_config: Optional[PostProcessConfig] = None
+    ray_tracer: Optional[RayTracer] = None
 
     def __post_init__(self):
         # Initialize core components from the scene and configurations
@@ -83,6 +85,8 @@ class RenderLoop(ABC):
             raise ValueError("Shading model must be provided.")
 
         self.camera.set_aspect_ratio(self.width / self.height)
+
+        self.ray_tracer = RayTracer(scene=self.scene, shader=self.shader, lights=self.lights, skybox=self.skybox, max_depth=self.max_depth)
 
     def on_row_end_update_preview(self, current_row: int, pixels_u8: List[Tuple[int, int, int]]) -> None:
         """
