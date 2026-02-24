@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Tuple, List, Optional
 from src.scene.camera import Camera
 from src.scene.light import Light
-from src.shading.shading_model import LocalShading
+from src.shading.local_shading import LocalShading
 from src.shading.blinn_phong_shader import BlinnPhongShader
 from .progress import ProgressUI, PreviewConfig, ProgressDisplay
 from src.scene.scene import Scene
@@ -15,7 +15,7 @@ from src.io.image_helper import write_ppm, convert_ppm_to_png
 from src.render.post_process.post_process_pipeline import post_process_pipeline
 from src.render.post_process.post_process_config import PostProcessConfig
 from src.render.resolution import Resolution
-from src.render.integrator.helpers import RecursiveIntegrator
+from src.render.integrator import RecursiveIntegrator
 
 
 class ImgFormat(Enum):

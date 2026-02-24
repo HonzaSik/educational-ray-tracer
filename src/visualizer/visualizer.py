@@ -216,9 +216,9 @@ class Visualizer:
             :param filename: Name of the output file (e.g., "output.png").
             :param dpi: Dots per inch (resolution) of the saved image.
         """
-        self.show_legend()
         self.plot.tight_layout()
-        self.ax.legend().set_visible(show_legend)
+        if self.ax.get_legend() is not None:
+            self.ax.legend().set_visible(show_legend)
         if self.fig is not None:
             self.fig.savefig(filename, dpi=dpi)
         else:

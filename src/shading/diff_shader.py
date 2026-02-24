@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .shading_model import LocalShading
+from .local_shading import LocalShading
 from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 from src.material.color import Color
