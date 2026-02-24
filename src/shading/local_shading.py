@@ -31,7 +31,6 @@ def apply_noise_normal_perturbation(
     n = vec.normalize()
     tangent, bitangent = tangent_basis(n)
 
-    # sphere-friendly mapping (works great for planets)
     p = hit.normal.normalize()
 
     h0 = noise.value(p * scale)
@@ -44,7 +43,7 @@ def apply_noise_normal_perturbation(
     return (n - tangent * (strength * dht) - bitangent * (strength * dhb)).normalize()
 
 
-class ShadingModel(ABC):
+class LocalShading(ABC):
     @abstractmethod
     def shade(self, hit: SurfaceInteraction, light: Light, view_dir: Vector, scene: Scene | None = None) -> Color:
         ...

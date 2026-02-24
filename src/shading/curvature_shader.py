@@ -1,6 +1,6 @@
 # src/shading/curvature_shader.py
 from dataclasses import dataclass
-from .shading_model import ShadingModel
+from .shading_model import LocalShading
 from src.scene.surface_interaction import SurfaceInteraction
 from src.material.color import Color
 from src.math import Vector
@@ -9,7 +9,7 @@ from ..scene import Light
 
 
 @dataclass
-class CurvatureShader(ShadingModel):
+class CurvatureShader(LocalShading):
     """
     Simple object shader for visualizing curvature by approximating it using finite differences of normals.
     Lighter areas indicate higher curvature, while darker areas indicate flat regions.

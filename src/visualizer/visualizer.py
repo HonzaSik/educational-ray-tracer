@@ -6,8 +6,9 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from src import Camera
+from src import Camera, Sphere, Plane, Square, Triangle
 from src.geometry.geometry_hit import GeometryHit
+from src.geometry.primitives import Box, Cylinder, Torus
 from src.geometry.ray import Ray
 from src.scene.light import LightType, Light
 from src.scene.object import Object
@@ -21,7 +22,7 @@ def to_matplotlib_coords(x: float, y: float, z: float) -> Tuple[float, float, fl
     """
     Converts coordinates from our 3D space (X right, Y up, Z forward) to matplotlib's 3D coordinate system (X right, Y forward, Z up)
     """
-    return x, -z, y
+    return x, z, y
 
 
 def vector_to_matplotlib(vec):
@@ -60,7 +61,19 @@ class Visualizer:
     view_elev: float = 20
     view_azim: float = -60
     view_roll: float = 0
+    _registered_labels = set()
 
+    def __post_init__(self):
+        self._registered_labels: set = set()  # instance-level, not class-level
+
+    def _once(self, label: str) -> str | None:
+        if label in self._registered_labels:
+            return None
+        self._registered_labels.add(label)
+        return label
+
+    def reset_labels(self):
+        self._registered_labels.clear()
 
     def create_empty_scene(self,
                            size=10.0,
@@ -99,6 +112,8 @@ class Visualizer:
         fig = self.plot.figure(figsize=figsize)
         ax = fig.add_subplot(111, projection="3d")
         ax.set_facecolor(background_color)
+        self.reset_labels()  # reset registered labels for the new scene
+
         try:
             ax.view_init(elev=view_elev, azim=view_azim, roll=view_roll)
         except TypeError:
@@ -177,7 +192,7 @@ class Visualizer:
         limit = size * 1.3
         # set limits and aspect ratio to make sure the scene is centered and not distorted
         ax.set_xlim(-limit, limit)
-        ax.set_ylim(-limit, limit)
+        ax.set_ylim(limit, -limit)
         ax.set_zlim(-limit, limit)
         # centered axes at the origin and make sure they have equal scaling
         ax.set_box_aspect([1, 1, 1])
@@ -195,19 +210,26 @@ class Visualizer:
 
         return fig, ax
 
-    def savefig(self, filename: str = "tmp.png", dpi: int = 300) -> None:
+    def savefig(self, filename: str = "tmp.png", dpi: int = 300, show_legend=True) -> None:
         """Save the current figure to a file.
+            :param show_legend: show legend in the saved image (default is True)
             :param filename: Name of the output file (e.g., "output.png").
             :param dpi: Dots per inch (resolution) of the saved image.
         """
+        self.show_legend()
+        self.plot.tight_layout()
+        self.ax.legend().set_visible(show_legend)
         if self.fig is not None:
             self.fig.savefig(filename, dpi=dpi)
         else:
             raise RuntimeError("No figure to save. Please create a scene first.")
 
 
-    def show(self) -> None:
+    def show(self, show_legend=True) -> None:
         """Display the current figure."""
+        self.show_legend()
+        self.plot.tight_layout()
+        self.ax.legend().set_visible(show_legend)
         if self.fig is not None:
             self.plot.show()
         else:
@@ -391,18 +413,26 @@ class Visualizer:
             raise RuntimeError("No figure to set title on. Please create a scene first.")
 
 
-    def visualize_ray(self, ray: Ray, length=5.0, color='magenta', opacity=0.6, ended_by_hit_point : SurfaceInteraction | GeometryHit | None = None):
+    def visualize_ray(self, ray: Ray, length=5.0, color='magenta', opacity=0.6, ended_by_hit_point : SurfaceInteraction | GeometryHit | None = None, ended_by_point: Vertex | None = None, label: str | None = None):
         """
         Visualizes a ray in the 3D scene by plotting a line from the ray's origin in the direction of the ray.
         Parameters:
-            ax: matplotlib 3D axis to plot on
-            ray: Ray object containing origin and direction
-            length: how long the ray should be visualized (default is 5.0 units)
-            color: color of the ray line (default is 'magenta')
+            :param length: how long the ray should be visualized (default is 5.0 units)
+            :param ray: Ray object containing origin and direction
+            :param color: color of the ray line (default is 'magenta')
+            :param label: optional label for the ray (will be shown in legend, but only for the first ray with this label to avoid duplicates)
+            :param ended_by_point: if provided, the ray will be visualized only up to this point (e.g. the light source position for shadow rays)
+            :param opacity: opacity of the ray line (default is 0.6)
+            :param ended_by_hit_point: if provided, the ray will be visualized only up to the hit point (e.g. for primary rays that hit an object)
         """
 
-        if ended_by_hit_point is not None:
-            length = min(length, ended_by_hit_point.dist)
+        if ended_by_hit_point is not None and ended_by_hit_point.geom.dist < length and ended_by_point is None:
+            length = ended_by_hit_point.geom.dist
+
+        if ended_by_point is not None:
+            dist_to_point = (ended_by_point - ray.origin).norm()
+            if dist_to_point < length:
+                length = dist_to_point
 
         start = vertex_to_matplotlib(ray.origin)
         end_point = ray.origin + ray.direction * length
@@ -411,29 +441,31 @@ class Visualizer:
         self.ax.plot([start[0], end[0]],
                  [start[1], end[1]],
                  [start[2], end[2]],
-                 color=color, linewidth=2, alpha=opacity)
+                 color=color, linewidth=2, alpha=opacity, label=self._once(label) if label else None)
 
-    def visualize_intersections(self, ray: Ray, objects: List[Object], intersection_opacity=0.5, max_dist=100.0, intersection_size=20):
-        """
-        Plot simple representations of objects in the scene (e.g. spheres as points)
 
-        Parameters:
-        -----------
-        ax : matplotlib 3D axes
-        objects : list of Object
-            The objects to plot (we will just plot their centers for simplicity)
-        """
+    def visualize_closest_intersection(self, ray: Ray, objects: List[Object], intersection_opacity=0.5, max_dist=100.0,
+                                intersection_size=20):
+        closest_hit = None
+        closest_obj = None
+
         for obj in objects:
             intersection_point = obj.geometry.intersect(ray)
             if intersection_point is not None and intersection_point.dist < max_dist:
-                self.ax.scatter(*vertex_to_matplotlib(intersection_point.point),
-                           color=obj.material.get_color(), s=intersection_size, alpha=0.5)
+                if closest_hit is None or intersection_point.dist < closest_hit.dist:
+                    closest_hit = intersection_point
+                    closest_obj = obj
+
+        if closest_hit is not None:
+            self.ax.scatter(*vertex_to_matplotlib(closest_hit.point),
+                          color=closest_obj.material.get_color(), s=intersection_size, alpha=0.5, label=self._once('Closest Intersection'))
+
 
     def visualize_lights_positions(self, lights: List[Light]):
         for light in lights:
             if light.type == LightType.POINT:
                 self.ax.scatter(*vertex_to_matplotlib(light.position), color='yellow', s=100, alpha=0.9, edgecolors='Orange',
-                           linewidths=2, zorder=30, label='Point Light')
+                           linewidths=2, zorder=30, label=self._once('Point Light'))
 
 
     def visualize_normal_at_hit_point(self, hit_point: 'SurfaceInteraction',
@@ -450,10 +482,10 @@ class Visualizer:
         self.ax.quiver(p[0], p[1], p[2],
                        n[0] * length, n[1] * length, n[2] * length,
                        color=color, arrow_length_ratio=0.3, linewidth=1.3,
-                       alpha=alpha)
+                       alpha=alpha, label=self._once("Normal at Hit Point"))
 
     def show_image_plane_point(self, camera: Camera, u: float, v: float,
-                               color='purple', size=20, label='Image Plane Point'):
+                               color='purple', size=20):
         """
         Shows a (u,v) coordinate on the actual camera image plane in 3D space.
         u, v should be in [-1, 1] range.
@@ -467,7 +499,7 @@ class Visualizer:
 
         p = vertex_to_matplotlib(point_w)
         self.ax.scatter(*p, color=color, s=size, alpha=0.9,
-                        edgecolors='black', linewidths=2, zorder=20, label=label)
+                        edgecolors='black', linewidths=2, zorder=20, label=self._once(f'Image Plane Point'))
 
         self.ax.legend(loc='upper right', fontsize=10)
 
@@ -480,6 +512,7 @@ class Visualizer:
             ray_length: how long the shadow rays should be visualized (default is 5.0 units)
             color: color of the shadow rays (default is 'gray')
             opacity: opacity of the shadow rays (default is 0.5)
+            :param objects: list of objects in the scene to check for occlusion (shadows)
         """
         if hit is None:
             return
@@ -495,6 +528,164 @@ class Visualizer:
             for obj in objects:
                 shadow_hit = obj.geometry.intersect(Ray(origin=hit_point, direction=light_dir))
                 if shadow_hit is not None and shadow_hit.dist < light_dist:
-                    self.visualize_ray(Ray(origin=hit_point, direction=light_dir), length=shadow_hit.dist, color='black', opacity=opacity, ended_by_hit_point=shadow_hit)
+                    self.visualize_ray(Ray(origin=hit_point, direction=light_dir), color='black', opacity=opacity, ended_by_point=light.position, label='Shadow Rays (Blocked)')
                 else:
-                    self.visualize_ray(Ray(origin=hit_point, direction=light_dir), length=light_dist, color=color, opacity=opacity)
+                    self.visualize_ray(Ray(origin=hit_point, direction=light_dir), length=light_dist, color=color, opacity=opacity, label='Shadow Rays (Unblocked)')
+
+    def visualize_objects(self, objects: List[Object], opacity=0.3):
+        for obj in objects:
+            if isinstance(obj.geometry, Sphere):
+                center = vertex_to_matplotlib(obj.geometry.center)
+                radius = obj.geometry.radius
+                color = obj.material.get_color()
+
+                # Generate sphere mesh
+                u = np.linspace(0, 2 * np.pi, 20)
+                v = np.linspace(0, np.pi, 20)
+                x = center[0] + radius * np.outer(np.cos(u), np.sin(v))
+                y = center[1] + radius * np.outer(np.sin(u), np.sin(v))
+                z = center[2] + radius * np.outer(np.ones(np.size(u)), np.cos(v))
+
+                # Wireframe
+                self.ax.plot_wireframe(x, y, z, color=color, alpha=opacity, linewidth=0.5)
+
+                # Optional: solid surface with transparency
+                self.ax.plot_surface(x, y, z, color=color, alpha=0.05)
+
+            # PLANE WIREFRAME
+            if isinstance(obj.geometry, Plane):
+                point = vertex_to_matplotlib(obj.geometry.point)
+                normal = vertex_to_matplotlib(obj.geometry.normal)  # assumes normalized
+                color = obj.material.get_color()
+                size = 2.0  # half-extent of the plane grid
+
+                # Build two orthogonal vectors to the normal
+                normal = np.array(normal)
+                if abs(normal[0]) < 0.9:
+                    tangent = np.cross(normal, [1, 0, 0])
+                else:
+                    tangent = np.cross(normal, [0, 1, 0])
+                tangent /= np.linalg.norm(tangent)
+                bitangent = np.cross(normal, tangent)
+
+                # Create a grid on the plane
+                s = np.linspace(-size, size, 10)
+                t = np.linspace(-size, size, 10)
+                S, T = np.meshgrid(s, t)
+
+                X = point[0] + S * tangent[0] + T * bitangent[0]
+                Y = point[1] + S * tangent[1] + T * bitangent[1]
+                Z = point[2] + S * tangent[2] + T * bitangent[2]
+
+                self.ax.plot_wireframe(X, Y, Z, color=color, alpha=opacity, linewidth=0.5)
+                self.ax.plot_surface(X, Y, Z, color=color, alpha=0.05)
+
+
+            if isinstance(obj.geometry, Box):
+                c1 = vertex_to_matplotlib(obj.geometry.corner1)
+                c2 = vertex_to_matplotlib(obj.geometry.corner2)
+                color = obj.material.get_color()
+
+                x0, y0, z0 = c1
+                x1, y1, z1 = c2
+
+                # 8 corners of the box
+                corners = np.array([
+                    [x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0],  # bottom face
+                    [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1],  # top face
+                ])
+
+                # 6 faces, each defined by 4 corner indices
+                faces = [
+                    [corners[0], corners[1], corners[2], corners[3]],  # bottom
+                    [corners[4], corners[5], corners[6], corners[7]],  # top
+                    [corners[0], corners[1], corners[5], corners[4]],  # front
+                    [corners[2], corners[3], corners[7], corners[6]],  # back
+                    [corners[0], corners[3], corners[7], corners[4]],  # left
+                    [corners[1], corners[2], corners[6], corners[5]],  # right
+                ]
+
+                poly = Poly3DCollection(faces, alpha=opacity/2, facecolor=color, edgecolor=color, linewidth=0.8)
+                self.ax.add_collection3d(poly)
+
+            # CYLINDER
+            if isinstance(obj.geometry, Cylinder):
+                base = np.array(vertex_to_matplotlib(obj.geometry.base_point))
+                cap = np.array(vertex_to_matplotlib(obj.geometry.cap_point))
+                r = obj.geometry.radius
+                color = obj.material.get_color()
+
+                axis = cap - base
+                length = np.linalg.norm(axis)
+                axis_n = axis / length
+
+                # Build orthogonal basis around the axis
+                if abs(axis_n[0]) < 0.9:
+                    perp = np.cross(axis_n, [1, 0, 0])
+                else:
+                    perp = np.cross(axis_n, [0, 1, 0])
+                perp /= np.linalg.norm(perp)
+                perp2 = np.cross(axis_n, perp)
+
+                theta = np.linspace(0, 2 * np.pi, 30)
+                circle = r * (np.outer(np.cos(theta), perp) + np.outer(np.sin(theta), perp2))
+
+                t = np.linspace(0, 1, 10)
+                X = base[0] + np.outer(t, axis[0]) + np.outer(np.ones(10), circle[:, 0])
+                Y = base[1] + np.outer(t, axis[1]) + np.outer(np.ones(10), circle[:, 1])
+                Z = base[2] + np.outer(t, axis[2]) + np.outer(np.ones(10), circle[:, 2])
+
+                self.ax.plot_wireframe(X, Y, Z, color=color, alpha=opacity, linewidth=0.5)
+                self.ax.plot_surface(X, Y, Z, color=color, alpha=0.05)
+
+                # Draw end caps
+                for center_pt in [base, cap]:
+                    cap_x = center_pt[0] + circle[:, 0]
+                    cap_y = center_pt[1] + circle[:, 1]
+                    cap_z = center_pt[2] + circle[:, 2]
+                    self.ax.plot(np.append(cap_x, cap_x[0]),
+                                 np.append(cap_y, cap_y[0]),
+                                 np.append(cap_z, cap_z[0]), color=color, linewidth=0.8)
+
+            # SQUARE
+            if isinstance(obj.geometry, Square):
+                verts = [vertex_to_matplotlib(obj.geometry.v0),
+                         vertex_to_matplotlib(obj.geometry.v1),
+                         vertex_to_matplotlib(obj.geometry.v2),
+                         vertex_to_matplotlib(obj.geometry.v3)]
+                color = obj.material.get_color()
+
+                poly = Poly3DCollection([verts], alpha=opacity, facecolor=color, edgecolor=color, linewidth=0.8)
+                self.ax.add_collection3d(poly)
+
+            # TORUS
+            if isinstance(obj.geometry, Torus):
+                center = np.array(vertex_to_matplotlib(obj.geometry.center))
+                R = obj.geometry.radius_major
+                r = obj.geometry.radius_tube
+                color = obj.material.get_color()
+
+                u = np.linspace(0, 2 * np.pi, 30)
+                v = np.linspace(0, 2 * np.pi, 30)
+                U, V = np.meshgrid(u, v)
+
+                X = center[0] + (R + r * np.cos(V)) * np.cos(U)
+                Y = center[1] + (R + r * np.cos(V)) * np.sin(U)
+                Z = center[2] + r * np.sin(V)
+
+                self.ax.plot_wireframe(X, Y, Z, color=color, alpha=opacity, linewidth=0.5)
+                self.ax.plot_surface(X, Y, Z, color=color, alpha=0.05)
+
+            # TRIANGLE
+            if isinstance(obj.geometry, Triangle):
+                verts = [vertex_to_matplotlib(obj.geometry.v0),
+                         vertex_to_matplotlib(obj.geometry.v1),
+                         vertex_to_matplotlib(obj.geometry.v2)]
+                color = obj.material.get_color()
+
+                poly = Poly3DCollection([verts], alpha=opacity/2, facecolor=color, edgecolor=color, linewidth=0.8)
+                self.ax.add_collection3d(poly)
+
+    def show_legend(self, loc='upper right', fontsize=10, framealpha=0.7):
+        """Call once after all elements have been added to get a complete legend."""
+        self.ax.legend(loc=loc, fontsize=fontsize, framealpha=framealpha)

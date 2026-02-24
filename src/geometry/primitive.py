@@ -1,10 +1,11 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from src.geometry.geometry_hit import GeometryHit
 from src.geometry.ray import Ray
 from src.math import Vertex
 
-
+@dataclass
 class Primitive(ABC):
     """Geometric object interface for ray tracing intersections"""
 

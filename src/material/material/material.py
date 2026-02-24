@@ -32,28 +32,33 @@ class Material(ABC):
         Get the base color of the material as a Color object.
         :return: Base color
         """
-        pass
+        NotImplementedError("get_color not implemented for this material")
+        return Color(1.0, 1.0, 1.0)
 
     def get_reflectance(self) -> float:
         """
         Get the reflectance of the material.
         :return: Reflectance value
         """
-        pass
+        NotImplementedError("Reflectance not implemented for this material")
+        return 0.0
 
     def get_reflectance_vector(self) -> Vector:
         """
         Get the reflectance color vector of the material.
         :return: Reflectance color
         """
-        pass
+        NotImplementedError("Transparency not implemented for this material")
+        return Vector(0.0, 0.0, 0.0)
 
     def get_transparency(self) -> float:
         """
         Get the transparency of the material.
         :return: Transparency value
         """
-        pass
+        #raise
+        NotImplementedError("Transparency not implemented for this material")
+        return 0.0
 
     def get_ior(self) -> float:
         """

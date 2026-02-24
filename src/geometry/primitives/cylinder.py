@@ -10,6 +10,7 @@ from src.math import Vector
 
 @dataclass
 class Cylinder(Primitive):
+
     base_point: Vertex  # Center of the cylinder base
     cap_point: Vertex  # Center of the cylinder cap
     radius: float  # Radius of the cylinder

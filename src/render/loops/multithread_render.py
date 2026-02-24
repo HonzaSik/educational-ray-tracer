@@ -1,7 +1,6 @@
 import multiprocessing as mp
 from typing import List, Tuple
 from src.material.color import Color, to_u8
-from src.render.helpers import RayTracer
 from .linear_ray_caster import RenderLoop
 
 # shared globals for worker processes

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .shading_model import ShadingModel
+from .shading_model import LocalShading
 from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 from src.material.color import Color
@@ -52,12 +52,12 @@ class HashMethod(Enum):
 
 
 @dataclass
-class DiffShader(ShadingModel):
+class DiffShader(LocalShading):
     """
     Compares two shading models side-by-side using a procedural pattern.
     """
-    a: ShadingModel
-    b: ShadingModel
+    a: LocalShading
+    b: LocalShading
     scale: float = 4.0
     hash_method: HashMethod = HashMethod.CHECKER
 

@@ -9,6 +9,7 @@ EPS = 1e-6
 
 @dataclass
 class Box(Primitive):
+
     corner1: Vertex
     corner2: Vertex
 

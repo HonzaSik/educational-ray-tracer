@@ -1,4 +1,4 @@
-from .shading_model import ShadingModel, apply_noise_normal_perturbation
+from .shading_model import LocalShading, apply_noise_normal_perturbation
 from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 from src.material.color import Color
@@ -9,7 +9,7 @@ from src.scene.scene import Scene
 
 
 @dataclass
-class NormalShader(ShadingModel):
+class NormalShader(LocalShading):
     """
     Simple object shader for previewing normals.
     """

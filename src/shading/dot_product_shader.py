@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .shading_model import ShadingModel
+from .local_shading import LocalShading
 from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 from src.material.color import Color
@@ -8,7 +8,7 @@ import math
 
 
 @dataclass
-class DotProductShader(ShadingModel):
+class DotProductShader(LocalShading):
     """
     Object shader that colors based on the dot product between the normal and either the light direction or view direction.
     param use_light: If True, uses the light direction; otherwise uses the view direction.

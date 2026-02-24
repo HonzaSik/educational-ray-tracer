@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .shading_model import ShadingModel, apply_noise_normal_perturbation
+from .shading_model import LocalShading, apply_noise_normal_perturbation
 from src.scene.surface_interaction import SurfaceInteraction
 from src.material.color import Color, clamp_color255
 from src.material.material.material import MaterialSample
@@ -10,7 +10,7 @@ from .helpers import shadow_trace, light_dir_dist
 from src.scene.scene import Scene
 
 
-class BlinnPhongShader(ShadingModel):
+class BlinnPhongShader(LocalShading):
     """
     Blinn–Phong shader with optional Fresnel for dielectrics. Supports multiple lights, ambient, and emission.
     """

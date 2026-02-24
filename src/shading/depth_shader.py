@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .shading_model import ShadingModel
+from .shading_model import LocalShading
 from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
 from src.material.color import Color
@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class DepthShader(ShadingModel):
+class DepthShader(LocalShading):
     """
     Simple object shader for visualizing depth from the camera.
     """

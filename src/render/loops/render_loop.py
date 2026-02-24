@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Tuple, List, Optional
 from src.scene.camera import Camera
 from src.scene.light import Light
-from src.shading.shading_model import ShadingModel
+from src.shading.shading_model import LocalShading
 from src.shading.blinn_phong_shader import BlinnPhongShader
 from .progress import ProgressUI, PreviewConfig, ProgressDisplay
 from src.scene.scene import Scene
@@ -15,7 +15,7 @@ from src.io.image_helper import write_ppm, convert_ppm_to_png
 from src.render.post_process.post_process_pipeline import post_process_pipeline
 from src.render.post_process.post_process_config import PostProcessConfig
 from src.render.resolution import Resolution
-from ..helpers import RayTracer
+from src.render.integrator.helpers import RecursiveIntegrator
 
 
 class ImgFormat(Enum):
@@ -39,11 +39,11 @@ class RenderLoop(ABC):
     """
 
     scene: Scene = None
-    shading_model: Optional[ShadingModel] = None
+    shading_model: Optional[LocalShading] = None
     preview_config: Optional[PreviewConfig] = None
     render_config: Optional[RenderConfig] = None
     post_process_config: Optional[PostProcessConfig] = None
-    ray_tracer: Optional[RayTracer] = None
+    integrator: Optional[RecursiveIntegrator] = None
 
     def __post_init__(self):
         # Initialize core components from the scene and configurations
@@ -52,7 +52,7 @@ class RenderLoop(ABC):
         self.skybox: Optional[str] = self.scene.skybox_path if self.scene.skybox_path is not None else None
 
         # Set default shading model if none provided
-        self.shader: ShadingModel = self.shading_model if self.shading_model is not None else BlinnPhongShader()
+        self.shader: LocalShading = self.shading_model if self.shading_model is not None else BlinnPhongShader()
 
         # Set rendering parameters from render_config or use defaults
         self.spp: int = self.render_config.samples_per_pixel if self.render_config is not None else 1
@@ -86,7 +86,7 @@ class RenderLoop(ABC):
 
         self.camera.set_aspect_ratio(self.width / self.height)
 
-        self.ray_tracer = RayTracer(scene=self.scene, shader=self.shader, lights=self.lights, skybox=self.skybox, max_depth=self.max_depth)
+        self.integrator = RecursiveIntegrator(scene=self.scene, shader=self.shader, lights=self.lights, skybox=self.skybox, max_depth=self.max_depth)
 
     def on_row_end_update_preview(self, current_row: int, pixels_u8: List[Tuple[int, int, int]]) -> None:
         """

@@ -23,10 +23,7 @@ class LinearRayCaster(RenderLoop):
             dv = (random() - 0.5) / (self.height - 1)
             ray = self.camera.make_ray(u_base + du, v_base + dv)
 
-            acc += self.ray_tracer.cast_ray(
-                ray=ray,
-                depth=self.max_depth,
-            )
+            acc += self.integrator.cast_ray(ray=ray, depth=self.max_depth)
 
         col = acc / self.spp
         return to_u8(col.r), to_u8(col.g), to_u8(col.b)
