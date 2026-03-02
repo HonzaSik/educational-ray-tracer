@@ -3,7 +3,6 @@ from src.material.color import Color
 from src.scene.light import Light, LightType
 from src.material.material.material import Material
 
-
 @dataclass
 class ColorLibrary:
     """Simple library wrapper so you can access colors as attributes."""

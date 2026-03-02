@@ -5,7 +5,6 @@ from typing import Any
 from src.scene import Scene
 from src.io.object_libraries import ColorLibrary, LightLibrary, MaterialLibrary
 
-
 class PickleManager:
     """
     Manages saving and loading objects using pickle in a specified directory. Supports optional verbose mode (prints actions) and object validation. Can save/load lists or libraries (dicts) of Lights, Materials, and Colors.

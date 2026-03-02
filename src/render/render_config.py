@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from src.render.resolution import Resolution, CustomResolution
+from src.io.resolution import Resolution, CustomResolution
 
 
 @dataclass

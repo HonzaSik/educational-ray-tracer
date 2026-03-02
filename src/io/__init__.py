@@ -1,15 +1,13 @@
-from .image_helper import convert_ppm_to_png, write_ppm, ipynb_display_images
+from .image_helper import convert_ppm_to_png, write_ppm, ipynb_display_images, image_to_ppm, ipnb_display_multiple_images_in_row, image_pipeline
 from .object_libraries import ColorLibrary, LightLibrary, MaterialLibrary
 from .pickle_manager import PickleManager
-from src.render.resolution import Resolution
+from .resolution import Resolution
+from .video import frames_to_mp4
 
 __all__ = [
-    "ColorLibrary",
-    "LightLibrary",
-    "MaterialLibrary",
+    "ColorLibrary", "MaterialLibrary", "LightLibrary",
+    "convert_ppm_to_png", "write_ppm", "ipynb_display_images", "convert_ppm_to_png","image_to_ppm", "ipnb_display_multiple_images_in_row", "image_pipeline",
     "PickleManager",
-    "convert_ppm_to_png",
-    "write_ppm",
     "Resolution",
-    "ipynb_display_images"
+    "frames_to_mp4",
 ]

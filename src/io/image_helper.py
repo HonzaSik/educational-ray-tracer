@@ -1,6 +1,4 @@
 from pathlib import Path
-from typing import Tuple, List
-
 from IPython.core.display_functions import display
 from PIL import Image as PILImage
 from IPython.display import Image
@@ -55,7 +53,6 @@ def ipynb_display_images(path: str | list[str] | None = None) -> None:
     :param path: Path to the image file or list of image file paths.
     :return: None
     """
-
     if isinstance(path, list):
         for p in path:
             display(Image(filename=p))
@@ -88,8 +85,8 @@ def ipnb_display_multiple_images_in_row(paths: list[str], row_size: int = 3) -> 
 def image_pipeline(image, idx: int = 0) -> str:
     """
     Complete image processing pipeline: save as PPM, convert to PNG. With indexed filename.
-    :param image:
-    :param idx:
+    :param image: Image data as a tuple of (pixels, width, height)
+    :param idx: Index for the output filename to avoid overwriting previous images
     :return:
     """
     ppm = f"./images/img_{idx}.ppm"

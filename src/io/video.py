@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Sequence
 import imageio as imageio
 
-
 def frames_to_mp4(
         frames: Sequence[Path | str],
         output_path: Path | str,
@@ -19,14 +18,14 @@ def frames_to_mp4(
     if not frames:
         raise ValueError("frames_to_mp4: no frames provided")
 
-    # Normalize and sort the frame paths (e.g. frame_0000.png ... frame_0123.png)
+    # frame paths (e.g. frame_0000.png ... frame_0123.png)
     frame_paths = [Path(f) for f in frames]
     frame_paths.sort(key=lambda p: p.name)
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # It uses ffmpeg inside #todo how to do it without installing imageio
+    # uses ffmpeg inside
     with imageio.get_writer(
             output_path.as_posix(),
             fps=fps,

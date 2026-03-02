@@ -14,7 +14,7 @@ from src.render.render_config import RenderConfig
 from src.io.image_helper import write_ppm, convert_ppm_to_png
 from src.render.post_process.post_process_pipeline import post_process_pipeline
 from src.render.post_process.post_process_config import PostProcessConfig
-from src.render.resolution import Resolution
+from src.io.resolution import Resolution
 from src.render.integrator import RecursiveIntegrator
 from ..integrator.integrator import Integrator
 

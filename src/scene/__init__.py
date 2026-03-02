@@ -1,7 +1,7 @@
 from .camera import Camera
 from .light import Light, AmbientLight, PointLight
 from .scene import Scene
-from src.render.resolution import Resolution
+from src.io.resolution import Resolution
 
 __all__ = [
     "Camera",
