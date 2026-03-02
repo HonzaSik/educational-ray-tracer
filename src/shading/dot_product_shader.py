@@ -6,6 +6,8 @@ from src.material.color import Color
 from src.math import Vector
 import math
 
+from .. import Scene
+
 
 @dataclass
 class DotProductShader(LocalShading):
@@ -17,7 +19,7 @@ class DotProductShader(LocalShading):
     use_light: bool = False
     frequency: float = 8.0
 
-    def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector) -> Color:
+    def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector, scene: Scene | None = None) -> Color:
         """
         Shade based on the dot product between the normal and light/view direction.
         """
@@ -38,7 +40,7 @@ class DotProductShader(LocalShading):
         color = Color(math.sin(t * self.frequency) * 0.5 + 0.5, t, 1.0 - t)
         return color.clamp_01()
 
-    def shade_multiple_lights(self, hit: SurfaceInteraction, lights, view_dir):
+    def shade_multiple_lights(self, hit, lights, view_dir, scene: Scene | None = None) -> Color:
         """
         Shade using the first light in the list if use_light is True; otherwise, ignore lights.
         """

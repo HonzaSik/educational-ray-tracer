@@ -7,6 +7,8 @@ from src.math import Vector, Vertex
 from enum import Enum
 import math
 
+from .. import Scene
+
 
 def _hash_checker(v: Vertex, scale: float) -> int:
     """Classic checkerboard pattern (alternating X/Z cells)."""
@@ -76,16 +78,16 @@ class DiffShader(LocalShading):
         else:
             return 0
 
-    def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector) -> Color:
+    def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector, scene: Scene | None = None) -> Color:
         """
         Shade using either shader A or B based on the selected pattern using hashing.
         0 = shader A, 1 = shader B
         """
-        use_a = self._select_hash(hit.geom.point) == 0
-        color = (self.a if use_a else self.b).shade(hit, light, view_dir)
+        use_a = self._select_hash(hit.point) == 0
+        color = (self.a if use_a else self.b).shade(view_dir=view_dir, light=light, hit=hit)
         return color.clamp_01()
 
-    def shade_multiple_lights(self, hit, lights, view_dir) -> Color:
+    def shade_multiple_lights(self, hit, lights, view_dir, scene: Scene | None = None) -> Color:
         """
         Shade using either shader A or B based on the selected pattern using hashing.
         0 = shader A, 1 = shader B

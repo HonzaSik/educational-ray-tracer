@@ -18,33 +18,33 @@ from src.scene.surface_interaction import SurfaceInteraction
 from src.shading.helpers import light_dir_dist, shadow_trace
 
 
-def to_matplotlib_coords(x: float, y: float, z: float) -> Tuple[float, float, float]:
+def _to_matplotlib_coords(x: float, y: float, z: float) -> Tuple[float, float, float]:
     """
     Converts coordinates from our 3D space (X right, Y up, Z forward) to matplotlib's 3D coordinate system (X right, Y forward, Z up)
     """
     return x, z, y
 
 
-def vector_to_matplotlib(vec):
+def _vector_to_matplotlib(vec):
     """Convert a Vector object to matplotlib coordinates"""
-    return to_matplotlib_coords(vec.x, vec.y, vec.z)
+    return _to_matplotlib_coords(vec.x, vec.y, vec.z)
 
 
-def vertex_to_matplotlib(vert):
+def _vertex_to_matplotlib(vert):
     """Convert a Vertex object to matplotlib coordinates"""
-    return to_matplotlib_coords(vert.x, vert.y, vert.z)
+    return _to_matplotlib_coords(vert.x, vert.y, vert.z)
 
 
-def calculate_base_corners(camera: Camera):
+def _calculate_base_corners(camera: Camera):
     bl_w = camera.origin + (camera.right * (-camera.half_width) + camera.up * (-camera.half_height) + camera.forward)
     br_w = camera.origin + (camera.right * ( camera.half_width) + camera.up * (-camera.half_height) + camera.forward)
     tr_w = camera.origin + (camera.right * ( camera.half_width) + camera.up * ( camera.half_height) + camera.forward)
     tl_w = camera.origin + (camera.right * (-camera.half_width) + camera.up * ( camera.half_height) + camera.forward)
 
-    bl = vertex_to_matplotlib(bl_w)
-    br = vertex_to_matplotlib(br_w)
-    tr = vertex_to_matplotlib(tr_w)
-    tl = vertex_to_matplotlib(tl_w)
+    bl = _vertex_to_matplotlib(bl_w)
+    br = _vertex_to_matplotlib(br_w)
+    tr = _vertex_to_matplotlib(tr_w)
+    tl = _vertex_to_matplotlib(tl_w)
 
     return [bl, br, tr, tl]
 
@@ -271,7 +271,7 @@ class Visualizer:
             - frustum_depth: depth to which the frustum should be plotted (if show_frustum is True)
         """
 
-        cam_x, cam_y, cam_z = vertex_to_matplotlib(camera.origin)
+        cam_x, cam_y, cam_z = _vertex_to_matplotlib(camera.origin)
 
         # Camera position marker
         self.ax.scatter(cam_x, cam_y, cam_z, color='red', s=150, alpha=0.9,
@@ -286,7 +286,7 @@ class Visualizer:
             ]
 
             for vec, color, scale, line_width, label in vectors:
-                vx, vy, vz = vector_to_matplotlib(vec)
+                vx, vy, vz = _vector_to_matplotlib(vec)
                 self.ax.quiver(
                     cam_x, cam_y, cam_z,
                     vx * arrow_length,
@@ -315,9 +315,9 @@ class Visualizer:
             camera: Camera object
             extended_depth: depth to extend frustum to
         """
-        cam_pos = vertex_to_matplotlib(camera.origin)
+        cam_pos = _vertex_to_matplotlib(camera.origin)
 
-        bl, br, tr, tl = calculate_base_corners(camera)
+        bl, br, tr, tl = _calculate_base_corners(camera)
         corners = [bl, br, tr, tl]
         edges = [(bl, br), (br, tr), (tr, tl), (tl, bl)]
 
@@ -381,7 +381,7 @@ class Visualizer:
         """
 
 
-        corners = calculate_base_corners(camera)
+        corners = _calculate_base_corners(camera)
 
         if show_plane_corners:
             labels = [
@@ -451,9 +451,9 @@ class Visualizer:
             if dist_to_point < length:
                 length = dist_to_point
 
-        start = vertex_to_matplotlib(ray.origin)
+        start = _vertex_to_matplotlib(ray.origin)
         end_point = ray.origin + ray.direction * length
-        end = vertex_to_matplotlib(end_point)
+        end = _vertex_to_matplotlib(end_point)
 
         self.ax.plot([start[0], end[0]],
                  [start[1], end[1]],
@@ -474,15 +474,15 @@ class Visualizer:
                     closest_obj = obj
 
         if closest_hit is not None:
-            self.ax.scatter(*vertex_to_matplotlib(closest_hit.point),
-                          color=closest_obj.material.get_color(), s=intersection_size, alpha=0.5, label=self._once('Closest Intersection'))
+            self.ax.scatter(*_vertex_to_matplotlib(closest_hit.point),
+                            color=closest_obj.material.get_color(), s=intersection_size, alpha=0.5, label=self._once('Closest Intersection'))
 
 
     def visualize_lights_positions(self, lights: List[Light]):
         for light in lights:
             if light.type == LightType.POINT:
-                self.ax.scatter(*vertex_to_matplotlib(light.position), color='yellow', s=100, alpha=0.9, edgecolors='Orange',
-                           linewidths=2, zorder=30, label=self._once('Point Light'))
+                self.ax.scatter(*_vertex_to_matplotlib(light.position), color='yellow', s=100, alpha=0.9, edgecolors='Orange',
+                                linewidths=2, zorder=30, label=self._once('Point Light'))
 
 
     def visualize_normal_at_hit_point(self, hit_point: 'SurfaceInteraction',
@@ -493,8 +493,8 @@ class Visualizer:
         point = hit_point.geom.point
         normal = hit_point.normal
 
-        p = np.array(vertex_to_matplotlib(point))
-        n = np.array(vector_to_matplotlib(normal))  # normal is a vector, not a vertex
+        p = np.array(_vertex_to_matplotlib(point))
+        n = np.array(_vector_to_matplotlib(normal))  # normal is a vector, not a vertex
 
         self.ax.quiver(p[0], p[1], p[2],
                        n[0] * length, n[1] * length, n[2] * length,
@@ -514,7 +514,7 @@ class Visualizer:
                 camera.forward
         )
 
-        p = vertex_to_matplotlib(point_w)
+        p = _vertex_to_matplotlib(point_w)
         self.ax.scatter(*p, color=color, s=size, alpha=0.9,
                         edgecolors='black', linewidths=2, zorder=20, label=self._once(f'Image Plane Point'))
 
@@ -552,7 +552,7 @@ class Visualizer:
     def visualize_objects(self, objects: List[Object], opacity=0.3):
         for obj in objects:
             if isinstance(obj.geometry, Sphere):
-                center = vertex_to_matplotlib(obj.geometry.center)
+                center = _vertex_to_matplotlib(obj.geometry.center)
                 radius = obj.geometry.radius
                 color = obj.material.get_color()
 
@@ -571,8 +571,8 @@ class Visualizer:
 
             # PLANE WIREFRAME
             if isinstance(obj.geometry, Plane):
-                point = vertex_to_matplotlib(obj.geometry.point)
-                normal = vertex_to_matplotlib(obj.geometry.normal)  # assumes normalized
+                point = _vertex_to_matplotlib(obj.geometry.point)
+                normal = _vertex_to_matplotlib(obj.geometry.normal)  # assumes normalized
                 color = obj.material.get_color()
                 size = 2.0  # half-extent of the plane grid
 
@@ -599,8 +599,8 @@ class Visualizer:
 
 
             if isinstance(obj.geometry, Box):
-                c1 = vertex_to_matplotlib(obj.geometry.corner1)
-                c2 = vertex_to_matplotlib(obj.geometry.corner2)
+                c1 = _vertex_to_matplotlib(obj.geometry.corner1)
+                c2 = _vertex_to_matplotlib(obj.geometry.corner2)
                 color = obj.material.get_color()
 
                 x0, y0, z0 = c1
@@ -627,8 +627,8 @@ class Visualizer:
 
             # CYLINDER
             if isinstance(obj.geometry, Cylinder):
-                base = np.array(vertex_to_matplotlib(obj.geometry.base_point))
-                cap = np.array(vertex_to_matplotlib(obj.geometry.cap_point))
+                base = np.array(_vertex_to_matplotlib(obj.geometry.base_point))
+                cap = np.array(_vertex_to_matplotlib(obj.geometry.cap_point))
                 r = obj.geometry.radius
                 color = obj.material.get_color()
 
@@ -666,10 +666,10 @@ class Visualizer:
 
             # SQUARE
             if isinstance(obj.geometry, Square):
-                verts = [vertex_to_matplotlib(obj.geometry.v0),
-                         vertex_to_matplotlib(obj.geometry.v1),
-                         vertex_to_matplotlib(obj.geometry.v2),
-                         vertex_to_matplotlib(obj.geometry.v3)]
+                verts = [_vertex_to_matplotlib(obj.geometry.v0),
+                         _vertex_to_matplotlib(obj.geometry.v1),
+                         _vertex_to_matplotlib(obj.geometry.v2),
+                         _vertex_to_matplotlib(obj.geometry.v3)]
                 color = obj.material.get_color()
 
                 poly = Poly3DCollection([verts], alpha=opacity, facecolor=color, edgecolor=color, linewidth=0.8)
@@ -677,7 +677,7 @@ class Visualizer:
 
             # TORUS
             if isinstance(obj.geometry, Torus):
-                center = np.array(vertex_to_matplotlib(obj.geometry.center))
+                center = np.array(_vertex_to_matplotlib(obj.geometry.center))
                 R = obj.geometry.radius_major
                 r = obj.geometry.radius_tube
                 color = obj.material.get_color()
@@ -695,9 +695,9 @@ class Visualizer:
 
             # TRIANGLE
             if isinstance(obj.geometry, Triangle):
-                verts = [vertex_to_matplotlib(obj.geometry.v0),
-                         vertex_to_matplotlib(obj.geometry.v1),
-                         vertex_to_matplotlib(obj.geometry.v2)]
+                verts = [_vertex_to_matplotlib(obj.geometry.v0),
+                         _vertex_to_matplotlib(obj.geometry.v1),
+                         _vertex_to_matplotlib(obj.geometry.v2)]
                 color = obj.material.get_color()
 
                 poly = Poly3DCollection([verts], alpha=opacity/2, facecolor=color, edgecolor=color, linewidth=0.8)

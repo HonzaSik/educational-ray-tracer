@@ -136,7 +136,7 @@ class Animator:
                     new_position = self.animation_setup.move_from.lerp(
                         self.animation_setup.move_to, t_eased  # linear interpolation between from and to
                     )
-                    cam.origin = new_position  # todo update vec3/vertex/vector mismatch
+                    cam.origin = new_position
 
             rotate_duration = self.animation_setup.rotate_duration
             # rotate camera

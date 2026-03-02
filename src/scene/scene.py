@@ -216,6 +216,20 @@ class Scene:
 
         print("Scene validation passed.")
 
+    def normal_at(self, point: Vertex) -> Vector:
+        """
+        Get the normal vector at a given point in the scene by intersecting a ray from above.
+        Used for curvature shader to approximate curvature by sampling normals at nearby points.
+        :param point: Point to get the normal at
+        :return: Normal vector at the point
+        """
+        ray = Ray(origin=point + Vector(0, 1e-3, 0), direction=Vector(0, -1, 0))
+        hit = self.intersect(ray)
+        if hit is not None:
+            return hit.geom.normal.normalize()
+        else:
+            return Vector(0, 1, 0)
+
     @staticmethod
     def _ensure_images_dir(path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)

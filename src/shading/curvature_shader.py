@@ -1,4 +1,3 @@
-# src/shading/curvature_shader.py
 from dataclasses import dataclass
 from .local_shading import LocalShading
 from src.scene.surface_interaction import SurfaceInteraction
@@ -17,21 +16,20 @@ class CurvatureShader(LocalShading):
     _bias: float = 0.005
 
     def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector, scene: Scene | None = None) -> Color:
-        # """
-        # Shade based on the curvature approximated by finite differences of normals.
-        # """
-        # offset = self._bias
-        # norm = hit.geom.normal.normalize()
-        #
-        # # Sample normals at small offsets in x and z directions normalized
-        # offset_norm_x = world.normal_at(hit.geom.point + Vector(offset,0,0)).normalize()
-        # offset_norm_z = world.normal_at(hit.geom.point + Vector(0,0,offset)).normalize()
-        #
-        # # Approximate curvature using the change in normals in x and z directions
-        # curvature = 1.0 - 0.5 * (norm.dot(offset_norm_x) + norm.dot(offset_norm_z))
-        # color = Color(curvature, curvature, curvature)
-        # return color.clamp_01()
-        raise NotImplementedError("CurvatureShader is not implemented after world refactor.")
+        """
+        Shade based on the curvature approximated by finite differences of normals.
+        """
+        offset = self._bias
+        norm = hit.geom.normal.normalize()
+
+        # Sample normals at small offsets in x and z directions normalized
+        offset_norm_x = scene.normal_at(hit.geom.point + Vector(offset,0,0)).normalize()
+        offset_norm_z = scene.normal_at(hit.geom.point + Vector(0,0,offset)).normalize()
+
+        # Approximate curvature using the change in normals in x and z directions
+        curvature = 1.0 - 0.5 * (norm.dot(offset_norm_x) + norm.dot(offset_norm_z))
+        color = Color(curvature, curvature, curvature)
+        return color.clamp_01()
 
     def shade_multiple_lights(self, hit, lights, view_dir, scene: Scene | None = None) -> Color:
         """
