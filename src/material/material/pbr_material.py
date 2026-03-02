@@ -15,9 +15,6 @@ class PbrMaterial(Material):
     6. ior: Index of refraction for transparent materials
     """
 
-    def get_color(self) -> Color:
-        pass  # todo
-
     base_color: Color = field(default_factory=lambda: Color.custom_rgb(200, 200, 200))
     metallic: float = 0.0
     roughness: float = 0.5
@@ -25,7 +22,14 @@ class PbrMaterial(Material):
     transparency: float = 0.0
     ior: float = 1.5
 
+    def get_color(self) -> Color:
+        return self.base_color
+
     def __post_init__(self):
+        """
+        Validate that metallic, roughness, reflectivity, and transparency are between 0.0 and 1.0.
+        :return: None
+        """
         for attr in ['metallic', 'roughness', 'reflectivity', 'transparency']:
             value = getattr(self, attr)
             if not (0.0 <= value <= 1.0):

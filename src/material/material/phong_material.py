@@ -1,8 +1,22 @@
 from dataclasses import dataclass, field
+from typing import Optional
 from src.material.color import Color
 from src.material.material.material import Material
+from src.material.material.sample import Sample
+from src.material.textures.noise.normal_base import Noise
 from src.math.vector import Vector
 
+
+@dataclass
+class PhongMaterialSample(Sample):
+    base_color: Color
+    spec_color: Color
+    shininess: float
+    ior: float = 1.5
+    opacity: float = 1.0
+    normal_noise: Optional[Noise] = None
+    reflectivity: float = 0.0
+    emission: Color = field(default_factory=lambda: Color(0.0, 0.0, 0.0))
 
 @dataclass
 class PhongMaterial(Material):
@@ -37,3 +51,17 @@ class PhongMaterial(Material):
 
     def get_color(self) -> Color:
         return self.base_color
+
+    def sample(self, hit) -> Sample:
+        """
+        Default behavior: constant Phong-like properties from getters.
+        Procedural materials override this.
+        """
+        shininess = float(getattr(self, "shininess", 32.0))
+        return PhongMaterialSample(
+            base_color=self.get_color(),
+            spec_color=self.get_specular_color(),
+            shininess=shininess,
+            opacity=1.0 - float(getattr(self, "transparency", 0.0)),
+            ior=float(getattr(self, "ior", 1.0)),
+        )

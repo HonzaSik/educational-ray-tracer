@@ -1,21 +1,11 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 from src.material.color import Color
+from src.material.material.sample import Sample
 from src.material.textures.noise.normal_base import Noise
 from src.math.vector import Vector
-
-@dataclass
-class MaterialSample:
-    base_color: Color
-    spec_color: Color
-    shininess: float
-    ior: float = 1.5
-    opacity: float = 1.0
-    normal_noise: Optional[Noise] = None
-    reflectivity: float = 0.0
-    emission: Color = field(default_factory=lambda: Color(0.0, 0.0, 0.0))
 
 
 @dataclass
@@ -56,7 +46,6 @@ class Material(ABC):
         Get the transparency of the material.
         :return: Transparency value
         """
-        #raise
         NotImplementedError("Transparency not implemented for this material")
         return 0.0
 
@@ -75,16 +64,10 @@ class Material(ABC):
         """
         pass
 
-    def sample(self, hit) -> MaterialSample:
+    def sample(self, hit) -> Sample:
         """
-        Default behavior: constant Phong-like properties from getters.
-        Procedural materials override this.
+        Optional method to sample material properties at a hit point. Can be overridden by procedural materials.
+        :param hit: Hit information
+        :return: MaterialSample with properties at the hit point
         """
-        shininess = float(getattr(self, "shininess", 32.0))
-        return MaterialSample(
-            base_color=self.get_color(),
-            spec_color=self.get_specular_color(),
-            shininess=shininess,
-            opacity=1.0 - float(getattr(self, "transparency", 0.0)),
-            ior=float(getattr(self, "ior", 1.0)),
-        )
+        pass
