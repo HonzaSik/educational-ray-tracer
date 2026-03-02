@@ -52,7 +52,7 @@ class PhongMaterial(Material):
     def get_color(self) -> Color:
         return self.base_color
 
-    def sample(self, hit) -> Sample:
+    def sample(self, hit) -> PhongMaterialSample:
         """
         Default behavior: constant Phong-like properties from getters.
         Procedural materials override this.
