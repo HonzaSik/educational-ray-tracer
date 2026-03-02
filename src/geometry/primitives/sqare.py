@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+from dataclasses import field
+
 from src.math import Vertex, Vector
 from src.geometry.primitive import Primitive
 from src.geometry.ray import Ray
@@ -11,6 +14,7 @@ class Square(Primitive):
     """
     Square in 3D space defined by four vertices and material.
     The square is composed of two triangles for intersection calculations.
+    Default square can not be scaled by Z because it is defined in the XY plane, but it can be created with custom vertices to allow scaling in Z direction.
     """
     v0: Vertex
     v1: Vertex
@@ -20,11 +24,17 @@ class Square(Primitive):
     tri1: Triangle = None
     tri2: Triangle = None
 
-    def __init__(self, vertex: Vertex, diagonal_vertex: Vertex):
-        self.v0 = vertex
-        self.v2 = diagonal_vertex
-        self.v1 = Vertex(diagonal_vertex.x, vertex.y, vertex.z)
-        self.v3 = Vertex(vertex.x, diagonal_vertex.y, diagonal_vertex.z)
+    def __init__(self, vertex: Vertex | None = None, diagonal_vertex: Vertex | None = None):
+        if vertex and diagonal_vertex:
+            self.v0 = vertex
+            self.v2 = diagonal_vertex
+            self.v1 = Vertex(diagonal_vertex.x, vertex.y, vertex.z)
+            self.v3 = Vertex(vertex.x, vertex.y, diagonal_vertex.z)
+        else:
+            self.v0 = Vertex(-0.5, -0.5, 0)
+            self.v1 = Vertex(0.5, -0.5, 0)
+            self.v2 = Vertex(0.5, 0.5, 0)
+            self.v3 = Vertex(-0.5, 0.5, 0)
         self.__post_init__()
 
     def __post_init__(self):

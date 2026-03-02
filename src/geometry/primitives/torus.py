@@ -5,7 +5,7 @@ from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 import random
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -14,9 +14,9 @@ class Torus(Primitive):
     A torus object. Donut shape defined by a major radius (distance from center to tube center) and a minor radius (tube radius). Uses as example of custom Hittable implementation. in jupyter notebook.
     The torus is centered at 'center' vertex and l
     """
-    center: Vertex
-    radius_major: float  # Major radius (distance from center to tube center)
-    radius_tube: float  # Minor radius (tube radius)
+    center: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))
+    radius_major: float = 1.0  # Major radius (distance from center to tube center)
+    radius_tube: float  = 0.2  # Minor radius (tube radius)
 
     def normal_at(self, point: Vertex) -> Vector:
         local_hit = point - self.center

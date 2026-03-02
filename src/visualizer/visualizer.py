@@ -160,7 +160,7 @@ class Visualizer:
                       color=axis_colors['x'], arrow_length_ratio=0.4, linewidth=3, alpha=0.7)
             ax.quiver(0, 0, size * (1 - arrow_scale), 0, 0, size * arrow_scale,
                       color=axis_colors['y'], arrow_length_ratio=0.4, linewidth=3, alpha=0.7)
-            ax.quiver(0, -size * (1 - arrow_scale), 0, 0, -size * arrow_scale, 0,
+            ax.quiver(0, size * (1 - arrow_scale), 0, 0, size * arrow_scale, 0,
                       color=axis_colors['z'], arrow_length_ratio=0.4, linewidth=3, alpha=0.7)
 
         if show_axes_labels and show_axes:
@@ -178,9 +178,9 @@ class Visualizer:
                     ha="center", va="bottom", **label_bg)
             ax.text(0, 0, -size * label_offset, "-Y", color=axis_colors['y'],
                     ha="center", va="top", **label_bg)
-            ax.text(0, size * label_offset, 0, "-Z", color=axis_colors['z'],
+            ax.text(0, -size * label_offset, 0, "-Z", color=axis_colors['z'],
                     ha="left", va="bottom", **label_bg)
-            ax.text(0, -size * label_offset, 0, "+Z", color=axis_colors['z'],
+            ax.text(0, size * label_offset, 0, "+Z", color=axis_colors['z'],
                     ha="right", va="top", **label_bg)
 
         if show_grid:
@@ -210,26 +210,43 @@ class Visualizer:
 
         return fig, ax
 
+    def show_legend(self, loc='upper right', fontsize=10, framealpha=0.7):
+        """Create legend only if there are labeled artists."""
+        if self.ax is None:
+            return
+
+        handles, labels = self.ax.get_legend_handles_labels()
+        filtered = [(h, l) for h, l in zip(handles, labels) if l and not l.startswith("_")]
+
+        if not filtered:
+            return
+
+        handles, labels = zip(*filtered)
+        self.ax.legend(handles, labels, loc=loc, fontsize=fontsize, framealpha=framealpha)
+
     def savefig(self, filename: str = "tmp.png", dpi: int = 300, show_legend=True) -> None:
-        """Save the current figure to a file.
-            :param show_legend: show legend in the saved image (default is True)
-            :param filename: Name of the output file (e.g., "output.png").
-            :param dpi: Dots per inch (resolution) of the saved image.
-        """
         self.plot.tight_layout()
-        if self.ax.get_legend() is not None:
-            self.ax.legend().set_visible(show_legend)
+        if show_legend:
+            self.show_legend()
+
+        legend = self.ax.get_legend()
+        if legend is not None:
+            legend.set_visible(show_legend)
+
         if self.fig is not None:
             self.fig.savefig(filename, dpi=dpi)
         else:
             raise RuntimeError("No figure to save. Please create a scene first.")
 
-
     def show(self, show_legend=True) -> None:
-        """Display the current figure."""
-        self.show_legend()
+        if show_legend:
+            self.show_legend()
+
         self.plot.tight_layout()
-        self.ax.legend().set_visible(show_legend)
+        legend = self.ax.get_legend()
+        if legend is not None:
+            legend.set_visible(show_legend)
+
         if self.fig is not None:
             self.plot.show()
         else:
@@ -685,7 +702,3 @@ class Visualizer:
 
                 poly = Poly3DCollection([verts], alpha=opacity/2, facecolor=color, edgecolor=color, linewidth=0.8)
                 self.ax.add_collection3d(poly)
-
-    def show_legend(self, loc='upper right', fontsize=10, framealpha=0.7):
-        """Call once after all elements have been added to get a complete legend."""
-        self.ax.legend(loc=loc, fontsize=fontsize, framealpha=framealpha)

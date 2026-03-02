@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from src.math import Vertex, Vector
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
@@ -11,8 +11,8 @@ class Plane(Primitive):
     """
     Plane in 3D space defined by a point, normal, and color.
     """
-    point: Vertex  # a point on the plane
-    normal: Vector  # normal vector of the plane (should be normalized)
+    point: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))  # a point on the plane
+    normal: Vector = field(default_factory=lambda: Vector(0, 1, 0))  # normal vector to the plane
 
     def __post_init__(self):
         self.normal = self.normal.normalize_ip()

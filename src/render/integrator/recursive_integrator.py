@@ -11,8 +11,6 @@ from src.math import reflect, refract
 from src.shading.blinn_phong_shader import BlinnPhongShader
 from src.shading.local_shading import LocalShading, apply_noise_normal_perturbation
 
-
-
 @dataclass
 class RecursiveIntegrator(Integrator):
     max_depth: int
@@ -21,7 +19,7 @@ class RecursiveIntegrator(Integrator):
     shader: LocalShading | None = None
     skybox: str | None = None
     _bias_scale: float = 1e-3
-    _bias_min: float = 1e-4
+    _bias_min: float = 1e-3
 
     def cast_ray(self, ray: Ray, depth: int | None = None) -> Color:
         if self.shader is None:
@@ -81,9 +79,6 @@ class RecursiveIntegrator(Integrator):
         return n_geom, n_shade
 
     def _bias(self, hit: SurfaceInteraction) -> float:
-        dist = getattr(hit.geom, "dist", None)
-        if dist is not None:
-            return max(self._bias_min, self._bias_scale * min(1.0, dist))
         return self._bias_min
 
     def _reflection_ray(self, ray: Ray, hit: SurfaceInteraction, n_geom: Vector, n_shade: Vector) -> Ray:

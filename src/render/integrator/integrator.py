@@ -1,6 +1,4 @@
 from abc import abstractmethod, ABC
-from dataclasses import dataclass
-
 from src.material.color import Color
 from src.geometry.ray import Ray
 

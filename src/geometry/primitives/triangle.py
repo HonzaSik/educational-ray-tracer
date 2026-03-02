@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
+
 from src.math import Vertex, Vector
 from src.geometry.primitive import Primitive
 from src.geometry.ray import Ray
 from src.geometry.geometry_hit import GeometryHit
 import random
-
 
 @dataclass
 class Triangle(Primitive):
@@ -19,7 +20,6 @@ class Triangle(Primitive):
     edge_1: Vector = None
     edge_2: Vector = None
 
-    # Precompute edges for intersection calculations to optimize performance
     def __post_init__(self):
         self.edge_1 = self.v1 - self.v0
         self.edge_2 = self.v2 - self.v0

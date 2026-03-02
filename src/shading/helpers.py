@@ -35,7 +35,10 @@ def shadow_trace(geometry_hit: SurfaceInteraction, light_direction: Vector, ligh
         raise ValueError("Scene must not be None for shadow tracing.")
 
     shadow_origin = geometry_hit.geom.point + geometry_hit.geom.normal * _BIAS
-    shadow_ray = Ray(shadow_origin, light_direction)
+
+    biased_origin = shadow_origin + light_direction * _BIAS
+    shadow_ray = Ray(origin=biased_origin, direction=light_direction)
+
     shadow_hit = scene.intersect(shadow_ray)
     return shadow_hit is not None and shadow_hit.geom.dist < light_distance
 

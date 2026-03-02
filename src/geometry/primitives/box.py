@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from src.math import Vertex, Vector
 from src.geometry.primitive import Primitive
 from src.geometry.ray import Ray
@@ -10,8 +10,8 @@ EPS = 1e-6
 @dataclass
 class Box(Primitive):
 
-    corner1: Vertex
-    corner2: Vertex
+    corner1: Vertex = field(default_factory=lambda: Vertex(-0.5, -0.5, -0.5))
+    corner2: Vertex = field(default_factory=lambda: Vertex(0.5, 0.5, 0.5))
 
     @property
     def x0(self):
@@ -63,18 +63,33 @@ class Box(Primitive):
             if ray.origin.z < self.z0 or ray.origin.z > self.z1:
                 return None
 
-        tx0 = (self.x0 - ray.origin.x) / ray.direction.x
-        tx1 = (self.x1 - ray.origin.x) / ray.direction.x
+        if abs(ray.direction.x) < EPS:
+            tx0 = float('-inf') if ray.origin.x < self.x0 else float('inf')
+            tx1 = float('-inf') if ray.origin.x > self.x1 else float('inf')
+        else:
+            tx0 = (self.x0 - ray.origin.x) / ray.direction.x
+            tx1 = (self.x1 - ray.origin.x) / ray.direction.x
+
         tmin = min(tx0, tx1)
         tmax = max(tx0, tx1)
 
-        ty0 = (self.y0 - ray.origin.y) / ray.direction.y
-        ty1 = (self.y1 - ray.origin.y) / ray.direction.y
+        if abs(ray.direction.y) < EPS:
+            ty0 = float('-inf') if ray.origin.y < self.y0 else float('inf')
+            ty1 = float('-inf') if ray.origin.y > self.y1 else float('inf')
+        else:
+            ty0 = (self.y0 - ray.origin.y) / ray.direction.y
+            ty1 = (self.y1 - ray.origin.y) / ray.direction.y
+
         tmin = max(tmin, min(ty0, ty1))
         tmax = min(tmax, max(ty0, ty1))
 
-        tz0 = (self.z0 - ray.origin.z) / ray.direction.z
-        tz1 = (self.z1 - ray.origin.z) / ray.direction.z
+        if abs(ray.direction.z) < EPS:
+            tz0 = (self.z0 - ray.origin.z) / ray.direction.z
+            tz1 = (self.z1 - ray.origin.z) / ray.direction.z
+        else:
+            tz0 = (self.z0 - ray.origin.z) / ray.direction.z
+            tz1 = (self.z1 - ray.origin.z) / ray.direction.z
+
         tmin = max(tmin, min(tz0, tz1))
         tmax = min(tmax, max(tz0, tz1))
 

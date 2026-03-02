@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from math import sqrt
 from src.math import Vertex
 from src.geometry.primitive import Primitive
@@ -11,9 +11,9 @@ from src.math import Vector
 @dataclass
 class Cylinder(Primitive):
 
-    base_point: Vertex  # Center of the cylinder base
-    cap_point: Vertex  # Center of the cylinder cap
-    radius: float  # Radius of the cylinder
+    base_point: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))  # Center of the cylinder base
+    cap_point: Vertex = field(default_factory=lambda: Vertex(0, 1, 0))   # Center of the cylinder cap
+    radius: float = 0.5
 
     def normal_at(self, point: Vertex) -> Vector:
         axis = self.cap_point - self.base_point

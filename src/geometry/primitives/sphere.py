@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from math import sqrt
 from src.math import Vertex
 from src.geometry.primitive import Primitive
@@ -13,8 +13,8 @@ class Sphere(Primitive):
     """
     Sphere in 3D space defined by center, radius, and color.
     """
-    center: Vertex  # center of the sphere
-    radius: float  # radius of the sphere
+    center: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))  # Center of the sphere
+    radius: float = field(default=0.5)  # Radius of the sphere
 
     # Ray-sphere intersection
     def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:

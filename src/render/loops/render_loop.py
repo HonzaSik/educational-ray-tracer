@@ -16,6 +16,7 @@ from src.render.post_process.post_process_pipeline import post_process_pipeline
 from src.render.post_process.post_process_config import PostProcessConfig
 from src.render.resolution import Resolution
 from src.render.integrator import RecursiveIntegrator
+from ..integrator.integrator import Integrator
 
 
 class ImgFormat(Enum):
@@ -43,7 +44,7 @@ class RenderLoop(ABC):
     preview_config: Optional[PreviewConfig] = None
     render_config: Optional[RenderConfig] = None
     post_process_config: Optional[PostProcessConfig] = None
-    integrator: Optional[RecursiveIntegrator] = None
+    integrator: Optional[Integrator] = None
 
     def __post_init__(self):
         # Initialize core components from the scene and configurations
@@ -152,7 +153,8 @@ class RenderLoop(ABC):
             raise RuntimeError("No image was saved. Please check the image format.")
         return saved_paths
 
-    def _save_as_ppm(self, filename: str, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Path:
+    @staticmethod
+    def _save_as_ppm(filename: str, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Path:
         """
         Saves the rendered pixels to a PPM file.
         :param filename: Name of the output file.
