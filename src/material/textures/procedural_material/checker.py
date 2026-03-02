@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 import math
-from src.material.material.material import MaterialSample
-from src.material.material.phong_material import PhongMaterial
+from src.material.material.phong_material import PhongMaterial, PhongMaterialSample
+
 
 @dataclass
 class CheckerMaterial(PhongMaterial):
     scale: float = 1.0
 
-    def sample(self, hit):
+    def phong_sample(self, hit):
         s = hit.point.x * self.scale
         t = hit.point.z * self.scale
 
@@ -16,7 +16,7 @@ class CheckerMaterial(PhongMaterial):
         else:
             col = self.base_color * 0.2
 
-        return MaterialSample(
+        return PhongMaterialSample(
             base_color=col,
             spec_color=self.spec_color,
             shininess=self.shininess,

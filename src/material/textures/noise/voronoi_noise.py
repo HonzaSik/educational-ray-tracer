@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import math
-from src.material.textures.noise.normal_base import Noise
+from src.material.textures.noise.noise import Noise
 from src.math.vector import Vector
 from src.math.vertex import Vertex
 

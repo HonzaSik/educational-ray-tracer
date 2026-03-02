@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from dataclasses import field, dataclass
-
 from src.math.vector import Vector
 from src.math.vertex import Vertex
 

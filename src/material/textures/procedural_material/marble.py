@@ -1,9 +1,7 @@
 from dataclasses import dataclass, field
 import math
-
 from src.material.color import clamp01
-from src.material.material.material import MaterialSample
-from src.material.material.phong_material import PhongMaterial
+from src.material.material.phong_material import PhongMaterial, PhongMaterialSample
 from src.material.textures.noise.normal_base import Noise
 from src.material.textures.noise.perlin_noise import PerlinNoise
 from src.math import Vector  # adjust import if needed
@@ -11,15 +9,15 @@ from src.math import Vector  # adjust import if needed
 
 @dataclass
 class MarbleMaterial(PhongMaterial):
-    vein_scale: float = 6.0          # try 4..12
-    warp_strength: float = 2.0       # try 0.5..3.0
-    vein_sharpness: float = 4.0      # try 2..8
+    vein_scale: float = 6.0
+    warp_strength: float = 2.0
+    vein_sharpness: float = 4.0
     warp_noise: Noise = field(default_factory=PerlinNoise)
     bump_noise: Noise | None = None
     light_color_factor: float = 1.0
     dark_color_factor: float = 0.75
 
-    def sample(self, hit: "SurfaceInteraction") -> MaterialSample:
+    def phong_sample(self, hit) -> PhongMaterialSample:
         p = hit.point
         dir = Vector(1.0, 0.35, 0.15).normalize()
         u = p.dot(dir)
@@ -41,7 +39,7 @@ class MarbleMaterial(PhongMaterial):
 
         shin = max(10.0, self.shininess * (0.6 + 0.3 * veins))
 
-        return MaterialSample(
+        return PhongMaterialSample(
             base_color=albedo,
             spec_color=self.spec_color,
             shininess=float(shin),

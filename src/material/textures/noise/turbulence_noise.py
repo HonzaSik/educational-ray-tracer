@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from src.material.textures.noise.normal_base import Noise
+from src.material.textures.noise.noise import Noise
 from src.material.textures.noise.perlin_noise import PerlinNoise
 from src.math.vertex import Vertex
 from src.math.vector import Vector

@@ -1,7 +1,7 @@
 import math
 from dataclasses import dataclass
 
-from src.material.textures.noise.normal_base import Noise
+from src.material.textures.noise.noise import Noise
 
 
 @dataclass

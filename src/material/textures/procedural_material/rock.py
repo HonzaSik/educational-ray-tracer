@@ -1,8 +1,5 @@
 from dataclasses import dataclass, field
-
-from src.material.material.material import MaterialSample
-from src.material.material.phong_material import PhongMaterial
-
+from src.material.material.phong_material import PhongMaterial, PhongMaterialSample
 from src.material.textures.noise.normal_base import Noise
 from src.material.textures.noise.perlin_noise import PerlinNoise
 from src.scene.surface_interaction import SurfaceInteraction
@@ -17,14 +14,11 @@ def smoothstep(e0: float, e1: float, x: float) -> float:
 
 @dataclass
 class RockMaterial(PhongMaterial):
-    # noise driving color / roughness variation
     color_noise: Noise = field(default_factory=PerlinNoise)
     color_scale: float = 3.0
-
-    # noise driving bump (normal perturbation)
     bump_noise: Noise | None = None
 
-    def sample(self, hit: SurfaceInteraction) -> MaterialSample:
+    def phong_sample(self, hit: SurfaceInteraction) -> PhongMaterialSample:
         p = hit.point  # world mapping for rocks; for planets use hit.normal.normalize()
 
         t = 0.5 * self.color_noise.value(p * self.color_scale) + 0.5  # -> [0,1]
@@ -40,7 +34,7 @@ class RockMaterial(PhongMaterial):
         # choose bump noise: if not provided, reuse color_noise but stronger scale/strength via its own settings
         nnoise = self.bump_noise if self.bump_noise is not None else self.normal_noise
 
-        return MaterialSample(
+        return PhongMaterialSample(
             base_color=albedo,
             spec_color=self.spec_color,
             shininess=float(shin),
