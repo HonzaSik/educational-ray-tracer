@@ -1,0 +1,54 @@
+from __future__ import annotations
+from dataclasses import dataclass, field
+from src.math import Vertex, Vector
+from src.geometry.ray import Ray
+from src.geometry.geometry_hit import GeometryHit
+from src.geometry.primitive import Primitive
+
+
+@dataclass
+class Plane(Primitive):
+    """
+    Plane in 3D space defined by a point, normal, and color.
+    """
+    point: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))  # a point on the plane
+    normal: Vector = field(default_factory=lambda: Vector(0, 1, 0))  # normal vector to the plane
+
+    def __post_init__(self):
+        self.normal = self.normal.normalize_ip()
+
+    def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
+        """
+        Calculate intersection of ray with plane.
+        :param ray: Ray to test intersection with
+        :param t_min: minimum valid distance for intersection
+        :param t_max: maximum valid distance for intersection
+        :return: Hit record if intersection occurs, else None
+        """
+        denom = ray.direction.dot(self.normal)
+        if abs(denom) < 1e-6:
+            return None  # Ray is parallel to the plane
+
+        t = (self.point - ray.origin).dot(self.normal) / denom
+        if t < t_min or t > t_max:
+            return None  # Intersection is out of bounds
+
+        hit_point = ray.point_at(t)
+        normal = self.normal
+        if ray.direction.dot(normal) > 0.0:
+            normal = -normal
+
+        return GeometryHit(
+            dist=t,
+            point=hit_point,
+            normal=normal,
+            front_face=ray.direction.dot(normal) < 0.0,
+        )
+
+    def normal_at(self, point: Vertex) -> Vector:
+        """
+        Get the normal vector at a given point on the plane's surface.
+        :param point: Point on the plane
+        :return: Normal vector at that point
+        """
+        return self.normal

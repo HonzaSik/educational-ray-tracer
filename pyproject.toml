@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "eduray"
+version = "0.1.0"
+description = "Educational raytracer implementation in Python with modular architecture. Suports classic raytracing features like shadows, reflections, refractions, and Phong shading. Aimed at students and hobbyists learning computer graphics concepts. Contains visualization tools and example scenes to demonstrate raytracing techniques."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+
+authors = [
+    { name = "Jan Šik"}
+]
+
+keywords = ["raytracing", "rendering", "computer-graphics", "phong", "shadows", "reflections", "refractions", "education", "python", "modular-architecture", "visualization", "numpy", "pillow", "tqdm", "jupyter", "ipywidgets", "matplotlib"]
+
+classifiers = [
+    "Development Status :: Alpha",
+    "Intended Audience :: Education",
+    "Topic :: Multimedia :: Graphics :: 3D Rendering",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+
+dependencies = [
+    "numpy>=1.26",
+    "Pillow>=10.0",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+
+notebook = [
+    "jupyter>=1.0",
+    "ipywidgets>=8.0",
+    "matplotlib>=3.8",
+]
+
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "mypy",
+]
+
+all = ["raytracer[notebook,dev]"]
+
+[project.urls]
+Repository = "https://github.com/HonzaSik/eduray"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+exclude = ["tests*", "notebooks*", "renders*"]

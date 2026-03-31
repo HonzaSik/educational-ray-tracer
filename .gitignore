@@ -1,0 +1,71 @@
+# Project docs / notes
+notes.md
+ideas.py
+
+# Render outputs & previews
+*.png
+*.jpg
+*.jpeg
+*.ppmzoom
+*.pkl
+*.pdf
+*.hdr
+*.gif
+prewiew.*
+
+# Generated assets / animations
+/images/
+anim_light/
+skyboxes/
+frames/
+output/
+renders/
+notebooks/images/
+notebooks/pickle_data/
+notebooks/animation_frames/
+notebooks/video/
+notebooks/*.png
+notebooks/*.jpg
+notebooks/*.ppm
+notebooks/*.mp4
+notebooks/animatons/
+notebooks/skybox/my_skyboxes/
+notebooks/skybox/my_skyboxes/*
+notebooks/benchmark_data/
+notebooks/benchmark_data/*
+
+stls/
+
+# Logs / profiling
+*.log
+*.out
+*.err
+
+# Python cache / build
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.dll
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE configs
+.vscode/
+.idea/
+
+#OS
+.DS_Store
+Thumbs.db
+
+# files
+stls/legacy.ipynb
+research.md
