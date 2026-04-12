@@ -59,9 +59,6 @@ class PhongMaterial(Material):
     def get_reflectance(self) -> float:
         return self.reflectivity
 
-    def get_reflectance_vector(self) -> Vector:
-        raise NotImplementedError
-
     def get_transparency(self) -> float:
         return self.transparency
 

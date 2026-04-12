@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from src.math.vector import Vector
-from src.scene.camera import Camera
+from src.scene.camera.camera import Camera
 from .ease import linear, ease_in_out, EaseType
 from src.math.vertex import Vertex
 from src.render.loops.render_loop import RenderLoop

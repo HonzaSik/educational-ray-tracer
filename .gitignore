@@ -1,6 +1,8 @@
 # Project docs / notes
 notes.md
 ideas.py
+notebooks
+notebooks/*
 
 # Render outputs & previews
 *.png
@@ -11,7 +13,7 @@ ideas.py
 *.pdf
 *.hdr
 *.gif
-prewiew.*
+preview.*
 
 # Generated assets / animations
 /images/
@@ -28,7 +30,7 @@ notebooks/*.png
 notebooks/*.jpg
 notebooks/*.ppm
 notebooks/*.mp4
-notebooks/animatons/
+notebooks/animations/
 notebooks/skybox/my_skyboxes/
 notebooks/skybox/my_skyboxes/*
 notebooks/benchmark_data/
@@ -69,3 +71,7 @@ Thumbs.db
 # files
 stls/legacy.ipynb
 research.md
+
+eduray.egg-info
+models
+dist

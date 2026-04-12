@@ -1,13 +1,14 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "eduray"
-version = "0.1.0"
+version = "0.1.2"
 description = "Educational raytracer implementation in Python with modular architecture. Suports classic raytracing features like shadows, reflections, refractions, and Phong shading. Aimed at students and hobbyists learning computer graphics concepts. Contains visualization tools and example scenes to demonstrate raytracing techniques."
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 
 authors = [
@@ -17,7 +18,7 @@ authors = [
 keywords = ["raytracing", "rendering", "computer-graphics", "phong", "shadows", "reflections", "refractions", "education", "python", "modular-architecture", "visualization", "numpy", "pillow", "tqdm", "jupyter", "ipywidgets", "matplotlib"]
 
 classifiers = [
-    "Development Status :: Alpha",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Education",
     "Topic :: Multimedia :: Graphics :: 3D Rendering",
     "Programming Language :: Python :: 3.11",
@@ -26,9 +27,13 @@ classifiers = [
 
 
 dependencies = [
-    "numpy>=1.26",
-    "Pillow>=10.0",
-    "tqdm>=4.66",
+    "numpy~=2.2.6",
+    "Pillow~=11.3.0",
+    "tqdm>=4.67.0",
+    "ipython~=9.5.0",
+    "ipywidgets>=8.1.0",
+    "imageio>=2.30.0",
+    "matplotlib~=3.10.6",
 ]
 
 [project.optional-dependencies]

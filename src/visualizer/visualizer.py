@@ -59,6 +59,7 @@ class Visualizer:
     view_elev: float = 20
     view_azim: float = -60
     view_roll: float = 0
+
     _registered_labels = set()
 
     def __post_init__(self):
@@ -78,7 +79,7 @@ class Visualizer:
                            figsize=(10, 10),
                            show_axes_labels=False,
                            show_arrows=True,
-                           background_color='whitesmoke',
+                           background_color='white',
                            show_grid=True,
                            show_axes=True,
                            show_xyz_labels=True,
@@ -222,9 +223,9 @@ class Visualizer:
         handles, labels = zip(*filtered)
         self.ax.legend(handles, labels, loc=loc, fontsize=fontsize, framealpha=framealpha)
 
-    def savefig(self, filename: str = "tmp.png", dpi: int = 300, show_legend=True) -> None:
+    def savefig(self, filename: str = "tmp.png", dpi: int = 300, show_legend : bool = True, fontsize : int = 10) -> None:
         if show_legend:
-            self.show_legend()
+            self.show_legend(fontsize=fontsize)
 
         legend = self.ax.get_legend()
         if legend is not None:
@@ -310,7 +311,6 @@ class Visualizer:
         if show_frustum:
             self.plot_frustum(camera, extended_depth=frustum_depth - 1.0)
 
-        self.ax.legend(loc='upper right', fontsize=10)
 
     def plot_frustum(self, camera: Camera, extended_depth=5.0):
         """
@@ -404,7 +404,7 @@ class Visualizer:
                        corner[2],
                        color='purple',
                        s=20,
-                       zorder=5,
+                       zorder=98,
                        alpha=0.9,
                        label='Image Plane Corners' if i == 0 else None)
 
@@ -413,10 +413,10 @@ class Visualizer:
                     corner[2],
                     label,
                     color='purple',
-                    fontsize=9,
+                    fontsize=13,
                     bbox=dict(boxstyle='round,pad=0.3', facecolor='white',
                               alpha=0.7, edgecolor='gray'),
-                    zorder=4,
+                    zorder=99,
                     horizontalalignment='center',
                     verticalalignment='center')
 
@@ -507,7 +507,7 @@ class Visualizer:
                        alpha=alpha, label=self._once("Normal at Hit Point"))
 
     def show_image_plane_point(self, camera: Camera, u: float, v: float,
-                               color='purple', size=20):
+                               color='purple', size=20, label: bool = False):
         """
         Shows a (u,v) coordinate on the actual camera image plane in 3D space.
         u, v should be in [-1, 1] range.
@@ -520,10 +520,15 @@ class Visualizer:
         )
 
         p = _vertex_to_matplotlib(point_w)
-        self.ax.scatter(*p, color=color, s=size, alpha=0.9,
-                        edgecolors='black', linewidths=2, zorder=20, label=self._once(f'Image Plane Point'))
 
-        self.ax.legend(loc='upper right', fontsize=10)
+        if label:
+            self.ax.text(p[0]-0.5, p[1], p[2], f"({u:.2f}, {v:.2f})", color=color, fontsize=13,
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor='white',
+                                alpha=0.7, edgecolor='gray'),
+                    zorder=22, horizontalalignment='left', verticalalignment='bottom')
+
+        self.ax.scatter(*p, color=color, s=size, alpha=0.9,
+                        edgecolors='black', linewidths=2, zorder=21, label=self._once(f'Image Plane Point'))
 
     def show_shadow_rays(self, hit: SurfaceInteraction, lights: List[Light], objects: List[Object], ray_length=5.0, color='gray', opacity=0.5):
         """
@@ -708,11 +713,11 @@ class Visualizer:
                 poly = Poly3DCollection([verts], alpha=opacity/2, facecolor=color, edgecolor=color, linewidth=0.8)
                 self.ax.add_collection3d(poly)
 
-    def visualize_unit_ball(self,
-                            center: 'Vertex | None' = None,
-                            color: str = 'steelblue',
-                            opacity: float = 0.12,
-                            label: str = "Unit Ball"):
+    def visualize_unit_sphere(self,
+                              center: 'Vertex | None' = None,
+                              color: str = 'steelblue',
+                              opacity: float = 0.12,
+                              label: str = "Unit Sphere"):
         """
         Visualizes a unit sphere (radius=1) as a reference for local object coordinate space.
 

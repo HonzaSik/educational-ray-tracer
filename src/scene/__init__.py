@@ -1,4 +1,4 @@
-from .camera import Camera
+from src.scene.camera import Camera, PinholeCamera
 from .light import Light, AmbientLight, PointLight, LightType, SpotLight, DirectionalLight
 from .scene import Scene
 from .object import Object
@@ -9,7 +9,7 @@ from .animation import EaseType, linear, ease_in_out, Easing
 
 
 __all__ = [
-    "Camera",
+    "Camera", "PinholeCamera",
     "Light", "AmbientLight", "PointLight", "LightType", "SpotLight", "DirectionalLight",
     "Scene",
     "Object",

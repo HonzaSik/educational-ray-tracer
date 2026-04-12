@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Tuple, List, Optional
-from src.scene.camera import Camera
+from src.scene.camera.camera import Camera
 from src.scene.light import Light
 from src.shading.local_shading import LocalShading
 from src.shading.blinn_phong_shader import BlinnPhongShader

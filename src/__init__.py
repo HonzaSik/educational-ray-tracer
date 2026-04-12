@@ -16,7 +16,7 @@ from .math import (
 
 # Scene & animation setup
 from .scene import (
-    Scene, Camera, Object,
+    Scene, Camera, Object, PinholeCamera,
     AmbientLight, PointLight, SpotLight, DirectionalLight,
     Animator, AnimationSetup, EaseType, Easing, linear, ease_in_out,
 )
@@ -57,7 +57,7 @@ __all__ = [
     # Math
     "Vertex", "Vector",
     # Scene & animation
-    "Scene", "Camera", "Object",
+    "Scene", "Camera", "Object", "PinholeCamera",
     "AmbientLight", "PointLight", "SpotLight", "DirectionalLight",
     "Animator", "AnimationSetup", "EaseType", "Easing", "linear", "ease_in_out",
     # Materials & textures

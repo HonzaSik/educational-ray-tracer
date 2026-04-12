@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from src.geometry.ray import Ray
-from src.scene.camera import Camera
+from src.scene.camera.camera import Camera
 from src.scene.light import Light, LightType
 from src.math import Vector
 from src.math import Vertex
