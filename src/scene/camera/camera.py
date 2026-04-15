@@ -29,3 +29,7 @@ class Camera(ABC):
     def set_aspect_ratio(self, aspect_ratio: float) -> None:
         self.aspect_ratio = aspect_ratio
         self.update_camera()
+
+    def zoom(self, factor: float) -> None:
+        """Zoom the camera by scaling the field of view or focal length."""
+        pass

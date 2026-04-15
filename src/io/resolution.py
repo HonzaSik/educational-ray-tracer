@@ -83,6 +83,8 @@ class Resolution(Enum):
     UW_QHD = (3440, 1440)  # Ultrawide QHD
     UW_4K = (5120, 2160)  # Ultrawide 4K
 
+    MY_PRINT_2_1 = (1400, 700)
+
 
     def __iter__(self):
         return iter(self.value)

@@ -9,7 +9,7 @@ from src.scene.light import Light
 from src.math.vector import Vector
 from src.math.optics import reflect, refract
 from src.shading.blinn_phong_shader import BlinnPhongShader
-from src.shading.fersnel import fresnel_reflectance
+from src.shading.fresnel import fresnel_reflectance
 from src.shading.local_shading import LocalShading, apply_noise_normal_perturbation
 
 @dataclass

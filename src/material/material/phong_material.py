@@ -10,7 +10,7 @@ from src.math.vector import Vector
 @dataclass
 class PhongMaterialSample(Sample):
     """
-    A sample of Phong material properties at a specific point on the surface.
+    A sample of Phong material properties at a specific point on the surface used for shading calculations, can be modified by procedural materials.
      - base_color: The base color of the material at the sample point.
      - spec_color: The specular color of the material at the sample point.
      - shininess: The shininess coefficient for specular highlights.

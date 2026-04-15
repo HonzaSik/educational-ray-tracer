@@ -4,6 +4,9 @@ ideas.py
 notebooks
 notebooks/*
 
+*/images/
+*/images/*
+
 # Render outputs & previews
 *.png
 *.jpg

@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from src import Camera, Sphere, Plane, Square, Triangle
+from src import Camera, Sphere, Plane, Square, Triangle, PinholeCamera
 from src.geometry.geometry_hit import GeometryHit
 from src.geometry.primitives import Box, Cylinder, Torus
 from src.scene.light import LightType, Light
@@ -32,7 +32,8 @@ def _vertex_to_matplotlib(vert):
     """Convert a Vertex object to matplotlib coordinates"""
     return _to_matplotlib_coords(vert.x, vert.y, vert.z)
 
-
+# Camera needs to be more strict and have defined right half_width up half_height forward
+# base pinhole camera works, and for now i dont want to lock ABC for this needs
 def _calculate_base_corners(camera: Camera):
     bl_w = camera.origin + (camera.right * (-camera.half_width) + camera.up * (-camera.half_height) + camera.forward)
     br_w = camera.origin + (camera.right * camera.half_width + camera.up * (-camera.half_height) + camera.forward)
@@ -384,8 +385,6 @@ class Visualizer:
             camera: Camera object
             show_plane_corners: whether to label the corners of the image plane with their (u,v) coordinates
         """
-
-
         corners = _calculate_base_corners(camera)
 
         if show_plane_corners:
@@ -522,7 +521,7 @@ class Visualizer:
         p = _vertex_to_matplotlib(point_w)
 
         if label:
-            self.ax.text(p[0]-0.5, p[1], p[2], f"({u:.2f}, {v:.2f})", color=color, fontsize=13,
+            self.ax.text(p[0]-0.5, p[1], p[2], f"({u:.2f}, {v:.2f})", color=color, fontsize=10,
                     bbox=dict(boxstyle='round,pad=0.3', facecolor='white',
                                 alpha=0.7, edgecolor='gray'),
                     zorder=22, horizontalalignment='left', verticalalignment='bottom')
@@ -561,33 +560,31 @@ class Visualizer:
 
     def visualize_objects(self, objects: List[Object], opacity=0.3):
         for obj in objects:
+
+            # SPHERE
             if isinstance(obj.geometry, Sphere):
                 center = _vertex_to_matplotlib(obj.geometry.center)
                 radius = obj.geometry.radius
                 color = obj.material.get_color()
 
-                # Generate sphere mesh
                 u = np.linspace(0, 2 * np.pi, 20)
                 v = np.linspace(0, np.pi, 20)
                 x = center[0] + radius * np.outer(np.cos(u), np.sin(v))
                 y = center[1] + radius * np.outer(np.sin(u), np.sin(v))
                 z = center[2] + radius * np.outer(np.ones(np.size(u)), np.cos(v))
 
-                # Wireframe
-                self.ax.plot_wireframe(x, y, z, color=color, alpha=opacity, linewidth=0.5)
+                x, y, z = self._transform_mesh(obj, x, y, z)
 
-                # Optional: solid surface with transparency
+                self.ax.plot_wireframe(x, y, z, color=color, alpha=opacity, linewidth=0.5)
                 self.ax.plot_surface(x, y, z, color=color, alpha=0.05)
 
-            # PLANE WIREFRAME
+            # PLANE
             if isinstance(obj.geometry, Plane):
                 point = _vertex_to_matplotlib(obj.geometry.point)
-                normal = _vertex_to_matplotlib(obj.geometry.normal)  # assumes normalized
+                normal = np.array(_vertex_to_matplotlib(obj.geometry.normal))
                 color = obj.material.get_color()
-                size = 2.0  # half-extent of the plane grid
+                size = 2.0
 
-                # Build two orthogonal vectors to the normal
-                normal = np.array(normal)
                 if abs(normal[0]) < 0.9:
                     tangent = np.cross(normal, [1, 0, 0])
                 else:
@@ -595,7 +592,6 @@ class Visualizer:
                 tangent /= np.linalg.norm(tangent)
                 bitangent = np.cross(normal, tangent)
 
-                # Create a grid on the plane
                 s = np.linspace(-size, size, 10)
                 t = np.linspace(-size, size, 10)
                 S, T = np.meshgrid(s, t)
@@ -604,10 +600,12 @@ class Visualizer:
                 Y = point[1] + S * tangent[1] + T * bitangent[1]
                 Z = point[2] + S * tangent[2] + T * bitangent[2]
 
+                X, Y, Z = self._transform_mesh(obj, X, Y, Z)
+
                 self.ax.plot_wireframe(X, Y, Z, color=color, alpha=opacity, linewidth=0.5)
                 self.ax.plot_surface(X, Y, Z, color=color, alpha=0.05)
 
-
+            # BOX
             if isinstance(obj.geometry, Box):
                 c1 = _vertex_to_matplotlib(obj.geometry.corner1)
                 c2 = _vertex_to_matplotlib(obj.geometry.corner2)
@@ -616,23 +614,23 @@ class Visualizer:
                 x0, y0, z0 = c1
                 x1, y1, z1 = c2
 
-                # 8 corners of the box
                 corners = np.array([
-                    [x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0],  # bottom face
-                    [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1],  # top face
+                    [x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0],
+                    [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1],
                 ])
 
-                # 6 faces, each defined by 4 corner indices
+                corners = self._apply_transform(obj, corners)
+
                 faces = [
-                    [corners[0], corners[1], corners[2], corners[3]],  # bottom
-                    [corners[4], corners[5], corners[6], corners[7]],  # top
-                    [corners[0], corners[1], corners[5], corners[4]],  # front
-                    [corners[2], corners[3], corners[7], corners[6]],  # back
-                    [corners[0], corners[3], corners[7], corners[4]],  # left
-                    [corners[1], corners[2], corners[6], corners[5]],  # right
+                    [corners[0], corners[1], corners[2], corners[3]],
+                    [corners[4], corners[5], corners[6], corners[7]],
+                    [corners[0], corners[1], corners[5], corners[4]],
+                    [corners[2], corners[3], corners[7], corners[6]],
+                    [corners[0], corners[3], corners[7], corners[4]],
+                    [corners[1], corners[2], corners[6], corners[5]],
                 ]
 
-                poly = Poly3DCollection(faces, alpha=opacity/2, facecolor=color, edgecolor=color, linewidth=0.8)
+                poly = Poly3DCollection(faces, alpha=opacity / 2, facecolor=color, edgecolor=color, linewidth=0.8)
                 self.ax.add_collection3d(poly)
 
             # CYLINDER
@@ -646,7 +644,6 @@ class Visualizer:
                 length = np.linalg.norm(axis)
                 axis_n = axis / length
 
-                # Build orthogonal basis around the axis
                 if abs(axis_n[0]) < 0.9:
                     perp = np.cross(axis_n, [1, 0, 0])
                 else:
@@ -662,27 +659,35 @@ class Visualizer:
                 Y = base[1] + np.outer(t, axis[1]) + np.outer(np.ones(10), circle[:, 1])
                 Z = base[2] + np.outer(t, axis[2]) + np.outer(np.ones(10), circle[:, 2])
 
+                X, Y, Z = self._transform_mesh(obj, X, Y, Z)
+
                 self.ax.plot_wireframe(X, Y, Z, color=color, alpha=opacity, linewidth=0.5)
                 self.ax.plot_surface(X, Y, Z, color=color, alpha=0.05)
 
-                # Draw end caps
                 for center_pt in [base, cap]:
-                    cap_x = center_pt[0] + circle[:, 0]
-                    cap_y = center_pt[1] + circle[:, 1]
-                    cap_z = center_pt[2] + circle[:, 2]
-                    self.ax.plot(np.append(cap_x, cap_x[0]),
-                                 np.append(cap_y, cap_y[0]),
-                                 np.append(cap_z, cap_z[0]), color=color, linewidth=0.8)
+                    cap_pts = np.stack([
+                        center_pt[0] + circle[:, 0],
+                        center_pt[1] + circle[:, 1],
+                        center_pt[2] + circle[:, 2],
+                    ], axis=1)
+                    cap_pts = self._apply_transform(obj, cap_pts)
+                    closed = np.vstack([cap_pts, cap_pts[0]])
+                    self.ax.plot(closed[:, 0], closed[:, 1], closed[:, 2], color=color, linewidth=0.8)
 
             # SQUARE
             if isinstance(obj.geometry, Square):
-                verts = [_vertex_to_matplotlib(obj.geometry.v0),
-                         _vertex_to_matplotlib(obj.geometry.v1),
-                         _vertex_to_matplotlib(obj.geometry.v2),
-                         _vertex_to_matplotlib(obj.geometry.v3)]
+                verts = np.array([
+                    _vertex_to_matplotlib(obj.geometry.v0),
+                    _vertex_to_matplotlib(obj.geometry.v1),
+                    _vertex_to_matplotlib(obj.geometry.v2),
+                    _vertex_to_matplotlib(obj.geometry.v3),
+                ])
                 color = obj.material.get_color()
 
-                poly = Poly3DCollection([verts], alpha=opacity, facecolor=color, edgecolor=color, linewidth=0.8)
+                verts = self._apply_transform(obj, verts)
+
+                poly = Poly3DCollection([verts.tolist()], alpha=opacity, facecolor=color, edgecolor=color,
+                                        linewidth=0.8)
                 self.ax.add_collection3d(poly)
 
             # TORUS
@@ -700,100 +705,24 @@ class Visualizer:
                 Y = center[1] + (R + r * np.cos(V)) * np.sin(U)
                 Z = center[2] + r * np.sin(V)
 
+                X, Y, Z = self._transform_mesh(obj, X, Y, Z)
+
                 self.ax.plot_wireframe(X, Y, Z, color=color, alpha=opacity, linewidth=0.5)
                 self.ax.plot_surface(X, Y, Z, color=color, alpha=0.05)
 
             # TRIANGLE
             if isinstance(obj.geometry, Triangle):
-                verts = [_vertex_to_matplotlib(obj.geometry.v0),
-                         _vertex_to_matplotlib(obj.geometry.v1),
-                         _vertex_to_matplotlib(obj.geometry.v2)]
+                verts = np.array([
+                    _vertex_to_matplotlib(obj.geometry.v0),
+                    _vertex_to_matplotlib(obj.geometry.v1),
+                    _vertex_to_matplotlib(obj.geometry.v2),
+                ])
                 color = obj.material.get_color()
 
-                poly = Poly3DCollection([verts], alpha=opacity/2, facecolor=color, edgecolor=color, linewidth=0.8)
+                verts = self._apply_transform(obj, verts)
+
+                poly = Poly3DCollection([verts.tolist()], alpha=opacity / 2, facecolor=color, edgecolor=color, linewidth=0.8)
                 self.ax.add_collection3d(poly)
-
-    def visualize_unit_sphere(self,
-                              center: 'Vertex | None' = None,
-                              color: str = 'steelblue',
-                              opacity: float = 0.12,
-                              label: str = "Unit Sphere"):
-        """
-        Visualizes a unit sphere (radius=1) as a reference for local object coordinate space.
-
-        Shows:
-          - Sphere wireframe + three great-circle rings (equator + two meridians)
-          - Local +X / +Y / +Z axes with tick marks at 0.5 and 1.0
-          - Outward surface normals at six cardinal points (+/-X, +/-Y, +/-Z face centres)
-          - A dashed "R = 1" callout from the origin to the +X surface point
-          - The object-space origin marked at the sphere centre
-
-        Parameters:
-            center:            centre of the sphere in world space (default: world origin)
-            color:             base colour for the sphere mesh
-            opacity:           wireframe opacity
-            axis_length:       how far past the surface the axis arrows extend (>1.0)
-            show_normals:      draw outward surface normals at the six cardinal points
-            show_unit_markers: draw tick marks and numeric labels at 0.5 and 1.0 on each axis
-            show_radius_line:  draw a dashed line from origin to the +X surface with "R = 1" label
-            label:             legend entry for the sphere
-        """
-
-        if center is None:
-            cx, cy, cz = 0.0, 0.0, 0.0
-        else:
-            cx, cy, cz = _vertex_to_matplotlib(center)
-
-        # ── Sphere mesh ──────────────────────────────────────────────────────
-        u = np.linspace(0, 2 * np.pi, 36)
-        v = np.linspace(0, np.pi, 36)
-        sx = cx + np.outer(np.cos(u), np.sin(v))
-        sy = cy + np.outer(np.sin(u), np.sin(v))
-        sz = cz + np.outer(np.ones_like(u), np.cos(v))
-
-        self.ax.plot_wireframe(sx, sy, sz, color=color, alpha=opacity, linewidth=0.4)
-        self.ax.plot_surface(sx, sy, sz, color=color, alpha=0.04, label=self._once(label))
-
-        # ── Three great-circle rings ─────────────────────────────────────────
-        theta = np.linspace(0, 2 * np.pi, 240)
-        ring_kw = dict(color=color, linewidth=1.1, alpha=0.55, linestyle='--')
-        # Equator  (matplotlib XY plane)
-        self.ax.plot(cx + np.cos(theta), cy + np.sin(theta),
-                     np.full_like(theta, cz), **ring_kw)
-        # Meridian in XZ-matplotlib plane
-        self.ax.plot(cx + np.cos(theta), np.full_like(theta, cy),
-                     cz + np.sin(theta), **ring_kw)
-        # Meridian in YZ-matplotlib plane
-        self.ax.plot(np.full_like(theta, cx), cy + np.cos(theta),
-                     cz + np.sin(theta), **ring_kw)
-
-        # ── Axes with tick marks ─────────────────────────────────────────────
-        #   matplotlib coords: X→right(red), Y-mpl→forward=our Z(green), Z-mpl→up=our Y(blue)
-        axes_def = [
-            ((1, 0, 0), 'red', 'Local +X'),
-            ((0, 1, 0), 'limegreen', 'Local +Z'),  # matplotlib Y = our Z
-            ((0, 0, 1), 'dodgerblue', 'Local +Y'),  # matplotlib Z = our Y
-        ]
-
-        tick_half = 0.07  # half-length of tick cross-bar
-        tick_vals = [0.5, 1.0]
-
-        show_bounds = True  # whether to draw a bounding box around the unit ball for easier visualization of the axes directions
-        if show_bounds:
-            bound_color = 'lightcoral'
-            bound_kw = dict(color=bound_color, linewidth=1.0, alpha=0.6, linestyle='--')
-            # Bounding box edges
-            for x in [-1, 1]:
-                for y in [-1, 1]:
-                    self.ax.plot([cx + x, cx + x], [cy + y, cy + y], [cz - 1, cz + 1], **bound_kw)
-                    self.ax.plot([cx + x, cx + x], [cy - 1, cy + 1], [cz + y, cz + y], **bound_kw)
-                    self.ax.plot([cx - 1, cx + 1], [cy + x, cy + x], [cz + y, cz + y], **bound_kw)
-
-
-
-        # show radius line from origin to +X surface point
-        self.ax.plot([cx, cx + 1], [cy, cy], [cz, cz], color='coral', linewidth=4.0, alpha=0.9, linestyle=':', label=self._once('Radius R=1'))
-
 
 
     def visualize_hit_point(self, hit: SurfaceInteraction, color='white', size=40,
@@ -807,3 +736,24 @@ class Visualizer:
                         label=self._once(label) if label else None)
         if show_normal:
             self.visualize_normal_at_hit_point(hit, length=normal_length, color=color, alpha=0.8)
+
+    def _apply_transform(self, obj: Object, points: np.ndarray) -> np.ndarray:
+        if obj.transform is None:
+            return points
+
+        M = obj.transform.matrix
+        world = points[:, [0, 2, 1]]
+
+        ones = np.ones((world.shape[0], 1))
+        world_h = np.hstack([world, ones])
+
+        transformed = (M @ world_h.T).T[:, :3]
+
+        return transformed[:, [0, 2, 1]]
+
+    def _transform_mesh(self, obj, x, y, z):
+        """Transform a meshgrid (x, y, z) of matplotlib coords through obj's world transform."""
+        shape = x.shape
+        pts = np.stack([x.ravel(), y.ravel(), z.ravel()], axis=1)
+        pts = self._apply_transform(obj, pts)
+        return pts[:, 0].reshape(shape), pts[:, 1].reshape(shape), pts[:, 2].reshape(shape)

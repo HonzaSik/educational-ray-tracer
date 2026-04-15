@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from src.material.textures.noise.noise import Noise
 from src.shading.helpers import tangent_basis
 from src.scene.scene import Scene
-from src.material.material.material import Material
 from src.material.color import Color
 from src.scene.surface_interaction import SurfaceInteraction
 from src.scene.light import Light
@@ -16,10 +15,12 @@ def apply_noise_normal_perturbation(
     noise_override: Noise | None,
     vec: Vector
 ) -> Vector:
+    # Apply normal perturbation based on noise. If noise_override is provided, it takes precedence over any noise in the material.
     noise = noise_override
     if noise is None:
         return vec
 
+    # If noise is present, apply normal perturbation. The strength of the perturbation is determined by the noise's strength property.
     strength = getattr(noise, "strength", 0.0)
     if strength == 0.0:
         return vec
@@ -28,18 +29,23 @@ def apply_noise_normal_perturbation(
     eps = getattr(noise, "eps", 1e-3)
     inv_eps = 1.0 / eps
 
+    # Compute the tangent and bitangent vectors for the normal. This is necessary to compute the noise gradient in the tangent space of the surface.
     n = vec.normalize()
     tangent, bitangent = tangent_basis(n)
 
+    # Sample the noise at the hit point and at small offsets in the tangent and bitangent directions to compute the gradient of the noise.
     p = hit.normal.normalize()
 
+    # Sample noise at the hit point and at small offsets in the tangent and bitangent directions to compute the gradient of the noise.
     h0 = noise.value(p * scale)
     ht = noise.value((p + tangent * eps) * scale)
     hb = noise.value((p + bitangent * eps) * scale)
 
+    # Compute the noise gradient in the tangent space. The gradient is approximated by finite differences of the noise values at the hit point and the offsets.
     dht = (ht - h0) * inv_eps
     dhb = (hb - h0) * inv_eps
 
+    # Perturb the normal by moving it in the direction opposite to the noise gradient, scaled by the strength of the noise. The perturbation is applied in the tangent and bitangent directions.
     return (n - tangent * (strength * dht) - bitangent * (strength * dhb)).normalize()
 
 
@@ -51,6 +57,3 @@ class LocalShading(ABC):
     @abstractmethod
     def shade_multiple_lights(self, hit: SurfaceInteraction, lights: list[Light], view_dir: Vector, scene: Scene | None = None) -> Color:
         ...
-
-    def apply_noise_texture(self, hit : SurfaceInteraction, material : Material, n : Vector) -> Vector:
-        raise NotImplementedError("Normal mapping from texture not implemented yet.")

@@ -24,11 +24,11 @@ class NormalShader(LocalShading):
         noise = getattr(material, "normal_noise", None)
         norm = apply_noise_normal_perturbation(hit, noise, n)
 
-        red = int((norm.x + 1) * 0.5 * 255)
-        green = int((norm.y + 1) * 0.5 * 255)
-        blue = int((norm.z + 1) * 0.5 * 255)
+        red = (norm.x + 1) * 0.5
+        green = (norm.y + 1) * 0.5
+        blue = (norm.z + 1) * 0.5
 
-        return Color.custom_rgb(red, green, blue)
+        return Color.linear_rgb(red, green, blue)
 
     def shade_multiple_lights(self, hit: SurfaceInteraction, lights: list[Light], view_dir: Vector,
                               scene: Scene | None = None) -> Color:

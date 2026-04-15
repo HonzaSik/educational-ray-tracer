@@ -17,9 +17,9 @@ class Primitive(ABC):
         :param t_max: maximum valid distance for intersection
         :return: Hit record if intersection occurs, else None
         """
-        pass
+        raise NotImplementedError("Primitive.intersect must be implemented by subclasses")
 
     @abstractmethod
     def normal_at(self, point: Vertex) -> Vertex:
         """Get the normal vector at a given point on the object's surface."""
-        pass
+        raise NotImplementedError("Primitive.normal_at must be implemented by subclasses")

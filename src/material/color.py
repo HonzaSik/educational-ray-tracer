@@ -218,24 +218,32 @@ class Color:
             clamp255(int(b * 255)),
         )
 
-    @staticmethod
     def clamp_01(self) -> Color:
         return Color(np.clip(self.data, 0.0, 1.0))
 
     @classmethod
     def background_color(cls, direction, skybox=None) -> Color:
-        """
-        Generate a background color based on the given direction and optional skybox.
-        :param direction: Vec3 | np.ndarray(3,)
-        :param skybox: str path or SkyboxHDR instance
-        :return: Color
-        """
         if skybox is not None:
-            return cls.from_hdr(skybox, direction)
+            if isinstance(skybox, str):
+                match skybox:
+                    case "black":
+                        return cls.custom_rgb(0, 0, 0)
 
+                    case "white":
+                        return cls.custom_rgb(255, 255, 255)
+
+                    case "sky" | "default" | None:
+                        pass # use default gradient sky
+
+                    case _:
+                        # assume it's an HDR file path
+                        return cls.from_hdr(skybox, direction)
+            else:
+                return cls.from_hdr(skybox, direction)
+
+        # default gradient sky
         direction = _as_np3(direction)
         normal = float(np.linalg.norm(direction))
-
         if normal > 0:
             direction = direction / normal
 
@@ -276,6 +284,8 @@ class Color:
 
 
 # color presets
+
+Color.BLACK = Color(0.0, 0.0, 0.0)
 Color.Black = Color(0.0, 0.0, 0.0)
 Color.White = Color(1.0, 1.0, 1.0)
 Color.Red = Color(1.0, 0.0, 0.0)

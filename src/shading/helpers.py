@@ -31,6 +31,7 @@ def shadow_trace(geometry_hit: SurfaceInteraction, light_direction: Vector, ligh
     :return: true if in shadow, false otherwise
     """
 
+    #for now is hit point calculated in scene, later will own his own abstract method for use of acceleration structures
     if scene is None:
         raise ValueError("Scene must not be None for shadow tracing.")
 

@@ -15,13 +15,3 @@ def fresnel_reflectance(ray_dir: Vector, normal: Vector, ior_out: float = 1.0, i
     cos_theta = clamp_float_01(normal.dot(-ray_dir.normalize()))
     r0 = ((ior_out - ior_in) / (ior_out + ior_in)) ** 2
     return r0 + (1 - r0) * (1 - cos_theta) ** 5
-
-
-def dielectric_f0(ior: float) -> Color:
-    """
-    Calculate base reflectance F0 for dielectric material based on index of refraction.
-    :param ior: index of refraction
-    :return: base reflectance Color
-    """
-    f0 = ((ior - 1.0) / (ior + 1.0)) ** 2
-    return

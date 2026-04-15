@@ -1,7 +1,7 @@
 from pathlib import Path
-from IPython.core.display_functions import display
 from PIL import Image as PILImage
 from IPython.display import Image
+from IPython.display import display, Image as IPImage
 
 def convert_ppm_to_png(ppm_path: str, png_path: str) -> None:
     """
@@ -62,7 +62,7 @@ def ipynb_display_images(path: str | list[str] | None = None) -> None:
             raise ValueError("No image path provided for display.")
         display(Image(filename=path))
 
-def ipnb_display_multiple_images_in_row(paths: list[str], row_size: int = 3) -> None:
+def ipynb_display_multiple_images_in_row(paths: list[str], row_size: int = 3) -> None:
     """
     Display multiple images in a single row in a Jupyter notebook.
     :param row_size: Number of images per row.
@@ -82,15 +82,34 @@ def ipnb_display_multiple_images_in_row(paths: list[str], row_size: int = 3) -> 
 
     display(HTML(html_content))
 
-def image_pipeline(image, idx: int = 0) -> str:
+class ImageResult:
+    def __init__(self, png_path: str):
+        self.path = png_path
+
+    def display(self):
+        display(IPImage(self.path))
+        return self
+
+    def display_in_row(self, row_size: int = 3):
+        ipynb_display_multiple_images_in_row([self.path], row_size=row_size)
+        return self
+
+    def __str__(self):
+        return self.path
+
+    def __repr__(self):
+        return f"ImageResult('{self.path}')"
+
+
+def image_pipeline(image, idx: int = 0) -> ImageResult:
     """
-    Complete image processing pipeline: save as PPM, convert to PNG. With indexed filename.
+    Complete image processing pipeline: save as PPM, convert to PNG.
     :param image: Image data as a tuple of (pixels, width, height)
     :param idx: Index for the output filename to avoid overwriting previous images
-    :return:
+    :return: ImageResult with a .display() method
     """
     ppm = f"./images/img_{idx}.ppm"
     png = f"./images/img_{idx}.png"
     image_to_ppm(ppm, image)
     convert_ppm_to_png(ppm, png)
-    return png
+    return ImageResult(png)

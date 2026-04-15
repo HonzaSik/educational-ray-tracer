@@ -47,7 +47,7 @@ from .render import (
 # Input/output utilities, including resolution handling and Jupyter notebook display functions PickleManager for saving/loading scenes, and libraries for colors, materials, and lights
 from .io import (
     Resolution,
-    ipynb_display_images, ipnb_display_multiple_images_in_row,
+    ipynb_display_images, ipynb_display_multiple_images_in_row,
     ColorLibrary, MaterialLibrary, LightLibrary, PickleManager,
 )
 
@@ -72,6 +72,6 @@ __all__ = [
     "RenderConfig", "PreviewConfig", "PostProcessConfig", "ProgressDisplay",
     # IO & resolution
     "Resolution",
-    "ipynb_display_images", "ipnb_display_multiple_images_in_row",
+    "ipynb_display_images", "ipynb_display_multiple_images_in_row",
     "ColorLibrary", "MaterialLibrary", "LightLibrary", "PickleManager",
 ]

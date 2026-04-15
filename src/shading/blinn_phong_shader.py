@@ -5,7 +5,7 @@ from src.material.color import Color, clamp_color255
 from src.material.material import PhongMaterialSample
 from src.scene.light import Light, LightType, AmbientLight
 from src.math import Vector
-from src.shading.fersnel import fresnel_reflectance, dielectric_f0
+from src.shading.fresnel import fresnel_reflectance
 from .helpers import shadow_trace, light_dir_dist
 from src.scene.scene import Scene
 from src.material.material.phong_material import PhongMaterial
@@ -56,7 +56,7 @@ class BlinnPhongShader(LocalShading):
     def shade_multiple_lights(self, hit: SurfaceInteraction, lights: list[Light], view_dir: Vector,
                               scene: Scene | None = None) -> Color:
 
-        material : PhongMaterial = hit.material
+        material: PhongMaterial = hit.material
 
         material_sample: PhongMaterialSample = material.sample(hit)
         is_transmissive = getattr(material, "transparency", 0.0) > 0.0 and getattr(material, "ior", 1.0) > 1.0

@@ -58,6 +58,10 @@ class Scene:
         if self.objects is not None:
             self.objects.clear()
 
+    # The hit point is currently computed directly in the scene.
+    # Later, this will likely be moved to a dedicated abstract method
+    # to better support acceleration structures.
+    # For now it is not a big deal since it uses only few objects for education and is not a bottleneck
     def intersect(self, ray: Ray) -> SurfaceInteraction | None:
         """
         Intersect a ray with the scene's objects.
@@ -142,7 +146,7 @@ class Scene:
         :return: None
         """
         self.camera.fov_deg = fov
-        self.camera.__post_init__()
+        self.camera.update_camera()
 
     def move_camera_to(self, position: Vertex) -> None:
         """
@@ -160,7 +164,7 @@ class Scene:
         """
         new_direction = (target - self.camera.origin).normalize()
         self.camera.direction = new_direction
-        self.camera.__post_init__()
+        self.camera.update_camera()
 
     def get_camera(self) -> Camera:
         """
@@ -212,8 +216,6 @@ class Scene:
         if not self.lights:
             raise ValueError("Scene must have at least one light.")
 
-        # todo add more validations
-
         print("Scene validation passed.")
 
     def normal_at(self, point: Vertex) -> Vector:
@@ -233,3 +235,12 @@ class Scene:
     @staticmethod
     def _ensure_images_dir(path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
+
+    def set_skybox(self, skybox_path: str) -> None:
+        """
+        Set the HFR skybox texture for the scene.
+        :param skybox_path: Path to the skybox texture or "black", "white", or "sky" for built-in options
+        :return: None
+        """
+        self.skybox_path = skybox_path
+        self.camera.update_camera()
