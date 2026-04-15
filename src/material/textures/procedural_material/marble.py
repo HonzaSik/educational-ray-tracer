@@ -27,7 +27,7 @@ class MarbleMaterial(PhongMaterial):
     light_color_factor: float = 1.0
     dark_color_factor: float = 0.75
 
-    def phong_sample(self, hit) -> PhongMaterialSample:
+    def sample(self, hit) -> PhongMaterialSample:
         p = hit.point
         dir = Vector(1.0, 0.35, 0.15).normalize()
         u = p.dot(dir)

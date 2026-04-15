@@ -738,8 +738,6 @@ class Visualizer:
             self.visualize_normal_at_hit_point(hit, length=normal_length, color=color, alpha=0.8)
 
     def _apply_transform(self, obj: Object, points: np.ndarray) -> np.ndarray:
-        if obj.transform is None:
-            return points
 
         M = obj.transform.matrix
         world = points[:, [0, 2, 1]]

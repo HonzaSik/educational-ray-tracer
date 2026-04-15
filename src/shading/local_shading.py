@@ -12,11 +12,11 @@ from src.math import Vector
 
 def apply_noise_normal_perturbation(
     hit: SurfaceInteraction,
-    noise_override: Noise | None,
+    noise: Noise | None,
     vec: Vector
 ) -> Vector:
     # Apply normal perturbation based on noise. If noise_override is provided, it takes precedence over any noise in the material.
-    noise = noise_override
+    noise = noise
     if noise is None:
         return vec
 
@@ -33,19 +33,19 @@ def apply_noise_normal_perturbation(
     n = vec.normalize()
     tangent, bitangent = tangent_basis(n)
 
-    # Sample the noise at the hit point and at small offsets in the tangent and bitangent directions to compute the gradient of the noise.
+    # normal of the hit point, used as the base for perturbation
     p = hit.normal.normalize()
 
-    # Sample noise at the hit point and at small offsets in the tangent and bitangent directions to compute the gradient of the noise.
+    # Find the noise values at the hit point and at small offsets in the tangent and bitangent directions. These values will be used to compute the noise gradient.
     h0 = noise.value(p * scale)
     ht = noise.value((p + tangent * eps) * scale)
     hb = noise.value((p + bitangent * eps) * scale)
 
-    # Compute the noise gradient in the tangent space. The gradient is approximated by finite differences of the noise values at the hit point and the offsets.
+    # Slope
     dht = (ht - h0) * inv_eps
     dhb = (hb - h0) * inv_eps
 
-    # Perturb the normal by moving it in the direction opposite to the noise gradient, scaled by the strength of the noise. The perturbation is applied in the tangent and bitangent directions.
+    # Modify normal and normalize the result.
     return (n - tangent * (strength * dht) - bitangent * (strength * dhb)).normalize()
 
 

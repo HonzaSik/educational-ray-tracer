@@ -21,3 +21,12 @@ class Noise(ABC):
         :return: Noise value as a float
         """
         raise NotImplementedError
+
+    def noise_fn(self, x: float, y: float) -> float:
+        """
+        Get the noise value at a given (x, y) coordinate by calling the value method with a Vector for Z = 0.0.
+        :param x: X coordinate to sample the noise
+        :param y: Y coordinate to sample the noise
+        :return: Noise value as a float
+        """
+        return self.value(Vector(x, y, 0.0))
