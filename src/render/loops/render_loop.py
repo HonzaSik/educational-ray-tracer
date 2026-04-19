@@ -41,19 +41,23 @@ class RenderLoop(ABC):
 
     scene: Scene = None
     shading_model: Optional[LocalShading] = None
+    integrator: Optional[Integrator] = None
+
     preview_config: Optional[PreviewConfig] = None
     render_config: Optional[RenderConfig] = None
     post_process_config: Optional[PostProcessConfig] = None
-    integrator: Optional[Integrator] = None
 
     def __post_init__(self):
-        # Initialize core components from the scene and configurations
+        # Camera setup
         self.camera: Camera = self.scene.camera
+        self.camera.set_aspect_ratio(self.render_config.resolution.aspect_ratio if self.render_config is not None else (Resolution.R360p.width / Resolution.R360p.height))
+
+        # load lights and skybox from scene
         self.lights: List[Light] = self.scene.lights
-        self.skybox: Optional[str] = self.scene.skybox_path if self.scene.skybox_path is not None else None
+        self.skybox: Optional[str] = self.scene.skybox if self.scene.skybox is not None else None
 
         # Set default shading model if none provided
-        self.shader: LocalShading = self.shading_model if self.shading_model is not None else BlinnPhongShader()
+        self.shader: LocalShading = self.shading_model
 
         # Set rendering parameters from render_config or use defaults
         self.spp: int = self.render_config.samples_per_pixel if self.render_config is not None else 1
@@ -82,12 +86,14 @@ class RenderLoop(ABC):
             raise ValueError("Camera must be provided.")
         if self.lights is None:
             raise ValueError("Lights must be provided.")
-        if self.shader is None:
-            raise ValueError("Shading model must be provided.")
 
-        self.camera.set_aspect_ratio(self.width / self.height)
-
-        self.integrator = RecursiveIntegrator(scene=self.scene, shader=self.shader, lights=self.lights, skybox=self.skybox, max_depth=self.max_depth)
+        self.integrator = self.integrator if self.integrator is not None else RecursiveIntegrator(
+            max_depth=self.max_depth,
+            scene=self.scene,
+            lights=self.lights,
+            shader=self.shader,
+            skybox=self.skybox
+        )
 
     def on_row_end_update_preview(self, current_row: int, pixels_u8: List[Tuple[int, int, int]]) -> None:
         """
@@ -102,6 +108,21 @@ class RenderLoop(ABC):
             # each interval_rows, update the preview or at the last row
             if ((current_row + 1) % config.refresh_interval_rows == 0) or (current_row + 1 == self.height):
                 self.ui.update_row(pixels_u8, current_row + 1)
+
+    def on_number_of_pixels_rendered_update_preview(self, num_pixels_rendered: int, pixels_u8: List[Tuple[int, int, int]]) -> None:
+        config = self.ui.preview
+
+        if self.ui.img_widget is None or config.refresh_interval_rows <= 0:
+            return
+
+        interval_pixels = config.refresh_interval_rows * self.width
+        total_pixels = self.width * self.height
+
+        if (
+                num_pixels_rendered % interval_pixels == 0
+                or num_pixels_rendered == total_pixels
+        ):
+            self.ui.update_image(pixels_u8, rendered_pixels=num_pixels_rendered)
 
     @abstractmethod
     def render_pixel(self, i: int, j: int) -> Tuple[int, int, int]:
@@ -129,7 +150,7 @@ class RenderLoop(ABC):
             else:
                 raise ValueError("Unsupported file extension. Please use .ppm or .png or specify img_format_list.")
 
-        # render all pixels only once
+        # render all pixels and get raw pixel data as (R,G,B) -> save as ppm first, then convert to png if needed
         pixels, width, height = self.render_all_pixels()
         saved_paths: [Path] = []
 

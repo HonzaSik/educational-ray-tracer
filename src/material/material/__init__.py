@@ -1,9 +1,9 @@
 from .material import Material
-from .sample import Sample
+from .material_sample import MaterialSample
 from .phong_material import PhongMaterial, PhongMaterialSample
 
 __all__ = [
     "Material",
-    "Sample",
+    "MaterialSample",
     "PhongMaterialSample", "PhongMaterial",
 ]

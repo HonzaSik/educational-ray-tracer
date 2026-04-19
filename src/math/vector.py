@@ -1,6 +1,8 @@
+from dataclasses import dataclass
+
 from .vec3 import Vec3
 
-
+@dataclass(slots=True)
 class Vector(Vec3):
     """
     Vector inheriting from Vec3, with vector-specific methods.

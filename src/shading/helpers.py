@@ -20,8 +20,8 @@ def tangent_basis(vec: Vector) -> tuple[Vector, Vector]:
     return tangent, bitangent
 
 
-def shadow_trace(geometry_hit: SurfaceInteraction, light_direction: Vector, light_distance: float,
-                 scene: Scene | None) -> bool:
+def in_shadow(geometry_hit: SurfaceInteraction, light_direction: Vector, light_distance: float,
+              scene: Scene | None) -> bool:
     """
     Trace a shadow ray from the hit point towards the light source.
     :param geometry_hit: HitPoint where the primary ray hit an object
@@ -31,7 +31,6 @@ def shadow_trace(geometry_hit: SurfaceInteraction, light_direction: Vector, ligh
     :return: true if in shadow, false otherwise
     """
 
-    #for now is hit point calculated in scene, later will own his own abstract method for use of acceleration structures
     if scene is None:
         raise ValueError("Scene must not be None for shadow tracing.")
 

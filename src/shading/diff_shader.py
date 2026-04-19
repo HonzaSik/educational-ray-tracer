@@ -61,6 +61,7 @@ class DiffShader(LocalShading):
     b: LocalShading
     scale: float = 4.0
     hash_method: HashMethod = HashMethod.CHECKER
+    scene: Scene | None = None
 
     def _select_hash(self, v: Vertex) -> int:
         """Return 0/1 based on the selected pattern."""
@@ -83,7 +84,7 @@ class DiffShader(LocalShading):
         0 = shader A, 1 = shader B
         """
         use_a = self._select_hash(hit.point) == 0
-        color = (self.a if use_a else self.b).shade(view_dir=view_dir, light=light, hit=hit)
+        color = (self.a if use_a else self.b).shade(view_dir=view_dir, light=light, hit=hit, scene=scene)
         return color.clamp_01()
 
     def shade_multiple_lights(self, hit, lights, view_dir, scene: Scene | None = None) -> Color:
@@ -92,4 +93,4 @@ class DiffShader(LocalShading):
         0 = shader A, 1 = shader B
         """
         use_a = self._select_hash(hit.geom.point) == 0
-        return (self.a if use_a else self.b).shade_multiple_lights(view_dir=view_dir, lights=lights, hit=hit)
+        return (self.a if use_a else self.b).shade_multiple_lights(view_dir=view_dir, lights=lights, hit=hit, scene=scene)

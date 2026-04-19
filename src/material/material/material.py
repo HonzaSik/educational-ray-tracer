@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 from src.material.color import Color
-from src.material.material.sample import Sample
+from src.material.material.material_sample import MaterialSample
 from src.material.textures.noise.noise import Noise
 from src.math.vector import Vector
 
@@ -63,7 +63,8 @@ class Material(ABC):
         """
         pass
 
-    def sample(self, hit) -> Sample:
+    @abstractmethod
+    def sample(self, hit) -> MaterialSample:
         """
         Optional method to sample material properties at a hit point. Can be overridden by procedural materials.
         :param hit: Hit information

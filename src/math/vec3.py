@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from numpy import cos, sin, sqrt
+from math import cos, sin, sqrt
 
 Number = float | int
 
@@ -75,16 +75,6 @@ class Vec3:
         self.z *= inv
         return self
 
-    # Hadamard products (component-wise multiplication)
-    def hadamard(self, o: Vec3) -> Vec3:
-        return Vec3(self.x * o.x, self.y * o.y, self.z * o.z)
-
-    def hadamard_ip(self, o: Vec3) -> Vec3:
-        self.x *= o.x
-        self.y *= o.y
-        self.z *= o.z
-        return self
-
     # vector operations
     def dot(self, o: Vec3) -> float:
         return self.x * o.x + self.y * o.y + self.z * o.z
@@ -129,19 +119,6 @@ class Vec3:
             self.x *= inv
             self.y *= inv
             self.z *= inv
-        return self
-
-    def clamp01(self) -> Vec3:
-        return Vec3(
-            0.0 if self.x < 0.0 else 1.0 if self.x > 1.0 else self.x,
-            0.0 if self.y < 0.0 else 1.0 if self.y > 1.0 else self.y,
-            0.0 if self.z < 0.0 else 1.0 if self.z > 1.0 else self.z,
-        )
-
-    def clamp01_ip(self) -> Vec3:
-        self.x = 0.0 if self.x < 0.0 else 1.0 if self.x > 1.0 else self.x
-        self.y = 0.0 if self.y < 0.0 else 1.0 if self.y > 1.0 else self.y
-        self.z = 0.0 if self.z < 0.0 else 1.0 if self.z > 1.0 else self.z
         return self
 
     def lerp(self, b: Vec3, t: float) -> Vec3:

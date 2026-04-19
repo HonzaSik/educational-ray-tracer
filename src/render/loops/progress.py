@@ -146,6 +146,30 @@ class ProgressUI:
         if self.status_widget is not None:
             self.status_widget.value = f"Rendering - {row}/{height} rows"
 
+    def update_image(self, pixels_flat_u8: List[Tuple[int, int, int]], rendered_pixels: int | None = None) -> None:
+        """
+        Update preview from a full image buffer.
+        :param pixels_flat_u8: Full flat pixel buffer of size width * height.
+        :param rendered_pixels: Optional number of already rendered pixels for status text.
+        """
+        if self.img_widget is None:
+            return
+
+        width, height = self.width, self.height
+        arr = np.asarray(pixels_flat_u8, dtype=np.uint8).reshape(height, width, 3)
+
+        img = Image.fromarray(arr)
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        self.img_widget.value = buf.getvalue()
+
+        if self.status_widget is not None:
+            if rendered_pixels is None:
+                self.status_widget.value = "Rendering..."
+            else:
+                total = width * height
+                self.status_widget.value = f"Rendering - {rendered_pixels}/{total} pixels"
+
     def update_end(self, pixels_flat_u8: List[Tuple[int, int, int]]) -> None:
         """
         Final update at the end of rendering to display the complete image.

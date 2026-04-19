@@ -25,5 +25,5 @@ class CheckerMaterial(PhongMaterial):
             shininess=self.shininess,
             reflectivity=self.reflectivity,
             ior=self.ior,
-            opacity=1.0
+            transparency=self.transparency,
         )

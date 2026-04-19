@@ -14,11 +14,11 @@ class Scene:
     camera: Camera
     lights: list[Light] = field(default_factory=list)
     objects: list[Object] = field(default_factory=list)
-    skybox_path: str | None = None
+    skybox: str | None = None
 
 
     def __str__(self) -> str:
-        return f"Scene(camera={self.camera}, lights={self.lights}, primitives={self.objects}, skybox_path={self.skybox_path})"
+        return f"Scene(camera={self.camera}, lights={self.lights}, primitives={self.objects}, skybox={self.skybox})"
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -40,6 +40,22 @@ class Scene:
             self.objects.extend(objects)
         else:
             raise TypeError("primitives must be a Primitive or a list of Primitives")
+
+    def in_shadow(self, point: Vertex, light: Light) -> bool:
+        """
+        Check if a point is in shadow with respect to a given light source.
+        :param point: Point to check for shadow
+        :param light: Light source to check against
+        :return: True if in shadow, False otherwise
+        """
+        light_dir = (light.position - point).normalize()
+        light_distance = (light.position - point).norm()
+
+        shadow_origin = point + light_dir * 1e-3
+        shadow_ray = Ray(origin=shadow_origin, direction=light_dir)
+
+        hit = self.intersect(shadow_ray)
+        return hit is not None and hit.geom.dist < light_distance
 
     def remove_object(self, obj: Object) -> None:
         """
@@ -242,5 +258,5 @@ class Scene:
         :param skybox_path: Path to the skybox texture or "black", "white", or "sky" for built-in options
         :return: None
         """
-        self.skybox_path = skybox_path
+        self.skybox = skybox_path
         self.camera.update_camera()

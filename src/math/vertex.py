@@ -1,5 +1,7 @@
+from dataclasses import dataclass
 from .vec3 import Vec3
 
+@dataclass(slots=True)
 class Vertex(Vec3):
     """
     Vertex inheriting from Vec3, with vertex-specific methods.

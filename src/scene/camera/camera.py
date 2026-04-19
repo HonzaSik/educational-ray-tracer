@@ -7,7 +7,7 @@ from src.geometry.ray import Ray
 @dataclass
 class Camera(ABC):
     origin: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))
-    aspect_ratio: float = 16.0 / 9.0
+    _aspect_ratio: float = 16.0 / 9.0
 
     @abstractmethod
     def make_ray(self, u: float, v: float) -> Ray:
@@ -27,7 +27,7 @@ class Camera(ABC):
         self.origin += offset
 
     def set_aspect_ratio(self, aspect_ratio: float) -> None:
-        self.aspect_ratio = aspect_ratio
+        self._aspect_ratio = aspect_ratio
         self.update_camera()
 
     def zoom(self, factor: float) -> None:

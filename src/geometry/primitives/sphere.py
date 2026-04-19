@@ -29,7 +29,7 @@ class Sphere(Primitive):
         # Quadratic coefficients
         a = ray.direction.dot(ray.direction)  # Usually = 1 if ray.direction is normalized
         b = 2.0 * oc.dot(ray.direction)  # Projection of oc onto the ray
-        c = oc.dot(oc) - self.radius * self.radius  # Distance^2 from ray origin to sphere surface
+        c = oc.dot(oc) - self.radius * self.radius  # Sphere quadratic coefficient c
 
         discriminant = b * b - 4 * a * c
         if discriminant < 0:

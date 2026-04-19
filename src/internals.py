@@ -21,7 +21,8 @@ from .scene import (
 from .material import (
     Material,
     Noise,
-    PhongMaterialSample
+    PhongMaterialSample,
+    MaterialSample,
 )
 
 from .shading import (
@@ -49,7 +50,7 @@ from .visualizer import (
 __all__ = [
     "Vec3",
     "SurfaceInteraction", "Light", "LightType",
-    "Material", "Noise", "PhongMaterialSample",
+    "Material", "Noise", "PhongMaterialSample", "MaterialSample",
     "LocalShading", "apply_noise_normal_perturbation",
     "Integrator", "RenderLoop", "ImgFormat",
     "write_ppm", "image_to_ppm", "convert_ppm_to_png",

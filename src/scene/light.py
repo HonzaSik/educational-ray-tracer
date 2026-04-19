@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+
+from src.material.color import Color
 from src.math import Vertex
 from enum import Enum
 from src.math import Vector
@@ -22,6 +24,7 @@ class Light(ABC):
     Abstract base class for different types of lights in a 3D scene.
     """
     intensity: float
+    color: Color = field(default_factory=lambda: Color(1.0, 1.0, 1.0))
     position: Vertex = field(default_factory=lambda: Vertex(0.0, 0.0, 0.0))
     falloff: float = 1.0
     type: LightType = None
@@ -39,6 +42,19 @@ class Light(ABC):
         """
         pass
 
+    @abstractmethod
+    def get_color_at(self, point: Vertex) -> Color:
+        """
+        Get the color of the light at a given point in the scene.
+
+        Args:
+            point (Vertex): The point in the scene to get the light color for.
+
+        Returns:
+            Color: The color of the light at the given point.
+        """
+        pass
+
     def translate(self, translation: Vector) -> None:
         """
         Translate the light's position by a given vector.
@@ -50,24 +66,40 @@ class Light(ABC):
 
 
 @dataclass
-class PointLight(Light):
+class PointLight:
     """
-    Represents a point light source in a 3D scene.
+    Simple light with no falloff
     """
+    position: Vertex
+    color: Color
+    intensity: float = 1.0
+    type: LightType = LightType.POINT
+
+    def intensity_at(self, point: Vertex) -> float:
+        return self.intensity
+
+    def get_color_at(self, point: Vertex) -> Color:
+        return self.color
+
+@dataclass
+class PointLightFalloff:
+    """
+    Simple light with no falloff
+    """
+    position: Vertex
+    color: Color = field(default_factory=lambda: Color(1.0, 1.0, 1.0))
+    intensity: float = 1.0
     type: LightType = LightType.POINT
 
     def intensity_at(self, point: Vertex) -> float:
         dx = point.x - self.position.x
         dy = point.y - self.position.y
         dz = point.z - self.position.z
-        r2 = dx*dx + dy*dy + dz*dz
-        if r2 < 1e-8:
-            return 0.0
-        inv_square = self.intensity / (4.0 * pi * r2)
-        if self.falloff > 0.0:
-            return inv_square / (1.0 + self.falloff * r2)
-        return inv_square
+        r2 = dx * dx + dy * dy + dz * dz
+        return self.intensity / max(r2, 1e-6)
 
+    def get_color_at(self, point: Vertex) -> Color:
+        return self.color
 
 @dataclass
 class AmbientLight(Light):
@@ -75,10 +107,14 @@ class AmbientLight(Light):
     Represents an ambient light source in a 3D scene.
     """
     type: LightType = LightType.AMBIENT
+    color: Color = field(default_factory=lambda: Color(1.0, 1.0, 1.0))
 
     def intensity_at(self, point: Vertex) -> float:
         # Ambient light has constant intensity everywhere
         return self.intensity
+
+    def get_color_at(self, point: Vertex) -> Color:
+        return self.color
 
 @dataclass
 class DirectionalLight(Light):
@@ -92,21 +128,35 @@ class DirectionalLight(Light):
         # Directional light has constant intensity everywhere
         return self.intensity
 
+    def get_color_at(self, point: Vertex) -> Color:
+        return self.color
+
 @dataclass
 class SpotLight(Light):
-    """
-    Represents a spotlight source in a 3D scene.
-    """
+    position: Vertex = field(default_factory=lambda: Vertex(0.0, 0.0, 0.0))
     direction: Vector = field(default_factory=lambda: Vector(0.0, -1.0, 0.0))
-    angle: float = pi / 6  # spotlight cone angle in radians
-    type: LightType = LightType.SPOT
+    angle: float = pi / 6
+
+    def __post_init__(self):
+        self.direction = self.direction.normalize()
 
     def intensity_at(self, point: Vertex) -> float:
-        # Calculate direction to point
-        to_point = (point - self.position).normalize()
+        dx = point.x - self.position.x
+        dy = point.y - self.position.y
+        dz = point.z - self.position.z
 
-        spot_effect = (self.direction.normalize()).dot(to_point)
+        length = (dx * dx + dy * dy + dz * dz) ** 0.5
 
-        if spot_effect > cos(self.angle):
-            return self.intensity * spot_effect
-        return 0.0
+        if length < 1e-8:
+            return 0.0
+
+        to_point = Vector(dx / length, dy / length, dz / length)
+        spot_effect = self.direction.dot(to_point)
+
+        if spot_effect <= cos(self.angle):
+            return 0.0
+
+        return self.intensity * spot_effect
+
+    def get_color_at(self, point: Vertex) -> Color:
+        return self.color

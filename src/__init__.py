@@ -53,7 +53,7 @@ from .io import (
 
 __all__ = [
     # Geometry primitive classes
-    "Sphere", "Plane", "Box", "Cylinder", "Torus", "Triangle", "Square", "Primitive",
+    "Sphere", "Plane", "Box", "Torus", "Triangle", "Square", "Primitive",
     # Math
     "Vertex", "Vector",
     # Scene & animation

@@ -2,16 +2,26 @@ from src.math import Vector
 from src.math.helpers import clamp_float_01
 from src.material.color import Color
 
-def fresnel_reflectance(ray_dir: Vector, normal: Vector, ior_out: float = 1.0, ior_in: float = 1.5) -> float:
+def fresnel_schlick(ray_dir: Vector, normal: Vector, ior_out: float = 1.0, ior_in: float = 1.5) -> float:
     """
-    Schlick's approximation for Fresnel reflectance.
-    :param ray_dir: incoming ray direction (towards surface)
-    :param normal: surface normal (pointing outward)
-    :param ior_out: IOR of the medium the ray is coming from
-    :param ior_in: IOR of the medium the ray is entering
-    :return: scalar Fresnel reflectance [0, 1]
+    Schlickova aproximace Fresnelovy odrazivosti.
+    ray_dir  ... směr paprsku ve směru letu
+    normal   ... geometrická normála směřující ven z povrchu
+    ior_out  ... index lomu prostředí, ze kterého paprsek přichází
+    ior_in   ... index lomu prostředí, do kterého paprsek vstupuje
     """
-    normal = normal.normalize()
-    cos_theta = clamp_float_01(normal.dot(-ray_dir.normalize()))
+    d = ray_dir.normalize()
+    n = normal.normalize()
+
+    cos_theta = n.dot(-d)
+
+    # flip normal if ray is inside the medium
+    if cos_theta < 0.0:
+        n = -n
+        cos_theta = n.dot(-d)
+        ior_out, ior_in = ior_in, ior_out
+
+    cos_theta = clamp_float_01(cos_theta)
+
     r0 = ((ior_out - ior_in) / (ior_out + ior_in)) ** 2
-    return r0 + (1 - r0) * (1 - cos_theta) ** 5
+    return r0 + (1.0 - r0) * (1.0 - cos_theta) ** 5

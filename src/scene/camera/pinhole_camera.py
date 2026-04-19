@@ -11,10 +11,10 @@ class PinholeCamera(Camera):
     Classic pinhole camera model.
     fov_deg: vertical field of view in degrees.
     """
-    fov_deg: float = 70.0
     direction: Vector = field(default_factory=lambda: Vector(0, 0, -1))
-    up_hint: Vector = field(default_factory=lambda: Vector(0, 1, 0))
+    fov_deg: float = 70.0
 
+    up_hint: Vector = field(default_factory=lambda: Vector(0, 1, 0))
     forward: Vector = field(init=False)
     right: Vector = field(init=False)
     up: Vector = field(init=False)
@@ -39,7 +39,7 @@ class PinholeCamera(Camera):
         self.forward = fwd
         self.right = right
         self.up = true_up
-        self.half_width = self.aspect_ratio * half_height
+        self.half_width = self._aspect_ratio * half_height
         self.half_height = half_height
 
     def make_ray(self, u: float, v: float) -> Ray:
@@ -64,7 +64,7 @@ class PinholeCamera(Camera):
     def copy(self) -> PinholeCamera:
         return PinholeCamera(
             fov_deg=self.fov_deg,
-            aspect_ratio=self.aspect_ratio,
+            _aspect_ratio=self._aspect_ratio,
             origin=Vertex(self.origin.x, self.origin.y, self.origin.z),
             direction=Vector(self.direction.x, self.direction.y, self.direction.z),
             up_hint=Vector(self.up_hint.x, self.up_hint.y, self.up_hint.z),

@@ -32,6 +32,6 @@ class RockMaterial(PhongMaterial):
             spec_color=self.spec_color,
             shininess=float(shin),
             ior=self.ior,
-            opacity=1.0 - self.transparency,
+            transparency=self.transparency,
             normal_noise=nnoise,
         )
