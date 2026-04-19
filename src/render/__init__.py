@@ -1,7 +1,7 @@
 from .integrator import RecursiveIntegrator
 from .integrator import Integrator
 
-from .loops import LinearRayCaster
+from .loops import LinearRenderLoop
 from .loops import MultiProcessRowRenderLoop
 from .loops import ProgressDisplay, PreviewConfig
 from .loops import RenderLoop, ImgFormat
@@ -14,7 +14,7 @@ from .render_config import RenderConfig
 __all__ = [
     'RecursiveIntegrator',
     'Integrator',
-    'LinearRayCaster',
+    'LinearRenderLoop',
     'MultiProcessRowRenderLoop',
     'ProgressDisplay', 'PreviewConfig',
     'RenderLoop', 'ImgFormat',

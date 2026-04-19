@@ -4,7 +4,7 @@ from random import random
 from typing import List, Tuple
 
 from src.material.color import Color, to_u8
-from .linear_ray_caster import RenderLoop
+from .linear_render_loop import RenderLoop
 
 # shared globals for worker processes
 _STATE = {}

@@ -39,7 +39,7 @@ from .shading import (
 
 # Rendering algorithms and utilities for rendering and post-processing
 from .render import (
-    LinearRayCaster, RecursiveIntegrator, MultiProcessRowRenderLoop,
+    LinearRenderLoop, RecursiveIntegrator, MultiProcessRowRenderLoop,
     # configs and utilities for rendering and post-processing
     RenderConfig, PreviewConfig, PostProcessConfig, ProgressDisplay
 )
@@ -68,7 +68,7 @@ __all__ = [
     "BlinnPhongShader",
     "DepthShader", "NormalShader", "DiffShader", "CurvatureShader", "DotProductShader",
     # Rendering
-    "LinearRayCaster", "RecursiveIntegrator", "MultiProcessRowRenderLoop",
+    "LinearRenderLoop", "RecursiveIntegrator", "MultiProcessRowRenderLoop",
     "RenderConfig", "PreviewConfig", "PostProcessConfig", "ProgressDisplay",
     # IO & resolution
     "Resolution",

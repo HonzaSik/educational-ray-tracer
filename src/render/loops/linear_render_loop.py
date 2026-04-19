@@ -6,7 +6,7 @@ from .render_loop import RenderLoop
 from dataclasses import dataclass
 
 @dataclass
-class LinearRayCaster(RenderLoop):
+class LinearRenderLoop(RenderLoop):
     """
     A basic single-threaded ray tracing render loop that processes the image line by line.
     Inherits from the abstract RenderLoop class and implements the render logic.
@@ -41,6 +41,7 @@ class LinearRayCaster(RenderLoop):
                 pixels.append(rgb)
 
             self.on_row_end_update_preview(row, pixels)
+            self.ui.update_pixel(self.width)
 
         self.ui.update_end(pixels)
         return pixels, self.width, self.height
