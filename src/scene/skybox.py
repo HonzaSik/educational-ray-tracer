@@ -140,7 +140,7 @@ class SkyboxHDR:
     Create a skybox from an HDR image file and can sample colors based on 3D direction vectors.
     """
 
-    def __init__(self, path: str, yaw_deg: float = 90):  # todo handle rotation after moove to scene
+    def __init__(self, path: str, yaw_deg: float = 90):
 
         arr = hdr_to_ndarray(path)
         self.data = arr

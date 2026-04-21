@@ -9,7 +9,7 @@ class Transform:
     Represents an affine transformation with its matrix and cached inverse.
     """
     matrix: np.ndarray        # 4x4 matrix representing the transformation
-    inverse: np.ndarray       # inverse of the matrix
+    inverse: np.ndarray       # inverse of the matrix for transforming rays and points back to local space
     inverse_T: np.ndarray     # inverse transpose for transforming normals
 
     @staticmethod
@@ -127,8 +127,8 @@ class Transform:
         Apply another transformation on top of this one by matrix multiplication.
         The resulting transformation is equivalent to first applying 'other' and then 'self'.
         """
-        matrix = self.matrix @ other.matrix
-        matrix_inv = other.inverse @ self.inverse
+        matrix = other.matrix @ self.matrix
+        matrix_inv = self.inverse @ other.inverse
         return Transform(matrix, matrix_inv, matrix_inv.T)
 
 

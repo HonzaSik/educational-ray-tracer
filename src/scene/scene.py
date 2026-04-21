@@ -105,13 +105,14 @@ class Scene:
         """
         return self.objects if self.objects is not None else []
 
-    def add_light(self, light: Light) -> None:
-        """
-        Add a light to the scene.
-        :param light: Light to add
-        :return: None
-        """
-        self.lights.append(light)
+    def add_lights(self, lights: Light | list[Light]) -> None:
+        """Add one light or an iterable of lights to the scene."""
+        if isinstance(lights, Light):
+            self.lights.append(lights)
+        elif isinstance(lights, list):
+            self.lights.extend(lights)
+        else:
+            raise TypeError("lights must be a Light or an iterable of Lights")
 
     def remove_light(self, light: Light) -> None:
         """
@@ -211,6 +212,13 @@ class Scene:
         :return: List of all lights
         """
         return self.lights
+
+    def get_all_not_ambient_lights(self) -> list[Light]:
+        """
+        Get all non-ambient lights in the scene.
+        :return: List of non-ambient lights
+        """
+        return [light for light in self.lights if light.type != LightType.AMBIENT]
 
     def get_ambient_light(self) -> Light | None:
         """

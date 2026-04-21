@@ -28,6 +28,8 @@ from .material import (
 from .shading import (
     LocalShading,
     apply_noise_normal_perturbation,
+    light_dir_dist,
+    in_shadow,
 )
 
 from .render import (
@@ -58,4 +60,5 @@ __all__ = [
     "reflect", "refract",
     "image_pipeline",
     "Visualizer",
+    "light_dir_dist", "in_shadow"
 ]

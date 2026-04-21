@@ -26,7 +26,6 @@ class Light(ABC):
     intensity: float
     color: Color = field(default_factory=lambda: Color(1.0, 1.0, 1.0))
     position: Vertex = field(default_factory=lambda: Vertex(0.0, 0.0, 0.0))
-    falloff: float = 1.0
     type: LightType = None
 
     @abstractmethod
@@ -66,12 +65,10 @@ class Light(ABC):
 
 
 @dataclass
-class PointLight:
+class PointLight(Light):
     """
     Simple light with no falloff
     """
-    position: Vertex
-    color: Color
     intensity: float = 1.0
     type: LightType = LightType.POINT
 
@@ -82,12 +79,10 @@ class PointLight:
         return self.color
 
 @dataclass
-class PointLightFalloff:
+class PointLightFalloff(Light):
     """
     Simple light with no falloff
     """
-    position: Vertex
-    color: Color = field(default_factory=lambda: Color(1.0, 1.0, 1.0))
     intensity: float = 1.0
     type: LightType = LightType.POINT
 

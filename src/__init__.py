@@ -34,7 +34,7 @@ from .material import (
 from .shading import (
     BlinnPhongShader,
     # other shaders for debugging and education
-    DepthShader, NormalShader, DiffShader, CurvatureShader, DotProductShader,
+    DepthShader, NormalShader, DiffShader, DotProductShader, MaskMethod,
 )
 
 # Rendering algorithms and utilities for rendering and post-processing
@@ -66,7 +66,7 @@ __all__ = [
     "checker", "marble", "rock",
     # Shading
     "BlinnPhongShader",
-    "DepthShader", "NormalShader", "DiffShader", "CurvatureShader", "DotProductShader",
+    "DepthShader", "NormalShader", "DiffShader", "DotProductShader", "MaskMethod",
     # Rendering
     "LinearRenderLoop", "RecursiveIntegrator", "MultiProcessRowRenderLoop",
     "RenderConfig", "PreviewConfig", "PostProcessConfig", "ProgressDisplay",

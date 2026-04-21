@@ -13,16 +13,14 @@ class DepthShader(LocalShading):
     """
     Simple object shader for visualizing depth from the camera.
     """
+    max_depth: float = 10.0
 
     def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector, scene: Scene | None = None) -> Color:
         """
-        Shade based on the depth from the camera.
-        Maps depth to a grayscale value, with closer points being lighter.
+        Shade based on the depth of the hit point from the camera. Closer objects will be brighter, while farther objects will be darker.
         """
-
-        max_depth = 10.0 # max depth for normalization; can be adjusted based on scene scale
-        depth = min(hit.geom.dist, max_depth)
-        intensity = 1.0 - (depth / max_depth)
+        depth = min(hit.geom.dist, self.max_depth)
+        intensity = 1.0 - (depth / self.max_depth)
         gray_value = int(intensity * 255)
         return Color.custom_rgb(gray_value, gray_value, gray_value)
 

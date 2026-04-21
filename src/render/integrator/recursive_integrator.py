@@ -3,7 +3,7 @@ from src.render.integrator.integrator import Integrator
 from src.scene.scene import Scene
 from src.geometry.ray import Ray
 from src.scene.surface_interaction import SurfaceInteraction
-from src.material.color import Color, clamp_color01
+from src.material.color import Color
 from src.material.material.material import Material
 from src.scene.light import Light
 from src.math.vector import Vector
@@ -91,7 +91,7 @@ class RecursiveIntegrator(Integrator):
             # No reflection or refraction, just local shading
             result = local_color
 
-        return clamp_color01(result)
+        return result
 
     @staticmethod
     def _get_normals(hit: SurfaceInteraction, material: Material) -> tuple[Vector, Vector]:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from .local_shading import LocalShading, apply_noise_normal_perturbation
 from src.scene.surface_interaction import SurfaceInteraction
-from src.material.color import Color, clamp_color255
+from src.material.color import Color
 from src.material.material import PhongMaterialSample
 from src.scene.light import Light, LightType
 from src.math import Vector

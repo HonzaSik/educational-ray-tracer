@@ -9,14 +9,14 @@ import math
 from src.scene.scene import Scene
 
 
-def _hash_checker(v: Vertex, scale: float) -> int:
+def _mask_checker(v: Vertex, scale: float) -> int:
     """Classic checkerboard pattern (alternating X/Z cells)."""
     coord = v * scale
     xi, zi = math.floor(coord.x), math.floor(coord.z)
     return (int(xi) + int(zi)) & 1  # 0 or 1
 
 
-def _hash_checked_lines(v: Vertex, scale: float) -> int:
+def _mask_checked_lines(v: Vertex, scale: float) -> int:
     """Diagonal grid pattern with lines double width."""
     coord = v * scale
     x_cell = math.floor(coord.x)
@@ -26,13 +26,13 @@ def _hash_checked_lines(v: Vertex, scale: float) -> int:
     return 0 if line_x ^ line_y else 1
 
 
-def _hash_stripes(v: Vertex, scale: float) -> int:
+def _mask_stripes(v: Vertex, scale: float) -> int:
     """Vertical stripe pattern (alternating by X axis)."""
     coord = v * scale
     return int(math.floor(coord.x)) % 2
 
 
-def _hash_circles(v: Vertex, scale: float) -> int:
+def _mask_circles(v: Vertex, scale: float) -> int:
     """Concentric rings in XZ plane."""
     r = math.sqrt(v.x * v.x + v.z * v.z)
     ring = math.floor(r * scale)
@@ -44,7 +44,7 @@ def _half_left_right(x: float) -> int:
     return 0 if x < 0 else 1
 
 
-class HashMethod(Enum):
+class MaskMethod(Enum):
     CHECKER = "checker"
     CHECKED_LINES = "checked_lines"
     STRIPES = "stripes"
@@ -60,37 +60,37 @@ class DiffShader(LocalShading):
     a: LocalShading
     b: LocalShading
     scale: float = 4.0
-    hash_method: HashMethod = HashMethod.CHECKER
+    mask_method: MaskMethod = MaskMethod.CHECKER
     scene: Scene | None = None
 
-    def _select_hash(self, v: Vertex) -> int:
+    def _select_mask(self, v: Vertex) -> int:
         """Return 0/1 based on the selected pattern."""
-        if self.hash_method == HashMethod.CHECKER:
-            return _hash_checker(v, self.scale)
-        elif self.hash_method == HashMethod.CHECKED_LINES:
-            return _hash_checked_lines(v, self.scale)
-        elif self.hash_method == HashMethod.STRIPES:
-            return _hash_stripes(v, self.scale)
-        elif self.hash_method == HashMethod.CIRCLES:
-            return _hash_circles(v, self.scale)
-        elif self.hash_method == HashMethod.HALF_IMAGE:
+        if self.mask_method == MaskMethod.CHECKER:
+            return _mask_checker(v, self.scale)
+        elif self.mask_method == MaskMethod.CHECKED_LINES:
+            return _mask_checked_lines(v, self.scale)
+        elif self.mask_method == MaskMethod.STRIPES:
+            return _mask_stripes(v, self.scale)
+        elif self.mask_method == MaskMethod.CIRCLES:
+            return _mask_circles(v, self.scale)
+        elif self.mask_method == MaskMethod.HALF_IMAGE:
             return _half_left_right(v.x)
         else:
             return 0
 
     def shade(self, hit: SurfaceInteraction, light: Light | None, view_dir: Vector, scene: Scene | None = None) -> Color:
         """
-        Shade using either shader A or B based on the selected pattern using hashing.
+        Shade using either shader A or B based on the selected pattern using masking.
         0 = shader A, 1 = shader B
         """
-        use_a = self._select_hash(hit.point) == 0
+        use_a = self._select_mask(hit.point) == 0
         color = (self.a if use_a else self.b).shade(view_dir=view_dir, light=light, hit=hit, scene=scene)
         return color.clamp_01()
 
     def shade_multiple_lights(self, hit, lights, view_dir, scene: Scene | None = None) -> Color:
         """
-        Shade using either shader A or B based on the selected pattern using hashing.
+        Shade using either shader A or B based on the selected pattern using masking.
         0 = shader A, 1 = shader B
         """
-        use_a = self._select_hash(hit.geom.point) == 0
+        use_a = self._select_mask(hit.geom.point) == 0
         return (self.a if use_a else self.b).shade_multiple_lights(view_dir=view_dir, lights=lights, hit=hit, scene=scene)

@@ -20,11 +20,11 @@ class PhongMaterialSample(MaterialSample):
      - transparency: Transparency of the material (0.0 to 1.0, default 0.0).
      - normal_noise: Optional procedural noise for normal perturbation.
     """
-    base_color: Color
-    spec_color: Color
-    ambient_color: Color
-    shininess: float
-    reflectivity: float
+    base_color: Color = field(default_factory=lambda: Color.custom_rgb(200, 200, 200))
+    spec_color: Color = field(default_factory=lambda: Color.custom_rgb(255, 255, 255))
+    ambient_color: Color = field(default_factory=lambda: Color.custom_rgb(30, 30, 30))
+    shininess: float = 32.0
+    reflectivity: float = 0.0
     ior: float = 1.5
     transparency: float = 0.0
     normal_noise: Optional[Noise] = None
@@ -113,6 +113,9 @@ class PhongMaterial(Material):
 
     def get_ior(self) -> float:
         return self.ior
+
+    def get_shininess(self) -> float:
+        return self.shininess
 
     def sample(self, hit) -> PhongMaterialSample:
         """

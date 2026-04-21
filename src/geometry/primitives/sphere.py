@@ -13,8 +13,8 @@ class Sphere(Primitive):
     """
     Sphere in 3D space defined by center, radius, and color. Centered at the origin by default with radius 0.5.
     """
-    center: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))  # Center of the sphere
-    radius: float = field(default=0.5)  # Radius of the sphere
+    center: Vertex = field(default_factory=lambda: Vertex(0, 0, 0))
+    radius: float = field(default=1)
 
     def intersect(self, ray: Ray, t_min=0.001, t_max=float('inf')) -> GeometryHit | None:
         """

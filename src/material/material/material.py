@@ -33,14 +33,6 @@ class Material(ABC):
         NotImplementedError("Reflectance not implemented for this material")
         return 0.0
 
-    def get_reflectance_vector(self) -> Vector:
-        """
-        Get the reflectance color vector of the material.
-        :return: Reflectance color
-        """
-        NotImplementedError("Transparency not implemented for this material")
-        return Vector(0.0, 0.0, 0.0)
-
     def get_transparency(self) -> float:
         """
         Get the transparency of the material.
@@ -60,6 +52,20 @@ class Material(ABC):
         """
         Get the specular color of the material.
         :return: Specular color
+        """
+        pass
+
+    def get_ambient_color(self) -> Color:
+        """
+        Get the ambient color of the material.
+        :return: Ambient color
+        """
+        pass
+
+    def get_shininess(self) -> float:
+        """
+        Get the shininess of the material for specular highlights.
+        :return: Shininess value
         """
         pass
 

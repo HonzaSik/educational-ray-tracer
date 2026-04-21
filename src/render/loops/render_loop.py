@@ -164,9 +164,9 @@ class RenderLoop(ABC):
 
         for img_format in img_format_list:
             if img_format == ImgFormat.PPM:
-                saved_paths.append(self._save_as_ppm(filename, pixels, width, height))
+                saved_paths.append(self.save_as_ppm(filename, pixels, width, height))
             elif img_format == ImgFormat.PNG:
-                saved_paths.append(self._save_as_png(filename, pixels, width, height))
+                saved_paths.append(self.save_as_png(filename, pixels, width, height))
             else:
                 raise ValueError(f"Unsupported image format: {img_format}")
 
@@ -175,7 +175,7 @@ class RenderLoop(ABC):
         return saved_paths
 
     @staticmethod
-    def _save_as_ppm(filename: str, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Path:
+    def save_as_ppm(filename: str, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Path:
         """
         Saves the rendered pixels to a PPM file.
         :param filename: Name of the output file.
@@ -188,7 +188,7 @@ class RenderLoop(ABC):
         write_ppm(filename, pixels, width, height)
         return Path(filename)
 
-    def _save_as_png(self, filename: str, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Path:
+    def save_as_png(self, filename: str, pixels: List[Tuple[int, int, int]], width: int, height: int) -> Path:
         """
         Saves the rendered pixels to a PNG file.
         :param filename: Name of the output file.
@@ -198,7 +198,7 @@ class RenderLoop(ABC):
         :return: Path to the saved PNG file.
         """
         ppm_temp_path = Path(filename).with_suffix(".ppm")
-        self._save_as_ppm(ppm_temp_path.as_posix(), pixels, width, height)
+        self.save_as_ppm(ppm_temp_path.as_posix(), pixels, width, height)
 
         png_path = Path(filename)
         convert_ppm_to_png(ppm_temp_path.as_posix(), png_path.as_posix())
@@ -207,3 +207,19 @@ class RenderLoop(ABC):
         ppm_temp_path.unlink(missing_ok=True)
 
         return png_path
+
+    def change_shader(self, new_shader: LocalShading) -> None:
+        """
+        Change the shader used in the integrator.
+        :param new_shader: New LocalShading instance to use.
+        """
+        self.shader = new_shader
+        if self.integrator is not None:
+            self.integrator.shader = new_shader
+
+    def change_integrator(self, new_integrator: Integrator) -> None:
+        """
+        Change the integrator used for rendering.
+        :param new_integrator: New Integrator instance to use.
+        """
+        self.integrator = new_integrator

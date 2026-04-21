@@ -35,6 +35,11 @@ def _vertex_to_matplotlib(vert):
 # Camera needs to be more strict and have defined right half_width up half_height forward
 # base pinhole camera works, and for now i dont want to lock ABC for this needs
 def _calculate_base_corners(camera: Camera):
+    """
+        Calculate the world coordinates of the corners of the camera's image plane based on its position and orientation.
+    :param camera: Camera object containing position, orientation, and image plane parameters defined by right half_width up half_height forward
+    :return:
+    """
     bl_w = camera.origin + (camera.right * (-camera.half_width) + camera.up * (-camera.half_height) + camera.forward)
     br_w = camera.origin + (camera.right * camera.half_width + camera.up * (-camera.half_height) + camera.forward)
     tr_w = camera.origin + (camera.right * camera.half_width + camera.up * camera.half_height + camera.forward)
@@ -64,15 +69,28 @@ class Visualizer:
     _registered_labels = set()
 
     def __post_init__(self):
+        """
+        Stores data about what labels have already been registered for the legend to avoid duplicates.
+        :return:
+        """
         self._registered_labels: set = set()  # instance-level, not class-level
 
     def _once(self, label: str) -> str | None:
+        """
+        Once label is used it save it into registered_labels set and returns the label. If the same label is used again, it returns None to avoid duplicates in the legend.
+        :param label: the label to check and register
+        :return:
+        """
         if label in self._registered_labels:
             return None
         self._registered_labels.add(label)
         return label
 
     def reset_labels(self):
+        """
+        Resets the set of registered labels. You can call this when creating a new scene to allow the same labels to be used again without duplicates in the legend.
+        :return:
+        """
         self._registered_labels.clear()
 
     def create_empty_scene(self,
@@ -211,7 +229,13 @@ class Visualizer:
         return fig, ax
 
     def show_legend(self, loc='upper right', fontsize=10, framealpha=0.7):
-        """Create legend only if there are labeled artists."""
+        """
+        Shows the legend on the plot with the specified location, font size and frame opacity. It filters out any labels that are empty or start with an underscore to avoid cluttering the legend with non-informative entries.
+        :param loc:
+        :param fontsize:
+        :param framealpha:
+        :return:
+        """
         if self.ax is None:
             return
 
@@ -225,6 +249,14 @@ class Visualizer:
         self.ax.legend(handles, labels, loc=loc, fontsize=fontsize, framealpha=framealpha)
 
     def savefig(self, filename: str = "tmp.png", dpi: int = 300, show_legend : bool = True, fontsize : int = 10) -> None:
+        """
+        Saves the current figure to a file with the specified filename and dpi as png or pdf. It also has an option to show or hide the legend before saving, and you can specify the font size of the legend.
+        :param filename: the name of the file to save the figure to (should end with .png or .pdf)
+        :param dpi: the resolution of the saved figure in dots per inch (only applicable for png format)
+        :param show_legend: whether to show the legend before saving the figure
+        :param fontsize: the font size of the legend (only applicable if show_legend is True)
+        :return:
+        """
         if show_legend:
             self.show_legend(fontsize=fontsize)
 
@@ -246,6 +278,11 @@ class Visualizer:
 
 
     def show(self, show_legend=True) -> None:
+        """
+            Displays the current figure. You can choose to show or hide the legend before displaying the figure.
+        :param show_legend: whether to show the legend before displaying the figure
+        :return:
+        """
         if show_legend:
             self.show_legend()
 
@@ -467,6 +504,15 @@ class Visualizer:
 
     def visualize_closest_intersection(self, ray: Ray, objects: List[Object], intersection_opacity=0.5, max_dist=100.0,
                                 intersection_size=20):
+        """
+        Visualizes the closest intersection point of a ray with a list of objects by plotting a scatter point at the intersection location. The color of the point corresponds to the material color of the intersected object. You can specify the maximum distance to consider for intersections, and the size and opacity of the intersection marker.
+        :param ray: Ray to test for intersections
+        :param objects: list of Object instances to check for intersections with the ray
+        :param intersection_opacity: opacity of the intersection marker (default is 0.5)
+        :param max_dist: maximum distance to consider for intersections (default is 100.0 units)
+        :param intersection_size: size of the intersection marker (default is 20)
+        :return:
+        """
         closest_hit = None
         closest_obj = None
 
@@ -483,14 +529,31 @@ class Visualizer:
 
 
     def visualize_lights_positions(self, lights: List[Light]):
+        """
+        Shows the positions of the light sources in the scene by plotting scatter points at their locations.
+        :param lights: list of Light instances to visualize skips ambient lights since they dont have a position
+        :return:
+        """
         for light in lights:
             if light.type == LightType.POINT:
                 self.ax.scatter(*_vertex_to_matplotlib(light.position), color='yellow', s=100, alpha=0.9, edgecolors='Orange',
                                 linewidths=2, zorder=30, label=self._once('Point Light'))
+            elif light.type == LightType.AMBIENT:
+                continue
+            else:
+                if hasattr(light, 'position'):
+                    self.ax.scatter(*_vertex_to_matplotlib(light.position), color='yellow', s=100, alpha=0.9, edgecolors='Orange',
+                                    linewidths=2, zorder=30, label=self._once('Light Source'))
 
 
-    def visualize_normal_at_hit_point(self, hit_point: 'SurfaceInteraction',
-                                      length=0.3, color='cyan', alpha=0.9):
+    def visualize_normal_at_hit_point(self, hit_point: 'SurfaceInteraction',length=0.3, color='cyan', alpha=0.9):
+        """
+        Visualizes the normal vector at a hit point by plotting an arrow originating from the hit point and pointing in the direction of the normal. The length, color and opacity of the normal vector can be customized.
+        :param hit_point: SurfaceInteraction containing the hit point and normal to visualize
+        :param length: Length of the normal vector arrow (default is 0.3 units)
+        :param color: color of the normal vector arrow (default is 'cyan')
+        :param alpha: opacity of the normal vector arrow (default is 0.9)
+        """
         if hit_point is None:
             return
 
@@ -505,11 +568,16 @@ class Visualizer:
                        color=color, arrow_length_ratio=0.3, linewidth=1.3,
                        alpha=alpha, label=self._once("Normal at Hit Point"))
 
-    def show_image_plane_point(self, camera: Camera, u: float, v: float,
-                               color='purple', size=20, label: bool = False):
+    def show_image_plane_point(self, camera: Camera, u: float, v: float,color='purple', size=20, label: bool = False):
         """
-        Shows a (u,v) coordinate on the actual camera image plane in 3D space.
-        u, v should be in [-1, 1] range.
+        Shows a point on the camera's image plane corresponding to the given (u, v) coordinates. The (u, v) coordinates are normalized device coordinates where (-1, -1) is the bottom-left corner of the image plane and (1, 1) is the top-right corner. The color and size of the point can be customized, and you can optionally label the point with its (u, v) coordinates.
+        :param camera: Camera object containing the position and orientation of the camera, as well as the parameters defining the image plane (half_width, half_height, forward, right, up)
+        :param u: horizontal coordinate in normalized device coordinates (-1 to 1)
+        :param v: vertical coordinate in normalized device coordinates (-1 to 1)
+        :param color: color of the point to visualize (default is 'purple')
+        :param size: size of the point to visualize (default is 20)
+        :param label: whether to label the point with its (u, v) coordinates (default is False)
+        :return:
         """
 
         point_w = camera.origin + (
@@ -531,14 +599,15 @@ class Visualizer:
 
     def show_shadow_rays(self, hit: SurfaceInteraction, lights: List[Light], objects: List[Object], ray_length=5.0, color='gray', opacity=0.5):
         """
-        Visualizes shadow rays from the hit point to each light source.
-        Parameters:
-            hit: SurfaceInteraction containing the hit point and normal
-            lights: list of Light objects in the scene
-            ray_length: how long the shadow rays should be visualized (default is 5.0 units)
-            color: color of the shadow rays (default is 'gray')
-            opacity: opacity of the shadow rays (default is 0.5)
-            :param objects: list of objects in the scene to check for occlusion (shadows)
+        Shows shadow rays from a hit point to each light source in the scene. For each light, it checks if there is an object blocking the ray from the hit point to the light source. If there is a blocking object, it visualizes the shadow ray in black up to the blocking point. If there is no blocking object, it visualizes the shadow ray in the specified color up to the light source. Ambient lights are skipped since they do not cast shadows.
+
+        :param hit: SurfaceInteraction containing the hit point from which to cast shadow rays
+        :param lights: list of Light instances representing the light sources in the scene
+        :param objects: list of Object instances to check for blocking the shadow rays
+        :param ray_length: maximum length to visualize the shadow rays (default is 5.0 units, but actual length will be adjusted based on distance to light and blocking objects)
+        :param color: color to visualize unblocked shadow rays (default is 'gray')
+        :param opacity: opacity of the shadow rays (default is 0.5)
+        :return:
         """
         if hit is None:
             return
@@ -559,6 +628,12 @@ class Visualizer:
                     self.visualize_ray(Ray(origin=hit_point, direction=light_dir), length=light_dist, color=color, opacity=opacity, label='Shadow Rays (Unblocked)')
 
     def visualize_objects(self, objects: List[Object], opacity=0.3):
+        """
+        Visualizes a list of objects in the scene by plotting their geometry. It supports visualizing spheres, planes, boxes and cylinders but only the defined one in the geometry module. The color of each object is determined by its material properties. You can specify the opacity of the visualized objects to make them more transparent and allow other elements in the scene (like rays and intersections) to be visible through them.
+        :param objects: list of Object instances to visualize
+        :param opacity: opacity of the visualized objects (default is 0.3)
+        :return:
+        """
         for obj in objects:
 
             # SPHERE
@@ -727,7 +802,16 @@ class Visualizer:
 
     def visualize_hit_point(self, hit: SurfaceInteraction, color='white', size=40,
                             show_normal=True, normal_length=0.3, label: str | None = None):
-        """Marks a ray hit point in the 3D scene, with optional surface normal."""
+        """
+        Visualizes a hit point in the scene by plotting a scatter point at the location of the hit. The color and size of the hit point can be customized, and you can choose to show the normal vector at the hit point as well. If show_normal is True, an arrow will be plotted originating from the hit point and pointing in the direction of the normal, with customizable length and color.
+        :param hit: SurfaceInteraction containing the hit point and normal to visualize
+        :param color: color of the hit point marker (default is 'white')
+        :param size: size of the hit point marker (default is 40)
+        :param show_normal: whether to visualize the normal vector at the hit point (default is True)
+        :param normal_length: length of the normal vector arrow if show_normal is True (default is 0.3 units)
+        :param label: optional label for the hit point (will be shown in legend, but only for the first hit point with this label to avoid duplicates)
+        :return:
+        """
         point = _vertex_to_matplotlib(hit.geom.point)
         self.ax.scatter(*point,
                         color=color, s=size,
@@ -738,7 +822,6 @@ class Visualizer:
             self.visualize_normal_at_hit_point(hit, length=normal_length, color=color, alpha=0.8)
 
     def _apply_transform(self, obj: Object, points: np.ndarray) -> np.ndarray:
-
         M = obj.transform.matrix
         world = points[:, [0, 2, 1]]
 
@@ -750,7 +833,6 @@ class Visualizer:
         return transformed[:, [0, 2, 1]]
 
     def _transform_mesh(self, obj, x, y, z):
-        """Transform a meshgrid (x, y, z) of matplotlib coords through obj's world transform."""
         shape = x.shape
         pts = np.stack([x.ravel(), y.ravel(), z.ravel()], axis=1)
         pts = self._apply_transform(obj, pts)
