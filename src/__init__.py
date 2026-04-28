@@ -24,7 +24,7 @@ from .scene import (
 from .material import (
     Color, PhongMaterial, RockMaterial, CheckerMaterial, MarbleMaterial,
     # noise types
-    PerlinNoise, SimplexNoise, FBMNoise, TurbulenceNoise, VoronoiNoise,
+    PerlinNoise, FBMNoise, TurbulenceNoise, VoronoiNoise,
     # procedural textures
 )
 
@@ -60,7 +60,7 @@ __all__ = [
     "Animator", "AnimationSetup", "EaseType", "Easing", "linear", "ease_in_out",
     # Materials & textures
     "Color", "PhongMaterial", "RockMaterial", "CheckerMaterial", "MarbleMaterial",
-    "PerlinNoise", "SimplexNoise", "FBMNoise", "TurbulenceNoise", "VoronoiNoise",
+    "PerlinNoise", "FBMNoise", "TurbulenceNoise", "VoronoiNoise",
     # Shading
     "BlinnPhongShader",
     "DepthShader", "NormalShader", "DiffShader", "DotProductShader", "MaskMethod",

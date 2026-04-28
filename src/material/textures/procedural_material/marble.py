@@ -13,15 +13,14 @@ from src.math import Vector  # adjust import if needed
 @dataclass
 class MarbleMaterial(PhongMaterial):
     """
-    Procedural marble material that simulates the appearance of marble veins using a combination of sine waves and noise.
-        - vein_scale: Controls the frequency of the veins (higher values create more veins)
-        - warp_strength: Controls how much the veins are warped by noise (higher values create more irregular veins)
-        - vein_sharpness: Controls how sharp the veins are (higher values create sharper veins
-        - warp_noise: The noise function used to warp the veins (default is Perlin noise)
-        - noise: Optional noise function that can be used to add additional detail to the material (
-            for example, to create a more rough or bumpy surface)
-        - light_color_factor: Multiplier for the base color in the lighter areas of the veins
-        - dark_color_factor: Multiplier for the base color in the darker areas of the veins
+    Marble material with procedural vein patterns. Uses a combination of sine waves and noise to create the characteristic swirling veins of marble.
+     - vein_scale: Controls the frequency of the veins (higher values create more veins)
+     - warp_strength: Controls how much the noise warps the veins (higher values create more distortion)
+     - vein_sharpness: Controls how sharp the veins are (higher values create sharper veins)
+     - warp_noise: The noise function used to warp the veins (default is Perlin noise)
+     - light_color_factor: Multiplier for the base color in the lighter areas of the veins
+     - dark_color_factor: Multiplier for the base color in the darker areas of the veins
+     - noise: Optional noise function for adding surface detail to the normal (not used for vein generation)
     """
     vein_scale: float = 6.0
     warp_strength: float = 2.0

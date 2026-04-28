@@ -35,7 +35,7 @@ class FBMNoise(Noise):
             amp *= self.gain
             freq *= self.lacunarity
 
-        # normalize the result to roughly [-1, 1]
+        # normalize the result to [-1, 1]
         if sum > 0:
             total /= sum
 

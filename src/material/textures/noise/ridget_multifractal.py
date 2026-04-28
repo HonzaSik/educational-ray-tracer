@@ -30,8 +30,8 @@ class RidgeNoise(Noise):
 
         for _ in range(self.octaves):
             n = self.base.value(x * freq)
-            n = 1.0 - abs(n)       # key idea
-            n *= n                # sharpen ridges
+            n = 1.0 - abs(n)
+            n *= n
             total += amp * n
 
             freq *= self.lacunarity

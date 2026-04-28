@@ -5,8 +5,6 @@ from src.material.textures.noise.noise import Noise
 from src.math.helpers import interpolate, perlin_fade
 import random
 
-# seed for same permutation each run
-random.seed(42)
 perm = list(range(256))
 # shuffle the permutation table to get pseudo-random gradients
 random.shuffle(perm)
