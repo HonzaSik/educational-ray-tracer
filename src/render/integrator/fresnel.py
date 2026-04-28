@@ -1,6 +1,5 @@
 from src.math import Vector
 from src.math.helpers import clamp_float_01
-from src.material.color import Color
 
 def fresnel_schlick(ray_dir: Vector, normal: Vector, ior_out: float = 1.0, ior_in: float = 1.5) -> float:
     """

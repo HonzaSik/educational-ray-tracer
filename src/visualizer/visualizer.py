@@ -595,7 +595,7 @@ class Visualizer:
                     zorder=22, horizontalalignment='left', verticalalignment='bottom')
 
         self.ax.scatter(*p, color=color, s=size, alpha=0.9,
-                        edgecolors='black', linewidths=2, zorder=21, label=self._once(f'Image Plane Point'))
+                        edgecolors='black', linewidths=2, zorder=21, label=self._once('Image Plane Point'))
 
     def visualize_shadow_rays(self, hit: SurfaceInteraction, lights: List[Light], objects: List[Object], ray_length=5.0, color='gray', opacity=0.5):
         """

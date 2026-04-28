@@ -40,7 +40,7 @@ class Transform:
         matrix_inv = np.eye(4)
         matrix_inv[:3, 3] = [-x, -y, -z]
 
-        return Transform(matrix, matrix_inv, matrix_inv.T)
+        return Transform(matrix, matrix_inv, matrix_inv)
 
     @staticmethod
     def scale(scale_x: float, scale_y: float, scale_z: float) -> Transform:
@@ -125,7 +125,8 @@ class Transform:
     def combine(self, other: Transform) -> Transform:
         """
         Apply another transformation on top of this one by matrix multiplication.
-        The resulting transformation is equivalent to first applying 'other' and then 'self'.
+        The resulting transformation is equivalent to first applying 'self'
+        and then 'other'.
         """
         matrix = other.matrix @ self.matrix
         matrix_inv = self.inverse @ other.inverse

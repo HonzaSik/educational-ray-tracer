@@ -5,7 +5,6 @@ from typing import Optional
 from src.material.color import Color
 from src.material.material.material_sample import MaterialSample
 from src.material.textures.noise.noise import Noise
-from src.math.vector import Vector
 
 
 @dataclass

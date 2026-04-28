@@ -1,13 +1,10 @@
 from dataclasses import dataclass, field
 import math
-
-from jupyter_core.application import base_flags
-
 from src.material.color import clamp01
 from src.material.material.phong_material import PhongMaterial, PhongMaterialSample
 from src.material.textures.noise.noise import Noise
 from src.material.textures.noise.perlin_noise import PerlinNoise
-from src.math import Vector  # adjust import if needed
+from src.math import Vector
 
 
 @dataclass

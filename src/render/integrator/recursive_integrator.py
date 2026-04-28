@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from src.render.integrator.integrator import Integrator
 from src.scene.scene import Scene
 from src.geometry.ray import Ray

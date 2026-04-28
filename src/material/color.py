@@ -1,9 +1,12 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Union, Iterable, Any
 import numpy as np
 from src.math import Vec3
 from src.math.helpers import interpolate
+from typing import Union, Iterable, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.scene.skybox import SkyboxHDR
 
 DT = np.float32
 _skybox_cache: dict[str, "SkyboxHDR"] = {}
