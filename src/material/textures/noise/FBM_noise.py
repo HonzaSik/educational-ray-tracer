@@ -27,16 +27,16 @@ class FBMNoise(Noise):
         amp = 1.0
         freq = 1.0
         total = 0.0
-        amp_sum = 0.0
+        sum = 0.0
 
         for _ in range(self.octaves):
             total += amp * self.base.value(x * freq)
-            amp_sum += amp
+            sum += amp
             amp *= self.gain
             freq *= self.lacunarity
 
-        # normalize to roughly [-1, 1]
-        if amp_sum > 0:
-            total /= amp_sum
+        # normalize the result to roughly [-1, 1]
+        if sum > 0:
+            total /= sum
 
         return total * self.strength

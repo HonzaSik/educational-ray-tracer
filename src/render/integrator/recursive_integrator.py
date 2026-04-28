@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from src.render.integrator.integrator import Integrator
 from src.scene.scene import Scene
 from src.geometry.ray import Ray
@@ -8,8 +8,8 @@ from src.material.material.material import Material
 from src.scene.light import Light
 from src.math.vector import Vector
 from src.math.optics import reflect, refract
-from src.shading.extended_blinn_phong_shader import ExtendedBlinnPhongShader
-from src.shading.fresnel import fresnel_schlick
+from src.shading.blinn_phong_shader import BlinnPhongShader
+from src.render.integrator.fresnel import fresnel_schlick
 from src.shading.local_shading import LocalShading, apply_noise_normal_perturbation
 
 @dataclass
@@ -18,9 +18,11 @@ class RecursiveIntegrator(Integrator):
     scene: Scene
     lights: list[Light]
     shader: LocalShading | None = None
-    skybox: str | None = None
-    _bias_scale: float = 1e-3
     _bias_min: float = 1e-3
+
+    def __post_init__(self):
+        if self.shader is None:
+            self.shader = BlinnPhongShader()
 
     def cast_ray(self, ray: Ray, depth: int | None = None) -> Color:
         """
@@ -30,25 +32,21 @@ class RecursiveIntegrator(Integrator):
         :return:
         """
 
-        if self.shader is None:
-            self.shader = ExtendedBlinnPhongShader()
-
         if depth is None:
             depth = self.max_depth
 
-        if depth <= 0:
-            return Color.custom_rgb(0, 0, 0)
-
-        # determine the closest intersection of the ray with the scene geometry but if there is no intersection, return the background color (which may be determined by a skybox if one is present in the scene)
         hit = self.scene.intersect(ray)
         if hit is None:
-            return Color.background_color(ray.direction, skybox=self.skybox)
+            return Color.background_color(ray.direction, skybox=self.scene.skybox)
 
-        local_color = self.shader.shade_multiple_lights(hit=hit, lights=self.lights, view_dir=-ray.direction, scene=self.scene)
+        local_color = self.shader.shade_multiple_lights(
+            hit=hit, lights=self.lights, view_dir=-ray.direction, scene=self.scene
+        )
 
-        # this catches the case where user creates a material that doesn't have reflectance or transparency properties, in which case we just do local shading without reflection/refraction
+        if depth <= 0:
+            return local_color
+
         material = hit.material
-
         reflectivity = material.get_reflectance()
         transparency = material.get_transparency()
 
@@ -57,45 +55,35 @@ class RecursiveIntegrator(Integrator):
 
         n_geom, n_shade = self._get_normals(hit, material)
 
-        if reflectivity > 0.0 and transparency > 0.0:
-            # Make two recursive calls: one for reflection and one for refraction, and combine the results using approximated Fresnel equations by Schlick's approximation
-            reflected_ray = self._reflection_ray(ray, hit, n_geom, n_shade)
-            refracted_ray = self._refraction_ray(ray, hit, n_geom, n_shade, material)
-            reflected_color = self.cast_ray(reflected_ray, depth - 1)
-            refracted_color = self.cast_ray(refracted_ray, depth - 1)
+        if transparency > 0.0:
+            result = local_color * (1.0 - transparency)
 
-            ior_m = material.get_ior()
-            front_face = n_shade.dot(ray.direction) < 0.0
-            ior_out, ior_in = (1.0, ior_m) if front_face else (ior_m, 1.0)
-            kr = fresnel_schlick(ray.direction, n_shade, ior_out=ior_out, ior_in=ior_in)
-
-            result = (
-                    local_color * (1.0 - kr) * (1.0 - transparency) # local color contribution is reduced by both reflectivity and transparency
-                    + reflected_color * kr # reflected color contribution is determined by the Fresnel reflectance
-                    + refracted_color * (1.0 - kr) * transparency # refracted color contribution is reduced by the Fresnel reflectance and transparency
-            )
-
-        elif reflectivity > 0.0:
-            # Only reflection, no refraction
             reflected_ray = self._reflection_ray(ray, hit, n_geom, n_shade)
             reflected_color = self.cast_ray(reflected_ray, depth - 1)
-            result = local_color * (1.0 - reflectivity) + reflected_color * reflectivity
 
-        elif transparency > 0.0:
-            # Only refraction, no reflection
+            kr = self._fresnel(ray, n_shade, material)
             refracted_ray = self._refraction_ray(ray, hit, n_geom, n_shade, material)
-            refracted_color = self.cast_ray(refracted_ray, depth - 1)
-            result = local_color * (1.0 - transparency) + refracted_color * transparency
 
-        else:
-            # No reflection or refraction, just local shading
-            result = local_color
+            if refracted_ray is None:
+                result += reflected_color * transparency
+            else:
+                refracted_color = self.cast_ray(refracted_ray, depth - 1)
+                result += reflected_color * (transparency * kr)
+                result += refracted_color * (transparency * (1.0 - kr))
 
-        return result
+            return result
+
+        if reflectivity > 0.0:
+            reflected_ray = self._reflection_ray(ray, hit, n_geom, n_shade)
+            reflected_color = self.cast_ray(reflected_ray, depth - 1)
+            return local_color * (1.0 - reflectivity) + reflected_color * reflectivity
+
+        return local_color
 
     @staticmethod
     def _get_normals(hit: SurfaceInteraction, material: Material) -> tuple[Vector, Vector]:
-        # gets the geometric normal and the shading normal (which may be perturbed by normal noise) for the hit point this is important for correct reflection/refraction ray generation
+        # geometric normal are real surface normals used for ray offsetting
+        # shading normal may be perturbed by a normal-noise map
         n_geom = hit.geom.normal.normalize()
         if hasattr(material, "normal_noise"):
             n_shade = apply_noise_normal_perturbation(hit, material.normal_noise, n_geom)
@@ -107,24 +95,35 @@ class RecursiveIntegrator(Integrator):
         return self._bias_min
 
     def _reflection_ray(self, ray: Ray, hit: SurfaceInteraction, n_geom: Vector, n_shade: Vector) -> Ray:
+        # flip shading normal to face against the incoming ray
         n = n_shade if n_shade.dot(ray.direction) <= 0.0 else -n_shade
         R = reflect(ray.direction, n).normalize()
-        origin = hit.geom.point + n_geom * self._bias()
+        # bias along the geometric normal to avoid self-intersection on the true surface
+        n_geom_facing = n_geom if n_geom.dot(ray.direction) <= 0.0 else -n_geom
+        origin = hit.geom.point + n_geom_facing * self._bias()
         return Ray(origin, R)
 
-    def _refraction_ray(self, ray: Ray, hit: SurfaceInteraction, n_geom: Vector, n_shade: Vector, material: Material) -> Ray:
-        ior_m = getattr(material, "ior", 1.5)
+    def _refraction_ray(self, ray: Ray, hit: SurfaceInteraction, n_geom: Vector, n_shade: Vector, material: Material) -> Ray | None:
+        ior_m = material.get_ior()
         front_face = n_shade.dot(ray.direction) < 0.0
         outward_n = n_shade if front_face else -n_shade
         ior_out, ior_in = (1.0, ior_m) if front_face else (ior_m, 1.0)
-        bias = self._bias()
 
+        # tdir is the refracted ray direction. If None, total internal reflection occurs and we should not cast a refraction ray.
         Tdir = refract(ray.direction, outward_n, ior_out=ior_out, ior_in=ior_in)
-
         if Tdir is None:
-            R = reflect(ray.direction, outward_n).normalize()
-            origin = hit.geom.point + n_geom * bias
-            return Ray(origin, R)
+            return None
 
-        origin = hit.geom.point - n_geom * bias
+        # bias into the surface (opposite side from reflection)
+        n_geom_facing = n_geom if n_geom.dot(ray.direction) <= 0.0 else -n_geom
+        origin = hit.geom.point - n_geom_facing * self._bias()
         return Ray(origin, Tdir.normalize())
+
+    @staticmethod
+    def _fresnel(ray: Ray, n_shade: Vector, material: Material) -> float:
+        # Schlick's approximation, with air assumed on the outside
+        ior_m = material.get_ior()
+        front_face = n_shade.dot(ray.direction) < 0.0
+        n = n_shade if front_face else -n_shade
+        ior_out, ior_in = (1.0, ior_m) if front_face else (ior_m, 1.0)
+        return fresnel_schlick(ray.direction, n, ior_out=ior_out, ior_in=ior_in)

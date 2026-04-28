@@ -15,6 +15,9 @@ class SurfaceInteraction:
     def hit_surface(self) -> GeometryHit:
         return self.geom
 
+    def get_material(self) -> Material:
+        return self.material
+
     @property
     def point(self): return self.geom.point
 

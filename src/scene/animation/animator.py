@@ -50,8 +50,8 @@ class Animator:
     Handles animation setup and frame generation.
     """
     animation_setup: AnimationSetup = None
-    animation_fps: int = 24  # todo move to QualityPreset
-    animation_length_seconds: float = 2.0  # todo move to QualityPreset
+    animation_fps: int = 24
+    animation_length_seconds: float = 2.0
     ray_tracer: RenderLoop | None = None
 
     _total_frames: int = 0
@@ -80,8 +80,6 @@ class Animator:
         elif ease == EaseType.EASE_IN_OUT:
             return ease_in_out(t)
         return t
-
-    # todo add more easing functions if needed in ease.py and here _apply_ease mb move to ease.py
 
     def create_png_sequence(
             self,
@@ -184,7 +182,6 @@ class Animator:
 
             # render individual frame as PNG by sequence - frame_0000.png, frame_0001.png, ...
             path = folder / f"frame_{frame_i:04d}.png"
-            spp, max_depth = (1, 5)  # todo remove hardcode later add to QualityPreset or params
 
             self.ray_tracer.render(str(path.resolve()))
 
@@ -205,7 +202,7 @@ class Animator:
         from src.io.video import frames_to_mp4
 
         if output_path is None:
-            output_path = Path("./animatons/animation.mp4")
+            output_path = Path("./animations/animation.mp4")
         elif not isinstance(output_path, Path):
             output_path = Path(output_path)
 

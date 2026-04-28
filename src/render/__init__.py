@@ -10,6 +10,7 @@ from .post_process import PostProcessConfig
 from .post_process import post_process_pipeline
 
 from .render_config import RenderConfig
+from .integrator import fresnel_schlick
 
 __all__ = [
     'RecursiveIntegrator',
@@ -20,5 +21,6 @@ __all__ = [
     'RenderLoop', 'ImgFormat',
     "PostProcessConfig",
     "post_process_pipeline",
-    "RenderConfig"
+    "RenderConfig",
+    "fresnel_schlick",
 ]

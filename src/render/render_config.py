@@ -18,8 +18,8 @@ class RenderConfig:
     def __post_init__(self):
         if self.samples_per_pixel <= 0:
             raise ValueError("Samples must be a positive integer.")
-        if self.max_depth <= 0:
-            raise ValueError("Max depth must be a positive integer.")
+        if self.max_depth < 0:
+            raise ValueError("Max depth must be a non-negative integer.")
 
     def set_resolution(self, resolution: Resolution) -> None:
         self.resolution = resolution

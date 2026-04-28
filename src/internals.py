@@ -36,6 +36,7 @@ from .render import (
     Integrator,
     RenderLoop,
     ImgFormat,
+    fresnel_schlick,
 )
 
 from .io import (
@@ -49,6 +50,11 @@ from .visualizer import (
     Visualizer,
 )
 
+from .math import (
+    clamp_float_01, interpolate, perlin_fade, lerp
+)
+
+
 __all__ = [
     "Vec3",
     "SurfaceInteraction", "Light", "LightType",
@@ -60,5 +66,7 @@ __all__ = [
     "reflect", "refract",
     "image_pipeline",
     "Visualizer",
-    "light_dir_dist", "in_shadow"
+    "light_dir_dist", "in_shadow",
+    "fresnel_schlick",
+    "clamp_float_01", "interpolate", "perlin_fade", "lerp"
 ]

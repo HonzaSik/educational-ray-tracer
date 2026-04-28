@@ -17,6 +17,9 @@ def interpolate(a: float, b: float, t: float) -> float:
     """
     return (1.0 - t) * a + b * t
 
+def old_perlin_fade(t: float) -> float:
+    # Old fade function as defined by Ken Perlin.
+    return t * t * (3.0 - 2.0 * t)
 
 def perlin_fade(t: float) -> float:
     # Fade function as defined by Ken Perlin.

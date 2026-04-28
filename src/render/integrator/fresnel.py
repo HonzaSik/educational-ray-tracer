@@ -4,7 +4,7 @@ from src.material.color import Color
 
 def fresnel_schlick(ray_dir: Vector, normal: Vector, ior_out: float = 1.0, ior_in: float = 1.5) -> float:
     """
-    Schlickova aproximace Fresnelovy odrazivosti.
+    Schlick's approximation for Fresnel reflectance.
     ray_dir  ... směr paprsku ve směru letu
     normal   ... geometrická normála směřující ven z povrchu
     ior_out  ... index lomu prostředí, ze kterého paprsek přichází

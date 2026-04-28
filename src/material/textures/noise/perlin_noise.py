@@ -17,7 +17,6 @@ def _grad(h: int, x: float, y: float, z: float) -> float:
     h &= 15
     # first 8 cases refer x, next 8 to y (axis U)
     u = x if h < 8 else y
-    # 0-3: y, 12,14: x; else z (axis V) this way mixes directions to not to align with axes
     v = y if h < 4 else (x if h in (12, 14) else z)
     # final gradient value is a combination of the two axes with signs directed by bits 0 and 1 of h
     return (u if (h & 1) == 0 else -u) + (v if (h & 2) == 0 else -v)
@@ -26,12 +25,13 @@ def _grad(h: int, x: float, y: float, z: float) -> float:
 @dataclass
 class PerlinNoise(Noise):
     """
-    Perlin noise texture. A classic procedural noise function that generates smooth, natural-looking patterns. It works by assigning pseudo-random gradient vectors to the corners of a grid and then interpolating between them based on the position of the point being sampled. The result is a continuous noise function that can be used for various effects like terrain generation, cloud textures, and more.
-     - The 'value' method computes the noise value at a given 3D point by determining which grid cell it falls into, calculating the contribution from each of the cell's corners based on their gradients, and then blending those contributions together using a fade function for smooth transitions.
-     - The permutation table is duplicated to avoid overflow when accessing gradients, allowing for seamless tiling of the noise.
-     - The output is typically in the range [-1, 1], which can be scaled and offset as needed for different applications.
-     This implementation is based on Ken Perlin's original algorithm and is widely used in computer graphics for its efficiency and visual quality.
-     Note: The permutation table is a key component of the algorithm, providing a way to generate consistent pseudo-random gradients without needing to store a large number of them. By shuffling a list of integers and using it to index into a gradient function, we can create a noise pattern that appears random but is actually deterministic based on the initial seed.
+    Perlin noise implementation based on Ken Perlin's 2002 algorithm. This implementation generates smooth, continuous noise values in 3D space.
+     - Uses a permutation table to generate pseudo-random gradients at the corners of the unit cube containing the point.
+     - The noise value is computed by blending the contributions from the corners based on the point's location within the cube and a fade function for smooth transitions.
+     - The output is a value in the range [-1, 1] that can be used for procedural texturing and other applications.
+     - The permutation table is duplicated to avoid overflow in gradient lookups, allowing for seamless tiling of the noise pattern.
+     - The fade function used is a quintic polynomial that provides smoother transitions between grid points compared to a simple linear fade.
+     - This implementation is designed for 3D noise but can be adapted for 2D or 4D by modifying the gradient function and input parameters accordingly.
     """
     #for speed, we duplicate the permutation list
     perm: list[int] = field(default_factory=lambda: perm + perm)

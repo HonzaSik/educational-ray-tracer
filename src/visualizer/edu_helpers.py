@@ -73,21 +73,17 @@ def sample_grid(noise_fn):
     return grid
 
 
-def show(grid, title=""):
+def visualize_noise_2D(grid, title="", size=(7, 7)):
     """
-    Simple visualization of a noise grid with optional gradient arrows.
-    :param grid: 2D array of noise values to visualize
-    :param title: Title for the plot
-    :param vmin: Minimum value for color scaling (default -1)
-    :param vmax: Maximum value for color scaling (default 1)
-    :return: None
+    Shows a 2D grid of noise values as an image. The grid is visualized using a color map that maps noise values to colors.
+    The function creates a plot with the specified title and displays the grid as an image, with axes labeled and a color bar indicating the mapping of noise values to colors.
     """
-    fig, ax = plt.subplots(figsize=(7, 7))
+    fig, ax = plt.subplots(figsize=size)
 
     img = ax.imshow(
         grid,
         origin="upper",
-        extent=[0, COLS, ROWS, 0],
+        extent=(0.0, float(COLS), float(ROWS), 0.0),
         cmap=COL_MAP,
         vmin=-1,
         vmax=1,
@@ -96,9 +92,9 @@ def show(grid, title=""):
     )
 
     for x in range(COLS + 1):
-        ax.axvline(x, color="blue", lw=1.2)
+        ax.axvline(x, color="blue", lw=1)
     for y in range(ROWS + 1):
-        ax.axhline(y, color="blue", lw=1.2)
+        ax.axhline(y, color="blue", lw=1)
 
     ax.set_title(title)
     ax.set_xlabel("x")

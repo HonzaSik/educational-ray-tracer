@@ -14,7 +14,7 @@ class Scene:
     camera: Camera
     lights: list[Light] = field(default_factory=list)
     objects: list[Object] = field(default_factory=list)
-    skybox: str | None = None
+    skybox: str | None = None # path to skybox texture HDR or "black", "white", or "sky" for built-in options
 
 
     def __str__(self) -> str:

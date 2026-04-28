@@ -1,7 +1,7 @@
 from .noise import Noise, FBMNoise, PerlinNoise, SimplexNoise, TurbulenceNoise, VoronoiNoise
-from .procedural_material import ProceduralMaterial, checker, marble, rock
+from .procedural_material import CheckerMaterial, RockMaterial, MarbleMaterial
 
 __all__ = [
     "Noise", "FBMNoise", "PerlinNoise", "SimplexNoise", "TurbulenceNoise", "VoronoiNoise",
-    "ProceduralMaterial", "checker", "marble", "rock"
+    "CheckerMaterial", "RockMaterial", "MarbleMaterial",
 ]

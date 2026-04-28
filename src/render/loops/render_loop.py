@@ -7,7 +7,6 @@ from typing import Tuple, List, Optional
 from src.scene.camera.camera import Camera
 from src.scene.light import Light
 from src.shading.local_shading import LocalShading
-from src.shading.blinn_phong_shader import BlinnPhongShader
 from .progress import ProgressUI, PreviewConfig, ProgressDisplay
 from src.scene.scene import Scene
 from src.render.render_config import RenderConfig
@@ -74,10 +73,6 @@ class RenderLoop(ABC):
             preview=self.preview_config if self.preview_config is not None else PreviewConfig()
         )
 
-        if self.spp <= 0:
-            raise ValueError("Samples per pixel must be a positive integer.")
-        if self.max_depth <= 0:
-            raise ValueError("Max depth must be a positive integer.")
         if self.width <= 0 or self.height <= 0:
             raise ValueError("Image width and height must be positive integers.")
         if self.ui is None:
@@ -92,7 +87,6 @@ class RenderLoop(ABC):
             scene=self.scene,
             lights=self.lights,
             shader=self.shader,
-            skybox=self.skybox
         )
 
     def on_row_end_update_preview(self, current_row: int, pixels_u8: List[Tuple[int, int, int]]) -> None:

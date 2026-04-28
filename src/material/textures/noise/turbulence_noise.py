@@ -25,15 +25,15 @@ class TurbulenceNoise(Noise):
         amp = 1.0
         freq = 1.0
         total = 0.0
-        amp_sum = 0.0
+        summ = 0.0
 
         for _ in range(self.octaves):
             total += amp * abs(self.base.value(x * freq))
-            amp_sum += amp
+            summ += amp
             amp *= self.gain
             freq *= self.lacunarity
 
-        if amp_sum > 0:
-            total /= amp_sum
+        if summ > 0:
+            total /= summ
 
         return total * self.strength

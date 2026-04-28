@@ -4,8 +4,7 @@
 
 # Geometry primitives
 from .geometry import (
-    Sphere, Plane, Box, Cylinder, Torus, Triangle, Square,
-    Primitive,
+    Sphere, Plane, Box, Cylinder, Torus, Triangle, Square, Primitive,
 )
 
 # Math
@@ -17,17 +16,16 @@ from .math import (
 # Scene & animation setup
 from .scene import (
     Scene, Camera, Object, PinholeCamera,
-    AmbientLight, PointLight, SpotLight, DirectionalLight,
+    AmbientLight, PointLight, SpotLight, DirectionalLight, PointLightFalloff,
     Animator, AnimationSetup, EaseType, Easing, linear, ease_in_out,
 )
 
 # Materials, procedural textures, and noise functions
 from .material import (
-    Color, PhongMaterial, ProceduralMaterial,
+    Color, PhongMaterial, RockMaterial, CheckerMaterial, MarbleMaterial,
     # noise types
     PerlinNoise, SimplexNoise, FBMNoise, TurbulenceNoise, VoronoiNoise,
     # procedural textures
-    checker, marble, rock,
 )
 
 # Shaders for rendering, debugging, and educational purposes
@@ -53,17 +51,16 @@ from .io import (
 
 __all__ = [
     # Geometry primitive classes
-    "Sphere", "Plane", "Box", "Torus", "Triangle", "Square", "Primitive",
+    "Sphere", "Plane", "Box", "Torus", "Triangle", "Square", "Primitive", "Cylinder",
     # Math
     "Vertex", "Vector",
     # Scene & animation
     "Scene", "Camera", "Object", "PinholeCamera",
-    "AmbientLight", "PointLight", "SpotLight", "DirectionalLight",
+    "AmbientLight", "PointLight", "SpotLight", "DirectionalLight", "PointLightFalloff",
     "Animator", "AnimationSetup", "EaseType", "Easing", "linear", "ease_in_out",
     # Materials & textures
-    "Color", "PhongMaterial", "ProceduralMaterial",
+    "Color", "PhongMaterial", "RockMaterial", "CheckerMaterial", "MarbleMaterial",
     "PerlinNoise", "SimplexNoise", "FBMNoise", "TurbulenceNoise", "VoronoiNoise",
-    "checker", "marble", "rock",
     # Shading
     "BlinnPhongShader",
     "DepthShader", "NormalShader", "DiffShader", "DotProductShader", "MaskMethod",

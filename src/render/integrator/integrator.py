@@ -5,6 +5,8 @@ from src.geometry.ray import Ray
 
 class Integrator(ABC):
 
+    scene: object # not a strict type, but should be a Scene for experimental purposes. Want to keep it flexible for different integrator implementations
+
     @abstractmethod
     def cast_ray(self, ray: Ray, depth: int | None = None) -> Color:
         """

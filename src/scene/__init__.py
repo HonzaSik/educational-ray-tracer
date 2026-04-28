@@ -1,5 +1,5 @@
 from src.scene.camera import Camera, PinholeCamera
-from .light import Light, AmbientLight, PointLight, LightType, SpotLight, DirectionalLight
+from .light import Light, AmbientLight, PointLight, LightType, SpotLight, DirectionalLight, PointLightFalloff
 from .scene import Scene
 from .object import Object
 from .surface_interaction import SurfaceInteraction
@@ -10,7 +10,7 @@ from .animation import EaseType, linear, ease_in_out, Easing
 
 __all__ = [
     "Camera", "PinholeCamera",
-    "Light", "AmbientLight", "PointLight", "LightType", "SpotLight", "DirectionalLight",
+    "Light", "AmbientLight", "PointLight", "LightType", "SpotLight", "DirectionalLight", "PointLightFalloff",
     "Scene",
     "Object",
     "SurfaceInteraction",

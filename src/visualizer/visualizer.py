@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from src import Camera, Sphere, Plane, Square, Triangle, PinholeCamera
+from src import Camera, Sphere, Plane, Square, Triangle
 from src.geometry.geometry_hit import GeometryHit
 from src.geometry.primitives import Box, Cylinder, Torus
 from src.scene.light import LightType, Light
@@ -296,7 +296,7 @@ class Visualizer:
         else:
             raise RuntimeError("No figure to show. Please create a scene first.")
 
-    def plot_camera_position_and_orientation(self,
+    def visualize_camera_position_and_orientation(self,
                                              camera: 'Camera',
                                              arrow_length=1,
                                              show_frustum=True,
@@ -344,13 +344,13 @@ class Visualizer:
                 )
 
         if show_plane:
-            self.plot_image_plane(camera, show_plane_corners=show_plane_corners)
+            self.visualize_image_plane(camera, show_plane_corners=show_plane_corners)
 
         if show_frustum:
-            self.plot_frustum(camera, extended_depth=frustum_depth - 1.0)
+            self.visualize_frustum(camera, extended_depth=frustum_depth - 1.0)
 
 
-    def plot_frustum(self, camera: Camera, extended_depth=5.0):
+    def visualize_frustum(self, camera: Camera, extended_depth=5.0):
         """
         Plot camera frustum showing the view volume edges.
 
@@ -414,7 +414,7 @@ class Visualizer:
                     linestyle=':',
                     label='Extended Frustum' if i == 0 else None)
 
-    def plot_image_plane(self, camera: Camera, show_plane_corners=False):
+    def visualize_image_plane(self, camera: Camera, show_plane_corners=False):
         """
         Plot the image plane rectangle with corner labels.
 
@@ -568,7 +568,7 @@ class Visualizer:
                        color=color, arrow_length_ratio=0.3, linewidth=1.3,
                        alpha=alpha, label=self._once("Normal at Hit Point"))
 
-    def show_image_plane_point(self, camera: Camera, u: float, v: float,color='purple', size=20, label: bool = False):
+    def visualize_image_plane_point(self, camera: Camera, u: float, v: float,color='purple', size=20, label: bool = False):
         """
         Shows a point on the camera's image plane corresponding to the given (u, v) coordinates. The (u, v) coordinates are normalized device coordinates where (-1, -1) is the bottom-left corner of the image plane and (1, 1) is the top-right corner. The color and size of the point can be customized, and you can optionally label the point with its (u, v) coordinates.
         :param camera: Camera object containing the position and orientation of the camera, as well as the parameters defining the image plane (half_width, half_height, forward, right, up)
@@ -597,7 +597,7 @@ class Visualizer:
         self.ax.scatter(*p, color=color, s=size, alpha=0.9,
                         edgecolors='black', linewidths=2, zorder=21, label=self._once(f'Image Plane Point'))
 
-    def show_shadow_rays(self, hit: SurfaceInteraction, lights: List[Light], objects: List[Object], ray_length=5.0, color='gray', opacity=0.5):
+    def visualize_shadow_rays(self, hit: SurfaceInteraction, lights: List[Light], objects: List[Object], ray_length=5.0, color='gray', opacity=0.5):
         """
         Shows shadow rays from a hit point to each light source in the scene. For each light, it checks if there is an object blocking the ray from the hit point to the light source. If there is a blocking object, it visualizes the shadow ray in black up to the blocking point. If there is no blocking object, it visualizes the shadow ray in the specified color up to the light source. Ambient lights are skipped since they do not cast shadows.
 
@@ -616,16 +616,34 @@ class Visualizer:
 
         for light in lights:
             if light.type == LightType.AMBIENT:
-                continue  # ambient light doesn't cast shadows
+                continue
 
             light_dir, light_dist = light_dir_dist(hit, light)
+            shadow_ray = Ray(origin=hit_point, direction=light_dir)
 
+            blocked = False
             for obj in objects:
-                shadow_hit = obj.geometry.intersect(Ray(origin=hit_point, direction=light_dir))
+                shadow_hit = obj.geometry.intersect(shadow_ray)
                 if shadow_hit is not None and shadow_hit.dist < light_dist:
-                    self.visualize_ray(Ray(origin=hit_point, direction=light_dir), color='black', opacity=opacity, ended_by_point=light.position, label='Shadow Rays (Blocked)')
-                else:
-                    self.visualize_ray(Ray(origin=hit_point, direction=light_dir), length=light_dist, color=color, opacity=opacity, label='Shadow Rays (Unblocked)')
+                    blocked = True
+                    break
+
+            if blocked:
+                self.visualize_ray(
+                    shadow_ray,
+                    color='black',
+                    opacity=opacity,
+                    ended_by_point=light.position,
+                    label='Shadow Rays (Blocked)'
+                )
+            else:
+                self.visualize_ray(
+                    shadow_ray,
+                    length=light_dist,
+                    color=color,
+                    opacity=opacity,
+                    label='Shadow Rays (Unblocked)'
+                )
 
     def visualize_objects(self, objects: List[Object], opacity=0.3):
         """

@@ -25,7 +25,7 @@ class PhongMaterialSample(MaterialSample):
     ambient_color: Color = field(default_factory=lambda: Color.custom_rgb(30, 30, 30))
     shininess: float = 32.0
     reflectivity: float = 0.0
-    ior: float = 1.5
+    ior: float = 1.0
     transparency: float = 0.0
     normal_noise: Optional[Noise] = None
 
@@ -95,6 +95,11 @@ class PhongMaterial(Material):
                 raise ValueError(
                     f"{attr} must be between {min_val} and {max_val}, got {value}"
                 )
+
+        total = self.reflectivity + self.transparency
+        if total > 1.0:
+            self.reflectivity /= total
+            self.transparency /= total
 
     def get_color(self) -> Color:
         return self.base_color

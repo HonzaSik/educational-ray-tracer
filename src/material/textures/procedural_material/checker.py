@@ -10,7 +10,7 @@ class CheckerMaterial(PhongMaterial):
     """
     scale: float = 1.0
 
-    def phong_sample(self, hit):
+    def sample(self, hit):
         s = hit.point.x * self.scale
         t = hit.point.z * self.scale
 

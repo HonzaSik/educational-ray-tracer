@@ -282,6 +282,22 @@ class Color:
         col_np = _as_np3(col)
         return cls(float(col_np[0]), float(col_np[1]), float(col_np[2]))
 
+    def to_matplotlib(self):
+        """
+        return color as a tuple of (r,g,b) in [0..1] for use in matplotlib.
+        :return:
+        """
+        r, g, b = self.as_rgb()
+        return clamp01(r), clamp01(g), clamp01(b)
+
+    def is_too_dark(self, threshold: float = 0.01) -> bool:
+        """
+        return True if the color is too dark (all components below the threshold).
+        :param threshold: threshold for darkness, default is 0.01 (1% of full brightness)
+        :return: True if the color is too dark, False otherwise
+        """
+        r, g, b = self.as_rgb()
+        return r < threshold and g < threshold and b < threshold
 
 # color presets
 

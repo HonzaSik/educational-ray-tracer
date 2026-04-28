@@ -7,6 +7,10 @@ from src.math.vertex import Vertex
 class Noise(ABC):
     """
     Abstract base class for procedural noise textures.
+    scale: A scaling factor applied to the input coordinates before sampling the noise function.
+    offset: A vector added to the input coordinates before sampling the noise function, allowing for shifting the noise pattern in space.
+    strength: A multiplier applied to the final noise value, controlling the intensity of the noise effect.
+    eps: A small epsilon value used to prevent issues with floating-point precision when sampling the noise function, especially for functions that may have discontinuities
     """
     scale: float = 1.0
     offset: Vector = field(default_factory=lambda: Vector(0.0, 0.0, 0.0))
